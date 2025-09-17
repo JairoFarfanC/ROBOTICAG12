@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.20)
 project(ejemplo1)
 MESSAGE( STATUS "COMPILING WITH QT6" )
 find_package(Qt6 REQUIRED COMPONENTS Gui Widgets Sql Core OpenGL Xml  )
