@@ -51,6 +51,7 @@ void ejemplo1::doSlide()
 {
 	qDebug() << "slide detected";
 	timer.start(horizontalSlider->value());
+	printf("ESTO ES UNA PRUEBA");
 }
 
 
