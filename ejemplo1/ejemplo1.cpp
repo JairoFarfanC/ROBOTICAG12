@@ -6,16 +6,21 @@ ejemplo1::ejemplo1(): Ui_Counter()
 	show();
 	connect(button, SIGNAL(clicked()), this, SLOT(doButton()) );
 	connect(&timer, SIGNAL(timeout()), this, SLOT(doCount()) );
-	connect(horizontalSlider, SIGNAL(valueChanged()), this, SLOT(doSlide()) );
+	connect(horizontalSlider, SIGNAL(sliderReleased()), this, SLOT(doSlide()) );
 
 	static int cSpeed=500;
-	timer.start(500);l
+	timer.start(cSpeed);
+
 
 	horizontalSlider->setRange(0,5000); //max cada 5 segundos cuenta
-	horizontalSlider->setValue(cSpeed);
+	horizontalSlider->setTickInterval(500);
+
+
+
 
 
 	//reemplaza por lectura de slider
+
 }
 
 void ejemplo1::doButton()
@@ -42,10 +47,10 @@ void ejemplo1::doCount(){
 	lcdNumber->display(value++);
 }
 
-int ejemplo1::doSlide()
+void ejemplo1::doSlide()
 {
-
-
+	qDebug() << "slide detected";
+	timer.start(horizontalSlider->value());
 }
 
 

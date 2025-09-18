@@ -16,7 +16,7 @@ class ejemplo1 : public QWidget, public Ui_Counter
 public slots:
     void doButton();
     void doCount();
-    int doSlide();
+    void doSlide();
 
 private:
     QTimer timer;
