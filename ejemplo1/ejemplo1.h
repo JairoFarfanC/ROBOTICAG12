@@ -17,10 +17,12 @@ public slots:
     void doButton();
     void doCount();
     void doSlide();
+    void reset();
 
 private:
     QTimer timer;
     QSlider *slider;
+    int cont = 0;
 };
 
 #endif // ejemplo1_H
