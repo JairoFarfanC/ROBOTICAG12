@@ -1,0 +1,18 @@
+Explain each line of the code:
+
+1. What is a concept in C++. Which is it role in our code?
+    El concept es una etiqueta que sirve como filtro y describe los requisitos que un tipo debe cumplir para ser usado en plantillas.
+    En nuestro programa se usa para especificar que la unica entrada invocable sean aquellas de la class "Timer".
+
+2. What is a templated method like connect?
+   Un metodo templated permite que el compilador cree automaticamente una version adaptada del mismo segun el tipo de variable que le pases.
+
+3. How is the lambda thread capturing variables? Which variables?
+
+4. Which restrictions has the f variable to be invoked?
+
+5. What does the detach method do?
+
+6. What are the std::atomic_bool and std::atomic_int types. Why do they not need a mutex?std::invoke
+
+
