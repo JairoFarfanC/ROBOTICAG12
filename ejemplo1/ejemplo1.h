@@ -6,6 +6,8 @@
 #include <QTimer>
 #include <QSlider>
 
+#include "Timer.h"
+
 
 class ejemplo1 : public QWidget, public Ui_Counter
 {
@@ -20,9 +22,12 @@ public slots:
     void reset();
 
 private:
-    QTimer timer;
+    Timer timer;
+    //QTimer timer;
     QSlider *slider;
     int cont = 0;
 };
+
+
 
 #endif // ejemplo1_H

@@ -6,9 +6,10 @@ ejemplo1::ejemplo1(): Ui_Counter()
 	show();
 	connect(stop_button, SIGNAL(clicked()), this, SLOT(doButton()) );
 	connect(reset_button, SIGNAL(clicked()), this, SLOT(reset()) );
-
-	connect(&timer, SIGNAL(timeout()), this, SLOT(doCount()) );
 	connect(horizontalSlider, SIGNAL(sliderReleased()), this, SLOT(doSlide()) );
+
+	//connect(&timer, SIGNAL(timeout()), this, SLOT(doCount()) );
+	timer.connect(std::bind(&ejemplo1::doCount, this));
 
 	static int cSpeed=500;
 	timer.start(cSpeed);
@@ -47,8 +48,7 @@ void ejemplo1::doCount(){
 void ejemplo1::doSlide()
 {
 	qDebug() << "slide detected";
-	timer.start(horizontalSlider->value());
-	printf("ESTO ES UNA PRUEBA");
+	timer.setInterval(horizontalSlider->value());
 }
 
 void ejemplo1::reset()

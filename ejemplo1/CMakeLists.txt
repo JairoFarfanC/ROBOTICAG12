@@ -20,9 +20,12 @@ MACRO (QT_WRAP_UI output )
 ENDMACRO(QT_WRAP_UI)
 
 include_directories(${QT_INCLUDES} ${CMAKE_CURRENT_BINARY_DIR})
+ADD_DEFINITIONS(-std=c++23 -Wextra)
 
 # Sources set
-SET ( SOURCES  ${SOURCES}  ejemplo1.cpp  main.cpp )
+SET ( SOURCES  ${SOURCES}  ejemplo1.cpp  main.cpp
+        cmake-build-debug/Timer.cpp
+        Timer.h)
 # Headers set
 SET ( HEADERS  ${HEADERS} ejemplo1.h )
 
