@@ -91,6 +91,79 @@ int ejemplo1::doRandom() {
 
 }
 
+void ejemplo1::testContainers() {
+    std::cout << "=== Test de Velocidad ===" << std::endl;
+
+    // ---------- VECTOR ----------
+    size_t N = 1'000'000; // tamaño (ajústalo según tu PC)
+    std::vector<int> v(N);
+
+    // Generador de aleatorios
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> dist(1, 100);
+
+    // Rellenar vector
+    for (size_t i = 0; i < N; ++i) {
+        v[i] = dist(gen);
+    }
+
+    // Sort
+    auto start = std::chrono::high_resolution_clock::now();
+    std::sort(v.begin(), v.end());
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    std::cout << "Sort took " << duration << " ms" << std::endl;
+
+    // Min element
+    start = std::chrono::high_resolution_clock::now();
+    auto minIt = std::min_element(v.begin(), v.end());
+    end = std::chrono::high_resolution_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+    std::cout << "Min element took " << duration << " µs, value = " << *minIt << std::endl;
+
+    // Shuffle
+    start = std::chrono::high_resolution_clock::now();
+    std::shuffle(v.begin(), v.end(), gen);
+    end = std::chrono::high_resolution_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    std::cout << "Shuffle took " << duration << " ms" << std::endl;
+
+    // Copy
+    start = std::chrono::high_resolution_clock::now();
+    std::vector<int> v_copy = v;
+    end = std::chrono::high_resolution_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    std::cout << "Copy took " << duration << " ms" << std::endl;
+
+
+    // ---------- MAP ----------
+    std::cout << "\n=== Test Map ===" << std::endl;
+    std::map<int, int> m;
+
+    // Insert N elementos
+    start = std::chrono::high_resolution_clock::now();
+    for (size_t i = 0; i < N; ++i) {
+        m[i] = dist(gen);
+    }
+    end = std::chrono::high_resolution_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    std::cout << "Insert " << N << " elements took " << duration << " ms" << std::endl;
+
+    // Buscar N/10 claves
+    start = std::chrono::high_resolution_clock::now();
+    for (size_t i = 0; i < N/10; ++i) {
+        auto it = m.find(i);
+        if (it == m.end()) {
+            std::cerr << "Key not found: " << i << std::endl;
+        }
+    }
+    end = std::chrono::high_resolution_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    std::cout << "Find " << N/10 << " elements took " << duration << " ms" << std::endl;
+}
+
+
 
 
 
