@@ -1,0 +1,9 @@
+/home/gallarin/Documents/4_Ingenieria/1_Cuatri/ROBOTICAG12/ejemplo1/cmake-build-debug/CMakeFiles/ejemplo1.dir
+/home/gallarin/Documents/4_Ingenieria/1_Cuatri/ROBOTICAG12/ejemplo1/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/gallarin/Documents/4_Ingenieria/1_Cuatri/ROBOTICAG12/ejemplo1/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/gallarin/Documents/4_Ingenieria/1_Cuatri/ROBOTICAG12/ejemplo1/cmake-build-debug/CMakeFiles/list_install_components.dir
+/home/gallarin/Documents/4_Ingenieria/1_Cuatri/ROBOTICAG12/ejemplo1/cmake-build-debug/CMakeFiles/install.dir
+/home/gallarin/Documents/4_Ingenieria/1_Cuatri/ROBOTICAG12/ejemplo1/cmake-build-debug/CMakeFiles/install/local.dir
+/home/gallarin/Documents/4_Ingenieria/1_Cuatri/ROBOTICAG12/ejemplo1/cmake-build-debug/CMakeFiles/install/strip.dir
+/home/gallarin/Documents/4_Ingenieria/1_Cuatri/ROBOTICAG12/ejemplo1/cmake-build-debug/CMakeFiles/ejemplo1_autogen_timestamp_deps.dir
+/home/gallarin/Documents/4_Ingenieria/1_Cuatri/ROBOTICAG12/ejemplo1/cmake-build-debug/CMakeFiles/ejemplo1_autogen.dir

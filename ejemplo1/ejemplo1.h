@@ -17,7 +17,7 @@ class ejemplo1 : public QWidget, public Ui_Counter
 
 public slots:
     void doButton();
-    void doCount();
+    void doCount(int step);
     void doSlide();
     void reset();
 

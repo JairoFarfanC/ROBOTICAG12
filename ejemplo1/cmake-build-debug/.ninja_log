@@ -1,0 +1,18 @@
+# ninja log v6
+1	990	1759134150019043626	ejemplo1_autogen/timestamp	f656fed5b0db3651
+1	990	1759134150019043626	ejemplo1_autogen/mocs_compilation.cpp	f656fed5b0db3651
+1	990	1759134150019043626	/home/gallarin/Documents/4_Ingenieria/1_Cuatri/ROBOTICAG12/ejemplo1/cmake-build-debug/ejemplo1_autogen/timestamp	f656fed5b0db3651
+1	990	1759134150019043626	/home/gallarin/Documents/4_Ingenieria/1_Cuatri/ROBOTICAG12/ejemplo1/cmake-build-debug/ejemplo1_autogen/mocs_compilation.cpp	f656fed5b0db3651
+992	2898	1759134150028211313	CMakeFiles/ejemplo1.dir/Timer.cpp.o	45e6e84430a06e9d
+992	10235	1759134150027043802	CMakeFiles/ejemplo1.dir/ejemplo1_autogen/mocs_compilation.cpp.o	42446509890a0911
+992	10490	1759134150027709480	CMakeFiles/ejemplo1.dir/ejemplo1.cpp.o	9688268646d2014c
+992	11287	1759134150027973636	CMakeFiles/ejemplo1.dir/main.cpp.o	ece5f2dbd7ed5254
+11288	11683	1759134160322289643	ejemplo1	cf336cd28e182995
+4	656	1759134802102859389	ejemplo1_autogen/timestamp	f656fed5b0db3651
+4	656	1759134802102859389	ejemplo1_autogen/mocs_compilation.cpp	f656fed5b0db3651
+4	656	1759134802102859389	/home/gallarin/Documents/4_Ingenieria/1_Cuatri/ROBOTICAG12/ejemplo1/cmake-build-debug/ejemplo1_autogen/timestamp	f656fed5b0db3651
+4	656	1759134802102859389	/home/gallarin/Documents/4_Ingenieria/1_Cuatri/ROBOTICAG12/ejemplo1/cmake-build-debug/ejemplo1_autogen/mocs_compilation.cpp	f656fed5b0db3651
+656	5929	1759134802107859543	CMakeFiles/ejemplo1.dir/ejemplo1_autogen/mocs_compilation.cpp.o	42446509890a0911
+656	6055	1759134802108952029	CMakeFiles/ejemplo1.dir/ejemplo1.cpp.o	9688268646d2014c
+656	6471	1759134802109211360	CMakeFiles/ejemplo1.dir/main.cpp.o	ece5f2dbd7ed5254
+6471	6784	1759134807923039666	ejemplo1	cf336cd28e182995

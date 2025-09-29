@@ -8,8 +8,12 @@ ejemplo1::ejemplo1(): Ui_Counter()
 	connect(reset_button, SIGNAL(clicked()), this, SLOT(reset()) );
 	connect(horizontalSlider, SIGNAL(sliderReleased()), this, SLOT(doSlide()) );
 
-	//connect(&timer, SIGNAL(timeout()), this, SLOT(doCount()) );
-	timer.connect(std::bind(&ejemplo1::doCount, this));
+	/**
+	 * MODIFICADO A PARTIR DE LA SEGUNDA PARTE DEL EJERCICIO 13, DESPUES DE LAS PREGUNTAS
+	 * Antes teniamos: timer.connect(std::bind(&ejemplo1::doCount, this));
+	 * Ahora aniadimos el parametro '1' que sera la cantidad en la que se ira incrementando el contador
+	 */
+	timer.connect(std::bind(&ejemplo1::doCount, this,1));
 
 	static int cSpeed=500;
 	timer.start(cSpeed);
@@ -41,8 +45,14 @@ void ejemplo1::doButton()
 
 }
 
-void ejemplo1::doCount(){
-	lcdNumber->display(cont++);
+/**
+ * ANIADIDO A PARTIR DE LA SEGUNDA PARTE DEL EJERCICIO 13, DESPUES DE LAS PREGUNTAS
+ * @param step he aniadido este parametro para poder indicar la cantidad que se suma en el contador en cada momento
+ * ya que el ejercicio me pedia aniadir un parametro en este metodo para tener mas flexibilidad y poder modificarlo cuando queramos.
+*/
+void ejemplo1::doCount(int step){
+	cont +=step;
+	lcdNumber->display(cont);
 }
 
 void ejemplo1::doSlide()

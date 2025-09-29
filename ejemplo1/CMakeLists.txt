@@ -25,6 +25,7 @@ ADD_DEFINITIONS(-std=c++23 -Wextra)
 # Sources set
 SET ( SOURCES  ${SOURCES}  ejemplo1.cpp  main.cpp
         cmake-build-debug/Timer.cpp
+        Timer.h
         Timer.h)
 # Headers set
 SET ( HEADERS  ${HEADERS} ejemplo1.h )
