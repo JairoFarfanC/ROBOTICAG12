@@ -20,6 +20,7 @@ public slots:
     void doCount(int step);
     void doSlide();
     void reset();
+    int doRandom();
 
 private:
     Timer timer;

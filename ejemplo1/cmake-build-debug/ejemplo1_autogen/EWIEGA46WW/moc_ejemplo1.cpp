@@ -28,7 +28,7 @@ QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 namespace {
 struct qt_meta_stringdata_ejemplo1_t {
-    uint offsetsAndSizes[14];
+    uint offsetsAndSizes[16];
     char stringdata0[9];
     char stringdata1[9];
     char stringdata2[1];
@@ -36,6 +36,7 @@ struct qt_meta_stringdata_ejemplo1_t {
     char stringdata4[5];
     char stringdata5[8];
     char stringdata6[6];
+    char stringdata7[9];
 };
 #define QT_MOC_LITERAL(ofs, len) \
     uint(sizeof(qt_meta_stringdata_ejemplo1_t::offsetsAndSizes) + ofs), len 
@@ -47,7 +48,8 @@ Q_CONSTINIT static const qt_meta_stringdata_ejemplo1_t qt_meta_stringdata_ejempl
         QT_MOC_LITERAL(19, 7),  // "doCount"
         QT_MOC_LITERAL(27, 4),  // "step"
         QT_MOC_LITERAL(32, 7),  // "doSlide"
-        QT_MOC_LITERAL(40, 5)   // "reset"
+        QT_MOC_LITERAL(40, 5),  // "reset"
+        QT_MOC_LITERAL(46, 8)   // "doRandom"
     },
     "ejemplo1",
     "doButton",
@@ -55,7 +57,8 @@ Q_CONSTINIT static const qt_meta_stringdata_ejemplo1_t qt_meta_stringdata_ejempl
     "doCount",
     "step",
     "doSlide",
-    "reset"
+    "reset",
+    "doRandom"
 };
 #undef QT_MOC_LITERAL
 } // unnamed namespace
@@ -66,7 +69,7 @@ Q_CONSTINIT static const uint qt_meta_data_ejemplo1[] = {
       10,       // revision
        0,       // classname
        0,    0, // classinfo
-       4,   14, // methods
+       5,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -74,16 +77,18 @@ Q_CONSTINIT static const uint qt_meta_data_ejemplo1[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags, initial metatype offsets
-       1,    0,   38,    2, 0x0a,    1 /* Public */,
-       3,    1,   39,    2, 0x0a,    2 /* Public */,
-       5,    0,   42,    2, 0x0a,    4 /* Public */,
-       6,    0,   43,    2, 0x0a,    5 /* Public */,
+       1,    0,   44,    2, 0x0a,    1 /* Public */,
+       3,    1,   45,    2, 0x0a,    2 /* Public */,
+       5,    0,   48,    2, 0x0a,    4 /* Public */,
+       6,    0,   49,    2, 0x0a,    5 /* Public */,
+       7,    0,   50,    2, 0x0a,    6 /* Public */,
 
  // slots: parameters
     QMetaType::Void,
     QMetaType::Void, QMetaType::Int,    4,
     QMetaType::Void,
     QMetaType::Void,
+    QMetaType::Int,
 
        0        // eod
 };
@@ -105,7 +110,9 @@ Q_CONSTINIT const QMetaObject ejemplo1::staticMetaObject = { {
         // method 'doSlide'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'reset'
-        QtPrivate::TypeAndForceComplete<void, std::false_type>
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        // method 'doRandom'
+        QtPrivate::TypeAndForceComplete<int, std::false_type>
     >,
     nullptr
 } };
@@ -120,6 +127,8 @@ void ejemplo1::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, vo
         case 1: _t->doCount((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
         case 2: _t->doSlide(); break;
         case 3: _t->reset(); break;
+        case 4: { int _r = _t->doRandom();
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = std::move(_r); }  break;
         default: ;
         }
     }
@@ -146,13 +155,13 @@ int ejemplo1::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 4)
+        if (_id < 5)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 4;
+        _id -= 5;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 4)
+        if (_id < 5)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 4;
+        _id -= 5;
     }
     return _id;
 }
