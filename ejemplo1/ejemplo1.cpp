@@ -91,11 +91,14 @@ int ejemplo1::doRandom() {
 
 }
 
+/**
+ * APARTADO NUMERO 15
+ */
 void ejemplo1::testContainers() {
-    std::cout << "=== Test de Velocidad ===" << std::endl;
+    std::cout << "=== Test Vector ===" << std::endl;
 
-    // ---------- VECTOR ----------
-    size_t N = 1'000'000; // tamaño (ajústalo según tu PC)
+    //Vamos a crear nuestro vector con 1.000.000 de numeros
+    size_t N = 1'000'000;
     std::vector<int> v(N);
 
     // Generador de aleatorios
@@ -103,41 +106,41 @@ void ejemplo1::testContainers() {
     std::mt19937 gen(rd());
     std::uniform_int_distribution<int> dist(1, 100);
 
-    // Rellenar vector
+    // Rellenar vector con los numeros aleatorios
     for (size_t i = 0; i < N; ++i) {
         v[i] = dist(gen);
     }
 
-    // Sort
+    //Imprimimos por pantalla cuanto tarda en hacerse la propiedad sort en el vector. Esta propiedad se encarga de ordenar los numeros
     auto start = std::chrono::high_resolution_clock::now();
     std::sort(v.begin(), v.end());
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-    std::cout << "Sort took " << duration << " ms" << std::endl;
+    std::cout << "El tiempo de hacer sort es: " << duration << " ms" << std::endl;
 
-    // Min element
+    //Imprimimos por pantalla cuanto se tarda en buscar el numero minimo en el vector
     start = std::chrono::high_resolution_clock::now();
     auto minIt = std::min_element(v.begin(), v.end());
     end = std::chrono::high_resolution_clock::now();
     duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
-    std::cout << "Min element took " << duration << " µs, value = " << *minIt << std::endl;
+    std::cout << "El tiempo de encontrar el minimo es: " << duration << " µs, value = " << *minIt << std::endl;
 
-    // Shuffle
+    //Imprimimos por pantalla el tiempo que se tarda en mezclar aleatoriamente los elementos del vector
     start = std::chrono::high_resolution_clock::now();
     std::shuffle(v.begin(), v.end(), gen);
     end = std::chrono::high_resolution_clock::now();
     duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-    std::cout << "Shuffle took " << duration << " ms" << std::endl;
+    std::cout << "El tiempo de hacer shuffle es: " << duration << " ms" << std::endl;
 
-    // Copy
+    //Imprimimos por pantalla el tiempo que tarda en copiar los numeros de un vector a otro
     start = std::chrono::high_resolution_clock::now();
     std::vector<int> v_copy = v;
     end = std::chrono::high_resolution_clock::now();
     duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-    std::cout << "Copy took " << duration << " ms" << std::endl;
+    std::cout << "El tiempo de copiar es: " << duration << " ms" << std::endl;
 
 
-    // ---------- MAP ----------
+    // AHORA VAMOS CON LAS PRUEBAS DEL MAP
     std::cout << "\n=== Test Map ===" << std::endl;
     std::map<int, int> m;
 
@@ -148,7 +151,7 @@ void ejemplo1::testContainers() {
     }
     end = std::chrono::high_resolution_clock::now();
     duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-    std::cout << "Insert " << N << " elements took " << duration << " ms" << std::endl;
+    std::cout << "Insert " << N << " elements tarda: " << duration << " ms" << std::endl;
 
     // Buscar N/10 claves
     start = std::chrono::high_resolution_clock::now();
@@ -160,7 +163,7 @@ void ejemplo1::testContainers() {
     }
     end = std::chrono::high_resolution_clock::now();
     duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-    std::cout << "Find " << N/10 << " elements took " << duration << " ms" << std::endl;
+    std::cout << "Encontrar " << N/10 << " elements tarda: " << duration << " ms" << std::endl;
 }
 
 
