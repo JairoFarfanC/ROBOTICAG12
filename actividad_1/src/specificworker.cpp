@@ -81,23 +81,20 @@ void SpecificWorker::initialize()
 void SpecificWorker::compute()
 {
     std::cout << "Compute worker" << std::endl;
-	//computeCODE
-	//try
-	//{
-	//  camera_proxy->getYImage(0,img, cState, bState);
-    //    if (img.empty())
-    //        emit goToEmergency()
-	//  memcpy(image_gray.data, &img[0], m_width*m_height*sizeof(uchar));
-	//  searchTags(image_gray);
-	//}
-	//catch(const Ice::Exception &e)
-	//{
-	//  std::cout << "Error reading from Camera" << e << std::endl;
-	//}
+
+	auto data = lidar3d_proxy->getLidarDataWithThreshold2d("helios", 10000, 1);
+	qInfo() << data.points.size();
+
+	omnirobot_proxy->setSpeedBase(0,0,0);
 }
 
 
 
+
+
+
+
+//////////////////////////////////////////////////////////////////
 void SpecificWorker::emergency()
 {
     std::cout << "Emergency worker" << std::endl;
