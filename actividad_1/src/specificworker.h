@@ -54,6 +54,12 @@ public:
      */
 	~SpecificWorker();
 
+	enum class State { IDLE, FORWARD, TURN, FOLLOW_WALL, SPIRAL };
+
+	using RetVal = std::tuple<State, float, float>;
+
+	RetVal FORWARD_method(const std::vector<RoboCompLidar3D::TPoint> &points);
+
 
 public slots:
 
@@ -89,6 +95,15 @@ private:
      * \brief Flag indicating whether startup checks are enabled.
      */
 	bool startup_check_flag;
+
+	struct Params
+	{
+		float LIDAR_OFFSET = 0.2f;
+		float STOP_THRESHOLD = 300.f;
+		float MAX_ADV_SPEED = 1000.f;
+	};
+
+	Params params;
 
 signals:
 	//void customSignal();

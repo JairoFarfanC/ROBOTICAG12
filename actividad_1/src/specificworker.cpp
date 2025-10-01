@@ -17,6 +17,9 @@
  *    along with RoboComp.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "specificworker.h"
+#include <stdexcept>
+
+
 
 SpecificWorker::SpecificWorker(const ConfigLoader& configLoader, TuplePrx tprx, bool startup_check) : GenericWorker(configLoader, tprx)
 {
@@ -30,11 +33,11 @@ SpecificWorker::SpecificWorker(const ConfigLoader& configLoader, TuplePrx tprx, 
 		#ifdef HIBERNATION_ENABLED
 			hibernationChecker.start(500);
 		#endif
-		
+
 		// Example statemachine:
 		/***
 		//Your definition for the statesmachine (if you dont want use a execute function, use nullptr)
-		states["CustomState"] = std::make_unique<GRAFCETStep>("CustomState", period, 
+		states["CustomState"] = std::make_unique<GRAFCETStep>("CustomState", period,
 															std::bind(&SpecificWorker::customLoop, this),  // Cyclic function
 															std::bind(&SpecificWorker::customEnter, this), // On-enter function
 															std::bind(&SpecificWorker::customExit, this)); // On-exit function
@@ -72,20 +75,37 @@ void SpecificWorker::initialize()
 
     /////////GET PARAMS, OPEND DEVICES....////////
     //int period = configLoader.get<int>("Period.Compute") //NOTE: If you want get period of compute use getPeriod("compute")
-    //std::string device = configLoader.get<std::string>("Device.name") 
+    //std::string device = configLoader.get<std::string>("Device.name")
 
 }
 
-
-
+/*
+ * 
+ */
 void SpecificWorker::compute()
 {
     std::cout << "Compute worker" << std::endl;
 
-	auto data = lidar3d_proxy->getLidarDataWithThreshold2d("helios", 10000, 1);
-	qInfo() << data.points.size();
 
-	omnirobot_proxy->setSpeedBase(0,0,0);
+	try
+	{
+		auto data = lidar3d_proxy->getLidarDataWithThreshold2d("helios", 10000, 1);
+		qInfo() << data.points.size();
+
+	}
+	catch (const Ice::Exception& e){ std::cout << e.what() << std::endl; }
+
+	// filtrar puntos quedándose con el mínimo de las theta iguales
+	// encontrar el mínimo elemento del lidar filtrado
+	// decidir si no hacer nada o   parar y girar en función de el min_element nuevo
+
+
+	try
+	{
+		omnirobot_proxy->setSpeedBase(0,0,0);
+	}
+	catch (const Ice::Exception& e){ std::cout << e.what() << std::endl; }
+
 }
 
 
