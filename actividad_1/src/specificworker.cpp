@@ -86,27 +86,86 @@ void SpecificWorker::compute()
 {
     std::cout << "Compute worker" << std::endl;
 
+    // Bucle infinito de control
+    while (true)
+    {
+        try
+        {
+            // Obtener los datos del LIDAR 3D
+            auto data = lidar3d_proxy->getLidarDataWithThreshold2d("helios", 10000, 1);
+            qInfo() << "LIDAR Data Points: " << data.points.size();
 
-	try
-	{
-		auto data = lidar3d_proxy->getLidarDataWithThreshold2d("helios", 10000, 1);
-		qInfo() << data.points.size();
+            // Filtrar puntos quedándose con el mínimo de las theta iguales
+            std::vector<RoboCompLidar3D::TPoint> filteredPoints;
+            float minDistance = std::numeric_limits<float>::infinity();
 
-	}
-	catch (const Ice::Exception& e){ std::cout << e.what() << std::endl; }
+            RoboCompLidar3D::TPoint closestPoint;
 
-	// filtrar puntos quedándose con el mínimo de las theta iguales
-	// encontrar el mínimo elemento del lidar filtrado
-	// decidir si no hacer nada o   parar y girar en función de el min_element nuevo
+            // Filtrar puntos y encontrar el más cercano
+            for (const auto& point : data.points)
+            {
+                bool alreadyExists = false;
+                for (const auto& filteredPoint : filteredPoints)
+                {
+                    if (fabs(filteredPoint.theta - point.theta) < 0.01)  // Umbral para decidir que son "similares"
+                    {
+                        alreadyExists = true;
+                        break;
+                    }
+                }
+
+                if (!alreadyExists)
+                {
+                    filteredPoints.push_back(point);
+
+                    // Si estamos usando coordenadas cartesianas (x, y, z):
+                    float distance = sqrt(point.x * point.x + point.y * point.y);  // Distancia al origen
+
+                    // Encontrar el punto más cercano
+                    if (distance < minDistance)
+                    {
+                        minDistance = distance;
+                        closestPoint = point;
+                    }
+                }
+            }
+
+        	qInfo() << minDistance;
 
 
-	try
-	{
-		omnirobot_proxy->setSpeedBase(0,0,0);
-	}
-	catch (const Ice::Exception& e){ std::cout << e.what() << std::endl; }
+            // Verificar si la distancia mínima está dentro del umbral seguro
+            if (minDistance < 350)  // Asumimos que 100 es un umbral seguro para la distancia
+            {
 
+                // Si la distancia es muy corta, detenerse y girar
+                qInfo() << "Close to obstacle, stopping and rotating...";
+                omnirobot_proxy->setSpeedBase(0, 0, 0); // Detenerse
+                omnirobot_proxy->setSpeedBase(0, 0, 30); // Girar en el sitio
+                QThread::sleep(1);  // Esperar un segundo mientras gira
+            }
+            else
+            {
+                // Si la distancia es suficientemente segura, continuar avanzando
+                qInfo() << "Clear path, continuing...";
+                omnirobot_proxy->setSpeedBase(1000, 0, 0); // Avanzar
+            }
+
+        }
+        catch (const Ice::Exception& e)
+        {
+            std::cout << e.what() << std::endl;
+        }
+
+        // Evitar que el bucle consuma demasiado CPU (esperar un tiempo antes de la siguiente iteración)
+        QThread::msleep(100);  // Esperar 100 ms entre cada ciclo de verificación
+    }
 }
+
+
+
+
+
+
 
 
 
@@ -174,4 +233,3 @@ int SpecificWorker::startup_check()
 /**************************************/
 // From the RoboCompOmniRobot you can use this types:
 // RoboCompOmniRobot::TMechParams
-
