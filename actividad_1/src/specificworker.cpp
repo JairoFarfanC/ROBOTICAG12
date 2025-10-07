@@ -80,7 +80,7 @@ void SpecificWorker::initialize()
 }
 
 /*
- * 
+ *
  */
 void SpecificWorker::compute()
 {
