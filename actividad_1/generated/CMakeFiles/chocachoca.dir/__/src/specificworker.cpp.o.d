@@ -927,9 +927,12 @@ generated/CMakeFiles/chocachoca.dir/__/src/specificworker.cpp.o: \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qtwidgetsglobal.h \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qtwidgets-config.h \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qtwidgetsexports.h \
- /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QWidget \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QFrame \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qframe.h \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qwidget.h \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qsizepolicy.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QWidget \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qwidget.h \
  /home/usuario/robocomp/classes/grafcetStep/GRAFCETStep.h \
  /usr/include/x86_64-linux-gnu/qt6/QtStateMachine/QState \
  /usr/include/x86_64-linux-gnu/qt6/QtStateMachine/qstate.h \
@@ -1048,4 +1051,40 @@ generated/CMakeFiles/chocachoca.dir/__/src/specificworker.cpp.o: \
  /usr/include/c++/13/bits/deque.tcc /usr/include/Ice/FactoryTableInit.h \
  /usr/include/Ice/DefaultValueFactory.h \
  /home/usuario/ROBOTICAG12/actividad_1/generated/Lidar3D.h \
- /home/usuario/ROBOTICAG12/actividad_1/generated/OmniRobot.h
+ /home/usuario/ROBOTICAG12/actividad_1/generated/OmniRobot.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtCore/qtmetamacros.h \
+ /home/usuario/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QWidget \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QGraphicsScene \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qgraphicsscene.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QGraphicsView \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qgraphicsview.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qscrollarea.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qabstractscrollarea.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qframe.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qgraphicsscene.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtGui/QMouseEvent \
+ /usr/include/x86_64-linux-gnu/qt6/QtGui/QResizeEvent \
+ /usr/include/x86_64-linux-gnu/qt6/QtOpenGLWidgets/QOpenGLWidget \
+ /usr/include/x86_64-linux-gnu/qt6/QtOpenGLWidgets/qopenglwidget.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtOpenGLWidgets/qtopenglwidgetsglobal.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtOpenGLWidgets/qtopenglwidgetsexports.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QScrollBar \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qscrollbar.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qabstractslider.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QApplication \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QVBoxLayout \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qboxlayout.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qlayout.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qlayoutitem.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qboxlayout.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qgridlayout.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QGraphicsPolygonItem \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qgraphicsitem.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtGui/qpainterpath.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtGui/qcolor.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtCore/QRect \
+ /usr/local/include/cppitertools/groupby.hpp \
+ /usr/local/include/cppitertools/internal/iterator_wrapper.hpp \
+ /usr/local/include/cppitertools/internal/iterbase.hpp \
+ /usr/local/include/cppitertools/internal/iterbase.hpp

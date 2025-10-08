@@ -93,7 +93,7 @@ int ejemplo1::doRandom() {
 
 /**
  * APARTADO NUMERO 15
- */
+
 void ejemplo1::testContainers() {
     std::cout << "=== Test Vector ===" << std::endl;
 
@@ -168,5 +168,5 @@ void ejemplo1::testContainers() {
 
 
 
-
+*/
 

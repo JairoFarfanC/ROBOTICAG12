@@ -17,7 +17,11 @@
  *    along with RoboComp.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "specificworker.h"
-#include <stdexcept>
+
+#include <iostream>
+#include <qcolor.h>
+#include <QRect>
+#include <cppitertools/groupby.hpp>
 
 
 
@@ -68,10 +72,22 @@ SpecificWorker::~SpecificWorker()
 
 
 void SpecificWorker::initialize()
+
 {
     std::cout << "initialize worker" << std::endl;
 
-    //initializeCODE
+
+
+	this->dimensions = QRectF(-6000, -3000, 12000, 6000);
+	viewer = new AbstractGraphicViewer(this->frame, this->dimensions);
+	//this->resize(900,450);
+	viewer->show();
+	const auto rob = viewer->add_robot(ROBOT_LENGTH, ROBOT_LENGTH, 0, 190, QColor("Blue"));
+	robot_polygon = std::get<0>(rob);
+
+	connect(viewer, &AbstractGraphicViewer::new_mouse_coordinates, this, &SpecificWorker::new_target_slot);
+
+	//initializeCODE
 
     /////////GET PARAMS, OPEND DEVICES....////////
     //int period = configLoader.get<int>("Period.Compute") //NOTE: If you want get period of compute use getPeriod("compute")
@@ -86,94 +102,77 @@ void SpecificWorker::compute()
 {
     std::cout << "Compute worker" << std::endl;
 
-    // Bucle infinito de control
-    while (true)
-    {
-        try
-        {
-            // Obtener los datos del LIDAR 3D
-            auto data = lidar3d_proxy->getLidarDataWithThreshold2d("helios", 10000, 1);
-            qInfo() << "LIDAR Data Points: " << data.points.size();
 
-            // Filtrar puntos quedándose con el mínimo de las theta iguales
-            std::vector<RoboCompLidar3D::TPoint> filteredPoints;
-            float minDistance = std::numeric_limits<float>::infinity();
+        try {
+	        // Obtener los datos del LIDAR 3D
+        	const auto data = lidar3d_proxy->getLidarDataWithThreshold2d("helios", 5000, 1);
+        	qInfo() << "LIDAR Data Points: " << data.points.size();
 
-            RoboCompLidar3D::TPoint closestPoint;
+        	// Filtrar puntos quedándose con el mínimo de las theta iguales
+        	const auto filtered = filter_lidar(data.points);
+        	if (filtered.has_value())
+        		draw_lidar(filtered.value(), &viewer->scene);
 
-            // Filtrar puntos y encontrar el más cercano
-            for (const auto& point : data.points)
-            {
-                bool alreadyExists = false;
-                for (const auto& filteredPoint : filteredPoints)
-                {
-                    if (fabs(filteredPoint.theta - point.theta) < 0.01)  // Umbral para decidir que son "similares"
-                    {
-                        alreadyExists = true;
-                        break;
-                    }
-                }
-
-                if (!alreadyExists)
-                {
-                    filteredPoints.push_back(point);
-
-                    // Si estamos usando coordenadas cartesianas (x, y, z):
-                    float distance = sqrt(point.x * point.x + point.y * point.y);  // Distancia al origen
-
-                    // Encontrar el punto más cercano
-                    if (distance < minDistance)
-                    {
-                        minDistance = distance;
-                        closestPoint = point;
-                    }
-                }
-            }
-
-        	qInfo() << minDistance;
-
-
-            // Verificar si la distancia mínima está dentro del umbral seguro
-            if (minDistance < 350)  // Asumimos que 100 es un umbral seguro para la distancia
-            {
-
-                // Si la distancia es muy corta, detenerse y girar
-                qInfo() << "Close to obstacle, stopping and rotating...";
-                omnirobot_proxy->setSpeedBase(0, 0, 0); // Detenerse
-                omnirobot_proxy->setSpeedBase(0, 0, 30); // Girar en el sitio
-                QThread::sleep(1);  // Esperar un segundo mientras gira
-            }
-            else
-            {
-                // Si la distancia es suficientemente segura, continuar avanzando
-                qInfo() << "Clear path, continuing...";
-                omnirobot_proxy->setSpeedBase(1000, 0, 0); // Avanzar
-            }
-
+        	update_robot_position();
         }
-        catch (const Ice::Exception& e)
-        {
-            std::cout << e.what() << std::endl;
-        }
-
-        // Evitar que el bucle consuma demasiado CPU (esperar un tiempo antes de la siguiente iteración)
-        QThread::msleep(100);  // Esperar 100 ms entre cada ciclo de verificación
-    }
+		catch (const Ice::Exception &e){ std::cout << e.what() << std::endl; }
 }
 
 
 
-
-
-
-
-
-
-
-
-
-
 //////////////////////////////////////////////////////////////////
+std::optional<RoboCompLidar3D::TPoints> SpecificWorker::filter_lidar(const RoboCompLidar3D::TPoints &points)
+{
+	if (points.empty()) return {};
+
+	RoboCompLidar3D::TPoints filtered;
+	for (auto &&[angle, pts] : iter::groupby(points, [](const auto &p)
+		{
+			float multiplier = std::pow(10.f, 2);
+			return std::floor(p.phi*multiplier)/multiplier;
+		}))
+	{
+			auto min_it = std::min_element(pts.begin(), pts.end(), [](const auto &a, const auto &b)
+					{return a.r < b.r;} );
+			filtered.emplace_back(*min_it);
+	}
+	return filtered;
+}
+
+void SpecificWorker::draw_lidar(const auto &points, QGraphicsScene* scene)
+{
+	static std::vector<QGraphicsItem*> draw_points;
+	for (const auto &p : draw_points)
+	{
+		scene->removeItem(p);
+		delete p;
+	}
+	draw_points.clear();
+
+	const QColor color("LightGreen");
+	const QPen pen(color, 10);
+	//const QBrush brush(color, Qt::SolidPattern);
+	for (const auto &p : points)
+	{
+		const auto dp = scene->addRect(-25, -25, 50, 50, pen);
+		dp->setPos(p.x, p.y);
+		draw_points.push_back(dp);   // add to the list of points to be deleted next time
+	}
+}
+
+void SpecificWorker::update_robot_position() {
+	try {
+		RoboCompGenericBase::TBaseState bState;
+		omnirobot_proxy->getBaseState(bState);
+		robot_polygon->setRotation(bState.alpha*180/M_1_PI);
+		robot_polygon->setPos(bState.x,bState.z);
+		std::cout << bState.alpha << " " << bState.x << " " << bState.z << std::endl;
+	}
+	catch (const Ice::Exception &e)  {std::cout << e.what() << std::endl;
+	}
+}
+
+///
 void SpecificWorker::emergency()
 {
     std::cout << "Emergency worker" << std::endl;
@@ -203,6 +202,25 @@ int SpecificWorker::startup_check()
 }
 
 
+void SpecificWorker::new_target_slot(QPointF p){
+
+}
+
+/**
+std::optional<RoboCompLidar3D::TPoints> SpecificWorker::filter_min_distance_cppintertools(const RoboCompLidar3D::TPoints& points)
+{
+	if (points.empty())
+		return {};
+
+	RoboCompLidar3D::TPoints result; result.reserve(points.size());
+
+	//Loop over the groups produced by iter::gorupby
+	for (auto && [angle, group] : iter::groupby(points, [](const auto &p) {
+		float multiplier = std::pow(10.0f, 2); return std::floor(p.phi * multiplier) /
+	}))
+
+}
+*/
 
 /**************************************/
 // From the RoboCompLidar3D you can call this methods:

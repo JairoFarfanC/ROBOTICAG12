@@ -32,6 +32,10 @@
 //#define HIBERNATION_ENABLED
 
 #include <genericworker.h>
+#include <qtmetamacros.h>
+
+
+#include <abstract_graphic_viewer/abstract_graphic_viewer.h>
 
 
 /**
@@ -54,12 +58,6 @@ public:
      */
 	~SpecificWorker();
 
-	enum class State { IDLE, FORWARD, TURN, FOLLOW_WALL, SPIRAL };
-
-	using RetVal = std::tuple<State, float, float>;
-
-	RetVal FORWARD_method(const std::vector<RoboCompLidar3D::TPoint> &points);
-
 
 public slots:
 
@@ -73,7 +71,9 @@ public slots:
 	 */
 	void compute();
 
-	/**
+
+
+/**
 	 * \brief Handles the emergency state loop.
 	 */
 	void emergency();
@@ -89,6 +89,10 @@ public slots:
      */
 	int startup_check();
 
+	void new_target_slot(QPointF);
+
+	void update_robot_position();
+
 private:
 
 	/**
@@ -96,14 +100,12 @@ private:
      */
 	bool startup_check_flag;
 
-	struct Params
-	{
-		float LIDAR_OFFSET = 0.2f;
-		float STOP_THRESHOLD = 300.f;
-		float MAX_ADV_SPEED = 1000.f;
-	};
-
-	Params params;
+	QRectF dimensions;
+	AbstractGraphicViewer *viewer;
+	const int ROBOT_LENGTH = 400;
+	QGraphicsPolygonItem *robot_polygon;
+	void draw_lidar(const auto &points, QGraphicsScene *scene);
+	std::optional<RoboCompLidar3D::TPoints> filter_lidar(const RoboCompLidar3D::TPoints &points);
 
 signals:
 	//void customSignal();

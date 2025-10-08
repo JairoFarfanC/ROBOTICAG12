@@ -1,7 +1,7 @@
 {
 	"InstallScripts" : 
 	[
-		"/home/gallarin/Documents/4_Ingenieria/1_Cuatri/ROBOTICAG12/ejemplo1/cmake-build-debug/cmake_install.cmake"
+		"/home/usuario/ROBOTICAG12/ejemplo1/cmake-build-debug/cmake_install.cmake"
 	],
 	"Parallel" : false
 }

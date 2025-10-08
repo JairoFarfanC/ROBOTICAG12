@@ -928,9 +928,12 @@ generated/CMakeFiles/chocachoca.dir/chocachoca_autogen/mocs_compilation.cpp.o: \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qtwidgetsglobal.h \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qtwidgets-config.h \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qtwidgetsexports.h \
- /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QWidget \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QFrame \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qframe.h \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qwidget.h \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qsizepolicy.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QWidget \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qwidget.h \
  /home/usuario/robocomp/classes/grafcetStep/GRAFCETStep.h \
  /usr/include/x86_64-linux-gnu/qt6/QtStateMachine/QState \
  /usr/include/x86_64-linux-gnu/qt6/QtStateMachine/qstate.h \
@@ -1054,8 +1057,8 @@ generated/CMakeFiles/chocachoca.dir/chocachoca_autogen/mocs_compilation.cpp.o: \
  /home/usuario/ROBOTICAG12/actividad_1/generated/chocachoca_autogen/VNU7RW3YIC/moc_specificworker.cpp \
  /home/usuario/ROBOTICAG12/actividad_1/generated/chocachoca_autogen/VNU7RW3YIC/../../../src/specificworker.h \
  /home/usuario/ROBOTICAG12/actividad_1/generated/genericworker.h \
- /home/usuario/ROBOTICAG12/actividad_1/generated/chocachoca_autogen/4B7W4TDGLD/moc_abstract_graphic_viewer.cpp \
- /home/usuario/ROBOTICAG12/actividad_1/generated/chocachoca_autogen/4B7W4TDGLD/../../../../../robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtCore/qtmetamacros.h \
+ /home/usuario/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.h \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QWidget \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QGraphicsScene \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qgraphicsscene.h \
@@ -1064,7 +1067,6 @@ generated/CMakeFiles/chocachoca.dir/chocachoca_autogen/mocs_compilation.cpp.o: \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qscrollarea.h \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qabstractscrollarea.h \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qframe.h \
- /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qwidget.h \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qgraphicsscene.h \
  /usr/include/x86_64-linux-gnu/qt6/QtGui/QMouseEvent \
  /usr/include/x86_64-linux-gnu/qt6/QtGui/QResizeEvent \
@@ -1085,5 +1087,7 @@ generated/CMakeFiles/chocachoca.dir/chocachoca_autogen/mocs_compilation.cpp.o: \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QGraphicsPolygonItem \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/qgraphicsitem.h \
  /usr/include/x86_64-linux-gnu/qt6/QtGui/qpainterpath.h \
+ /home/usuario/ROBOTICAG12/actividad_1/generated/chocachoca_autogen/4B7W4TDGLD/moc_abstract_graphic_viewer.cpp \
+ /home/usuario/ROBOTICAG12/actividad_1/generated/chocachoca_autogen/4B7W4TDGLD/../../../../../robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.h \
  /home/usuario/ROBOTICAG12/actividad_1/generated/chocachoca_autogen/UITLZZOD3R/moc_GRAFCETStep.cpp \
  /home/usuario/ROBOTICAG12/actividad_1/generated/chocachoca_autogen/UITLZZOD3R/../../../../../robocomp/classes/grafcetStep/GRAFCETStep.h
