@@ -102,6 +102,8 @@ void SpecificWorker::compute()
 {
     std::cout << "Compute worker" << std::endl;
 
+	std::vector<RoboCompLidar3D::TPoint> points;
+
 
         try {
 	        // Obtener los datos del LIDAR 3D
@@ -110,12 +112,50 @@ void SpecificWorker::compute()
 
         	// Filtrar puntos quedándose con el mínimo de las theta iguales
         	const auto filtered = filter_lidar(data.points);
-        	if (filtered.has_value())
+        	if (filtered.has_value()) {
         		draw_lidar(filtered.value(), &viewer->scene);
-
+        		points = filtered.value();
+        	}
         	update_robot_position();
         }
 		catch (const Ice::Exception &e){ std::cout << e.what() << std::endl; }
+
+		// El min
+		// si menor distancia en el centro del array es menor the 500
+		// el minimo elemento está en la mitad del array. Para leerlo calcula el largo del array/2, y algo de Begin
+		//    adv = 0, rot = 1
+		// else adv 1000 rot = 0
+	// Si no hay puntos, no continuamos
+
+
+		if (points.empty())
+			return;
+
+		// Obtener el punto central del array (zona frontal)
+		int mid_index = points.size() / 2;
+		float frontal_dist = points[mid_index].distance2d;
+
+		// Comportamiento simple de evasión
+		float side = 0.f;
+		float adv = 0.f;
+		float rot = 0.f;
+
+		if (frontal_dist < 500)  // obstáculo cerca
+		{
+			adv = 0.f;
+			rot = 1.f;
+		}
+		else  // despejado
+		{
+			adv = 1000.f;
+			rot = 0.f;
+		}
+		try
+		{
+			omnirobot_proxy->setSpeedBase(side, adv, rot);
+		}catch (const Ice::Exception &e) {
+			std::cout << e.what() << std::endl;
+		}
 }
 
 
