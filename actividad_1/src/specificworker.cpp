@@ -95,13 +95,19 @@ void SpecificWorker::initialize()
 
 }
 
+/**
+* TU LIDAR ESTA SIMULADO DENTRO DE WEBOTS Y CONECTADO AL SISTEMA ROBOCOMP. EL COMPONENTE LIDAR3D RECIBE LOS DATOS DEL SENSOR (EN WEBOTS).                   
+* TU COMPONENTE CHOCACHOCA LOS PIDE POR RED (USANDO LIDAR3D_PROXY). LO QUE RECIBE ES UNA LISTA DE PUNTOS (X, Y, Z, PHI, DISTANCIA...).               
+*/
+
 /*
- *
+ * Este metodo se ejecuta periodicamente con el periodo indicado en el fichero de configuración(cada "tick" del componente).
+ * De esta forma decides que hace el robot en cada momento.
  */
 void SpecificWorker::compute()
 {
     std::cout << "Compute worker" << std::endl;
-
+	//Esto es uun vector vacio donde guardaremos los puntos del lidar que realmente vamos a usar tras el filtrado
 	std::vector<RoboCompLidar3D::TPoint> points;
 
 
@@ -161,17 +167,30 @@ void SpecificWorker::compute()
 
 
 //////////////////////////////////////////////////////////////////
+// RoboCompLidar3D: nombre de la interfaz dentro del sistema RoboComp que gestiona los sensores LIDAR 3D.
+/*
+* Le pasamos por parametro la lista de puntos obtenida a traves del proxy del lidar3d. Cada punto representa una lectura del sensor LIDAR
+* Cada punto tiene los siguientes campos: x, y, z, phi, theta, r 
+*
+* Como con lidar3d tenemos mucha informacion y ruido debido a que hay demasiados datos, puntos repetidos etc el objetivo de este metodo
+* es quedarse solo con los puntos mas relevantes. En este caso nos quedamos con el punto mas cercano (minimo r) de cada angulo phi.
+*/ 
 std::optional<RoboCompLidar3D::TPoints> SpecificWorker::filter_lidar(const RoboCompLidar3D::TPoints &points)
 {
 	if (points.empty()) return {};
 
+	//Creamos un nuevo vector donde iremos aniadiendo los puntos que nos interesan
 	RoboCompLidar3D::TPoints filtered;
+	// phi representa el angulo redondeado a 2 decimales, por ejemplo 0.52
+	// pts tendra todos los puntos que tienen ese mismo angulo phi: 0.520, 0.524, 0.529... y los vamos agrupando con groupby
 	for (auto &&[angle, pts] : iter::groupby(points, [](const auto &p)
-		{
+		{	
+			//redondeamos a dos decimales
 			float multiplier = std::pow(10.f, 2);
 			return std::floor(p.phi*multiplier)/multiplier;
 		}))
-	{
+	{		// esto a calcular el punto con menor r (distancia), devolviendo un iterador que APUNTA al punto con menor r,
+			// por tanto luego hacemos un 'emplace_back' para aniadir ese punto al vector final, que solo tendra un unico valor.
 			auto min_it = std::min_element(pts.begin(), pts.end(), [](const auto &a, const auto &b)
 					{return a.r < b.r;} );
 			filtered.emplace_back(*min_it);
