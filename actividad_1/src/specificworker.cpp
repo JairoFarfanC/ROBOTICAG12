@@ -137,27 +137,28 @@ void SpecificWorker::compute()
 		if (points.empty())
 			return;
 
-		// Obtener el punto central del array (zona frontal)
+		// vamos a obtener el punto central del array de puntos ya que por como el LIDAR escanea, los puntos estan ordenados de 
+		// izquierda a derecha, por tanto el punto central es el que esta justo delante del robot(la direccion a la que esta mirando)
 		int mid_index = points.size() / 2;
+		// es la distancia en mm del punto central, cuanto menor sea ese valor, mas cerca hay un obstaculo justo delante
 		float frontal_dist = points[mid_index].distance2d;
 
-		// Comportamiento simple de evasión
-		float side = 0.f;
-		float adv = 0.f;
-		float rot = 0.f;
+		float side = 0.f; // lateral, izquierda/derecha
+		float adv = 0.f;  // avance, adelante/atras
+ 		float rot = 0.f;  // rotacion, giro
 
 		if (frontal_dist < 500)  // obstáculo cerca
 		{
-			adv = 0.f;
-			rot = 1.f;
+			adv = 0.f; // deja de avanzar
+			rot = 1.f; // empieza a girar a un lado (normalmente a la derecha)
 		}
 		else  // despejado
 		{
-			adv = 1000.f;
+			adv = 1000.f; // avanza hacia adelante a velocidad 1000 mm/s
 			rot = 0.f;
 		}
 		try
-		{
+		{	// enviamos los valores de avance, lateral y rotacion al robot
 			omnirobot_proxy->setSpeedBase(side, adv, rot);
 		}catch (const Ice::Exception &e) {
 			std::cout << e.what() << std::endl;
@@ -190,40 +191,60 @@ std::optional<RoboCompLidar3D::TPoints> SpecificWorker::filter_lidar(const RoboC
 			return std::floor(p.phi*multiplier)/multiplier;
 		}))
 	{		// esto a calcular el punto con menor r (distancia), devolviendo un iterador que APUNTA al punto con menor r,
-			// por tanto luego hacemos un 'emplace_back' para aniadir ese punto al vector final, que solo tendra un unico valor.
+			// por tanto luego hacemos un 'emplace_back' para aniadir ese punto al vector final, que tendra el valor minimo de cada grupo.
 			auto min_it = std::min_element(pts.begin(), pts.end(), [](const auto &a, const auto &b)
 					{return a.r < b.r;} );
 			filtered.emplace_back(*min_it);
 	}
 	return filtered;
 }
-
+/*
+* La funcion draw_lidar dibuja los puntos del lidar en la escena del viewer.
+* Le pasamos como parametro la lista de puntos que queremos dibujar y la escena donde se dibuja.
+*/
 void SpecificWorker::draw_lidar(const auto &points, QGraphicsScene* scene)
 {
+	// static para que mantenga el valor entre llamadas ya que  este metodo se ejecuta muchas veces por segundo, en cada tick del metodo compute
+	/*
+	* Cada vez:
+	* - Recibe nuevos puntos del LiDAR
+	* - Dibuja los puntos por pantalla
+	* - Borra los puntos dibujados la vez anterior(los del tick anterior)
+	*/
 	static std::vector<QGraphicsItem*> draw_points;
+	// recorre todos los puntos, los elimina de la escena y los borra de memoria
 	for (const auto &p : draw_points)
 	{
 		scene->removeItem(p);
 		delete p;
 	}
 	draw_points.clear();
-
+	// color de los puntos
 	const QColor color("LightGreen");
+	// creamos un lapiz de color y grosor 10
 	const QPen pen(color, 10);
-	//const QBrush brush(color, Qt::SolidPattern);
+	// vamos a dibujar el cuadrado
 	for (const auto &p : points)
 	{
+		// crea un cuadrado verde de 50x50 centrado en (0,0). Lo de centrado lo conseguimos poniendo -25,-25 (la esquina superior izquierda)
 		const auto dp = scene->addRect(-25, -25, 50, 50, pen);
+		// mueve ese cuadrado a la posicion real del punto detectado
 		dp->setPos(p.x, p.y);
 		draw_points.push_back(dp);   // add to the list of points to be deleted next time
 	}
 }
 
+// Este metodo actualiza la posicion del robot en el viewer
 void SpecificWorker::update_robot_position() {
 	try {
+		// Crea una 'foto' del estado actual del robot
+		// bState tiene los campos x, z, alpha (posicion y orientacion
 		RoboCompGenericBase::TBaseState bState;
+		// 'omnirobot_proxy' es el proxy que nos permite comunicarnos con el componente RoboCompOmniRobot( el que controla las ruedas del robot)
 		omnirobot_proxy->getBaseState(bState);
+		// la rotacion la hacemos en radianes por eso la cuenta esa que hay entre parentesis
 		robot_polygon->setRotation(bState.alpha*180/M_1_PI);
+		// mueve el robot a la posicion x,z (ojo que en el viewer z es y, ya que es 2D)
 		robot_polygon->setPos(bState.x,bState.z);
 		std::cout << bState.alpha << " " << bState.x << " " << bState.z << std::endl;
 	}
