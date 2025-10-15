@@ -1052,6 +1052,7 @@ generated/CMakeFiles/chocachoca.dir/__/src/specificworker.cpp.o: \
  /usr/include/Ice/DefaultValueFactory.h \
  /home/usuario/ROBOTICAG12/actividad_1/generated/Lidar3D.h \
  /home/usuario/ROBOTICAG12/actividad_1/generated/OmniRobot.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtCore/QObject \
  /usr/include/x86_64-linux-gnu/qt6/QtCore/qtmetamacros.h \
  /home/usuario/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.h \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QWidget \

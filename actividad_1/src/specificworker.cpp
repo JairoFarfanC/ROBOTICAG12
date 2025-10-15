@@ -96,8 +96,8 @@ void SpecificWorker::initialize()
 }
 
 /**
-* TU LIDAR ESTA SIMULADO DENTRO DE WEBOTS Y CONECTADO AL SISTEMA ROBOCOMP. EL COMPONENTE LIDAR3D RECIBE LOS DATOS DEL SENSOR (EN WEBOTS).                   
-* TU COMPONENTE CHOCACHOCA LOS PIDE POR RED (USANDO LIDAR3D_PROXY). LO QUE RECIBE ES UNA LISTA DE PUNTOS (X, Y, Z, PHI, DISTANCIA...).               
+* TU LIDAR ESTA SIMULADO DENTRO DE WEBOTS Y CONECTADO AL SISTEMA ROBOCOMP. EL COMPONENTE LIDAR3D RECIBE LOS DATOS DEL SENSOR (EN WEBOTS).
+* TU COMPONENTE CHOCACHOCA LOS PIDE POR RED (USANDO LIDAR3D_PROXY). LO QUE RECIBE ES UNA LISTA DE PUNTOS (X, Y, Z, PHI, DISTANCIA...).
 */
 
 /*
@@ -106,7 +106,7 @@ void SpecificWorker::initialize()
  */
 void SpecificWorker::compute()
 {
-    std::cout << "Compute worker" << std::endl;
+
 	//Esto es uun vector vacio donde guardaremos los puntos del lidar que realmente vamos a usar tras el filtrado
 	std::vector<RoboCompLidar3D::TPoint> points;
 
@@ -114,7 +114,7 @@ void SpecificWorker::compute()
         try {
 	        // Obtener los datos del LIDAR 3D
         	const auto data = lidar3d_proxy->getLidarDataWithThreshold2d("helios", 5000, 1);
-        	qInfo() << "LIDAR Data Points: " << data.points.size();
+       // 	qInfo() << "LIDAR Data Points: " << data.points.size();
 
         	// Filtrar puntos quedándose con el mínimo de las theta iguales
         	const auto filtered = filter_lidar(data.points);
@@ -122,7 +122,7 @@ void SpecificWorker::compute()
         		draw_lidar(filtered.value(), &viewer->scene);
         		points = filtered.value();
         	}
-        	update_robot_position();
+        	//update_robot_position();
         }
 		catch (const Ice::Exception &e){ std::cout << e.what() << std::endl; }
 
@@ -137,7 +137,7 @@ void SpecificWorker::compute()
 		if (points.empty())
 			return;
 
-		// vamos a obtener el punto central del array de puntos ya que por como el LIDAR escanea, los puntos estan ordenados de 
+		// vamos a obtener el punto central del array de puntos ya que por como el LIDAR escanea, los puntos estan ordenados de
 		// izquierda a derecha, por tanto el punto central es el que esta justo delante del robot(la direccion a la que esta mirando)
 		int mid_index = points.size() / 2;
 		// es la distancia en mm del punto central, cuanto menor sea ese valor, mas cerca hay un obstaculo justo delante
@@ -147,16 +147,19 @@ void SpecificWorker::compute()
 		float adv = 0.f;  // avance, adelante/atras
  		float rot = 0.f;  // rotacion, giro
 
-		if (frontal_dist < 500)  // obstáculo cerca
+		qInfo() << "Frontal distance: " << frontal_dist;
+		if (frontal_dist < 700)  // obstáculo cerca
 		{
 			adv = 0.f; // deja de avanzar
 			rot = 1.f; // empieza a girar a un lado (normalmente a la derecha)
 		}
-		else  // despejado
+		else  if (frontal_dist > 1000)// despejado
 		{
 			adv = 1000.f; // avanza hacia adelante a velocidad 1000 mm/s
 			rot = 0.f;
 		}
+		else {adv =0; rot = 1.f;}
+
 		try
 		{	// enviamos los valores de avance, lateral y rotacion al robot
 			omnirobot_proxy->setSpeedBase(side, adv, rot);
@@ -171,11 +174,11 @@ void SpecificWorker::compute()
 // RoboCompLidar3D: nombre de la interfaz dentro del sistema RoboComp que gestiona los sensores LIDAR 3D.
 /*
 * Le pasamos por parametro la lista de puntos obtenida a traves del proxy del lidar3d. Cada punto representa una lectura del sensor LIDAR
-* Cada punto tiene los siguientes campos: x, y, z, phi, theta, r 
+* Cada punto tiene los siguientes campos: x, y, z, phi, theta, r
 *
 * Como con lidar3d tenemos mucha informacion y ruido debido a que hay demasiados datos, puntos repetidos etc el objetivo de este metodo
 * es quedarse solo con los puntos mas relevantes. En este caso nos quedamos con el punto mas cercano (minimo r) de cada angulo phi.
-*/ 
+*/
 std::optional<RoboCompLidar3D::TPoints> SpecificWorker::filter_lidar(const RoboCompLidar3D::TPoints &points)
 {
 	if (points.empty()) return {};
@@ -185,7 +188,7 @@ std::optional<RoboCompLidar3D::TPoints> SpecificWorker::filter_lidar(const RoboC
 	// phi representa el angulo redondeado a 2 decimales, por ejemplo 0.52
 	// pts tendra todos los puntos que tienen ese mismo angulo phi: 0.520, 0.524, 0.529... y los vamos agrupando con groupby
 	for (auto &&[angle, pts] : iter::groupby(points, [](const auto &p)
-		{	
+		{
 			//redondeamos a dos decimales
 			float multiplier = std::pow(10.f, 2);
 			return std::floor(p.phi*multiplier)/multiplier;

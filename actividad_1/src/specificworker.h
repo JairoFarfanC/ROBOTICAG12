@@ -32,6 +32,7 @@
 //#define HIBERNATION_ENABLED
 
 #include <genericworker.h>
+#include <QObject>
 #include <qtmetamacros.h>
 
 
