@@ -148,17 +148,40 @@ void SpecificWorker::compute()
  		float rot = 0.f;  // rotacion, giro
 
 		qInfo() << "Frontal distance: " << frontal_dist;
-		if (frontal_dist < 700)  // obstáculo cerca
+
+	static bool is_rotating = false;
+	static float rotation_direction = 1.f;
+	if (frontal_dist < 500)
+	{
+		// Solo decide dirección aleatoria si no estaba girando ya
+		if (!is_rotating)
 		{
-			adv = 0.f; // deja de avanzar
-			rot = 1.f; // empieza a girar a un lado (normalmente a la derecha)
+			is_rotating = true;
+
+			// Dirección aleatoria: -1 (izquierda) o 1 (derecha)
+			rotation_direction = (std::rand() % 2 == 0) ? -1.f : 1.f;
+			std::cout << "Obstáculo cerca. Girando hacia: " << (rotation_direction == 1.f ? "derecha" : "izquierda") << std::endl;
 		}
-		else  if (frontal_dist > 1000)// despejado
-		{
-			adv = 1000.f; // avanza hacia adelante a velocidad 1000 mm/s
-			rot = 0.f;
-		}
-		else {adv =0; rot = 1.f;}
+
+		adv = 0.f;
+		rot = rotation_direction * 1.f;
+	}
+	// Si el camino está totalmente libre
+	else if (frontal_dist > 800)
+	{
+		adv = 1000.f;
+		// Introduce un poco de giro aleatorio al avanzar
+		float small_rotation = ((std::rand() % 100) / 100.0f - 0.5f) * 0.2f;
+		rot = small_rotation;
+		is_rotating = false;
+	}
+	// En el rango intermedio (ni muy cerca ni muy lejos)
+	else
+	{
+		adv = 0.f;
+		rot = rotation_direction * 1.f;
+		std::cout << "Intermedio. Sigue girando." << std::endl;
+	}
 
 		try
 		{	// enviamos los valores de avance, lateral y rotacion al robot
