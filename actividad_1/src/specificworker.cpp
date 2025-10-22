@@ -106,90 +106,137 @@ void SpecificWorker::initialize()
  */
 void SpecificWorker::compute()
 {
+    std::vector<RoboCompLidar3D::TPoint> points;
 
-	//Esto es uun vector vacio donde guardaremos los puntos del lidar que realmente vamos a usar tras el filtrado
-	std::vector<RoboCompLidar3D::TPoint> points;
-
-
-        try {
-	        // Obtener los datos del LIDAR 3D
-        	const auto data = lidar3d_proxy->getLidarDataWithThreshold2d("helios", 5000, 1);
-       // 	qInfo() << "LIDAR Data Points: " << data.points.size();
-
-        	// Filtrar puntos quedándose con el mínimo de las theta iguales
-        	const auto filtered = filter_lidar(data.points);
-        	if (filtered.has_value()) {
-        		draw_lidar(filtered.value(), &viewer->scene);
-        		points = filtered.value();
-        	}
-        	//update_robot_position();
+    try {
+        // Obtener los datos del LIDAR 3D
+        const auto data = lidar3d_proxy->getLidarDataWithThreshold2d("helios", 5000, 1);
+        const auto filtered = filter_lidar(data.points);
+        if (filtered.has_value()) {
+            draw_lidar(filtered.value(), &viewer->scene);
+            points = filtered.value();
         }
-		catch (const Ice::Exception &e){ std::cout << e.what() << std::endl; }
+    }
+    catch (const Ice::Exception &e) {
+        std::cout << e.what() << std::endl;
+    }
 
-		// El min
-		// si menor distancia en el centro del array es menor the 500
-		// el minimo elemento está en la mitad del array. Para leerlo calcula el largo del array/2, y algo de Begin
-		//    adv = 0, rot = 1
-		// else adv 1000 rot = 0
-	// Si no hay puntos, no continuamos
+    if (points.empty())
+        return;
+
+    // === CÁLCULO DE DISTANCIAS ===
+    int size = points.size();
+    int mid_index = size / 2;
+    int left_index = size * 0.30;
+    int right_index = size * 0.70;
+
+    float frontal_dist = points[mid_index].distance2d;
+    float left_dist = points[left_index].distance2d;
+    float right_dist = points[right_index].distance2d;
+
+    qInfo() << "Frontal: " << frontal_dist << " | Left: " << left_dist << " | Right: " << right_dist;
+
+    // === VARIABLES DE MOVIMIENTO ===
+    float side = 0.f;
+    float adv = 0.f;
+    float rot = 0.f;
 
 
-		if (points.empty())
-			return;
+    static bool is_rotating = false;
+    static float rotation_direction = 1.f;
+    static std::chrono::time_point<std::chrono::steady_clock, std::chrono::duration<float, std::ratio<1, 1000000000>>> rotation_end_time;
 
-		// vamos a obtener el punto central del array de puntos ya que por como el LIDAR escanea, los puntos estan ordenados de
-		// izquierda a derecha, por tanto el punto central es el que esta justo delante del robot(la direccion a la que esta mirando)
-		int mid_index = points.size() / 2;
-		// es la distancia en mm del punto central, cuanto menor sea ese valor, mas cerca hay un obstaculo justo delante
-		float frontal_dist = points[mid_index].distance2d;
+    // Umbrales
+    const float OBSTACLE_THRESHOLD = 500.f;
+    const float CLEAR_THRESHOLD = 800.f;
 
-		float side = 0.f; // lateral, izquierda/derecha
-		float adv = 0.f;  // avance, adelante/atras
- 		float rot = 0.f;  // rotacion, giro
+    auto now = std::chrono::steady_clock::now();
 
-		qInfo() << "Frontal distance: " << frontal_dist;
+    // === LÓGICA DE DECISIÓN ACTUALIZADA ===
+    bool obstacle_frontal = frontal_dist < OBSTACLE_THRESHOLD;
+    bool obstacle_left = left_dist < OBSTACLE_THRESHOLD;
+    bool obstacle_right = right_dist < OBSTACLE_THRESHOLD;
 
-	static bool is_rotating = false;
-	static float rotation_direction = 1.f;
-	if (frontal_dist < 500)
+	if ((obstacle_frontal || obstacle_left || obstacle_right) && !is_rotating)
 	{
-		// Solo decide dirección aleatoria si no estaba girando ya
-		if (!is_rotating)
+		is_rotating = true;
+
+		// Dirección de giro aleatoria por defecto [-1.5, 1.5]
+		rotation_direction = ((std::rand() % 3000) / 1000.0f) - 1.5f;
+
+		float rotation_duration = 0.0f;
+
+		// Caso: SOLO obstáculo a la izquierda → gira a la derecha durante 1 segundo
+		if (obstacle_left && !obstacle_frontal && !obstacle_right)
 		{
-			is_rotating = true;
+			rotation_direction = ((std::rand() % 1000) / 1000.0f) * 1.5f;  // [0.0, 1.5]
+			rotation_duration = 0.9f + static_cast<float>(std::rand() % 301) / 1000.f;  // [0.9, 1.2]
 
-			// Dirección aleatoria: -1 (izquierda) o 1 (derecha)
-			rotation_direction = (std::rand() % 2 == 0) ? -1.f : 1.f;
-			std::cout << "Obstáculo cerca. Girando hacia: " << (rotation_direction == 1.f ? "derecha" : "izquierda") << std::endl;
+			//rotation_duration = 1.2f;
+		}
+		// Caso: SOLO obstáculo a la derecha → gira a la izquierda durante 1 segundo
+		else if (obstacle_right && !obstacle_frontal && !obstacle_left)
+		{
+			rotation_direction = -((std::rand() % 1000) / 1000.0f) * 1.5f; // [-1.5, 0.0]
+			rotation_duration = 0.9f + static_cast<float>(std::rand() % 301) / 1000.f;  // [0.9, 1.2]
+
+			//rotation_duration = 1.2f;
+		}
+		// Caso: obstáculo FRONTAL (con o sin laterales) → duración aleatoria (1.0 a 2.0 s)
+		else
+		{
+			rotation_duration = 0.9f + static_cast<float>(std::rand() % 301) / 1000.f;  // [0.9, 1.2]
+
+			//rotation_duration = 1.f + static_cast<float>(std::rand() % 1200) / 1200.f;  // [1.5, 3.0]
 		}
 
-		adv = 0.f;
-		rot = rotation_direction * 1.f;
-	}
-	// Si el camino está totalmente libre
-	else if (frontal_dist > 800)
-	{
-		adv = 1000.f;
-		// Introduce un poco de giro aleatorio al avanzar
-		float small_rotation = ((std::rand() % 100) / 100.0f - 0.5f) * 0.2f;
-		rot = small_rotation;
-		is_rotating = false;
-	}
-	// En el rango intermedio (ni muy cerca ni muy lejos)
-	else
-	{
-		adv = 0.f;
-		rot = rotation_direction * 1.f;
-		std::cout << "Intermedio. Sigue girando." << std::endl;
+		rotation_end_time = now + std::chrono::duration<float>(rotation_duration);
+
+		std::cout << "Iniciando giro por obstáculo. Dirección: " << rotation_direction
+				  << " | Duración: " << rotation_duration << " segundos" << std::endl;
 	}
 
-		try
-		{	// enviamos los valores de avance, lateral y rotacion al robot
-			omnirobot_proxy->setSpeedBase(side, adv, rot);
-		}catch (const Ice::Exception &e) {
-			std::cout << e.what() << std::endl;
-		}
+
+    // Si está girando (por obstáculo frontal o lateral)
+    if (is_rotating)
+    {
+        if (now < rotation_end_time)
+        {
+            adv = 0.f;
+            rot = 1.2f;
+        }
+        else
+        {
+            is_rotating = false;
+        }
+    }
+    // Camino despejado → avanza
+    else if (frontal_dist > CLEAR_THRESHOLD)
+    {
+        adv = 1000.f;
+
+        // Pequeña rotación aleatoria para evitar trayectoria recta
+        //float small_rotation = ((std::rand() % 100) / 100.0f - 0.5f) * 0.2f;
+        rot = 0.f;
+    }
+    // Zona intermedia: avanzar lento
+    else
+    {
+        adv = 1000.f;
+        rot = 0.f;
+    }
+
+    // === ENVIAR VELOCIDADES AL ROBOT ===
+    try
+    {
+        omnirobot_proxy->setSpeedBase(side, adv, rot);
+    }
+    catch (const Ice::Exception &e)
+    {
+        std::cout << e.what() << std::endl;
+    }
 }
+
 
 
 
