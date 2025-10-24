@@ -2186,6 +2186,8 @@
  mdp:/usr/lib/gcc/x86_64-linux-gnu/13/include/stdbool.h
  mdp:/usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h
 /home/usuario/robocomp/classes/rapplication/rapplication.cpp
+/home/usuario/robocomp/classes/ConfigLoader/ConfigLoader.h
+/home/usuario/robocomp/classes/rapplication/rapplication.h
 /home/usuario/ROBOTICAG12/actividad_1/generated/genericworker.h
  mmc:Q_OBJECT
  mdp:/home/usuario/ROBOTICAG12/actividad_1/generated/GenericBase.h
@@ -3114,5 +3116,3 @@
  mdp:/usr/local/include/toml++/toml.h
  mdp:/usr/local/include/toml++/toml.hpp
  uic:ui_mainUI.h
-/home/usuario/robocomp/classes/rapplication/rapplication.h
-/home/usuario/robocomp/classes/ConfigLoader/ConfigLoader.h
