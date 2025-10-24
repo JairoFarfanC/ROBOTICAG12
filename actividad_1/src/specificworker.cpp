@@ -6,46 +6,47 @@
 #include <cppitertools/groupby.hpp>
 
 SpecificWorker::SpecificWorker(const ConfigLoader& configLoader, TuplePrx tprx, bool startup_check)
-	: GenericWorker(configLoader, tprx), startup_check_flag(startup_check)
+    : GenericWorker(configLoader, tprx), startup_check_flag(startup_check)
 {
-	if (this->startup_check_flag)
-		this->startup_check();
-	else
-	{
+    if (this->startup_check_flag)
+        this->startup_check();
+    else
+    {
 #ifdef HIBERNATION_ENABLED
-		hibernationChecker.start(500);
+        hibernationChecker.start(500);
 #endif
 
-		statemachine.setChildMode(QState::ExclusiveStates);
-		statemachine.start();
+        statemachine.setChildMode(QState::ExclusiveStates);
+        statemachine.start();
 
-		auto error = statemachine.errorString();
-		if (!error.isEmpty())
-		{
-			qWarning() << error;
-			throw error;
-		}
-	}
+        auto error = statemachine.errorString();
+        if (!error.isEmpty())
+        {
+            qWarning() << error;
+            throw error;
+        }
+    }
 }
 
 SpecificWorker::~SpecificWorker()
 {
-	std::cout << "Destroying SpecificWorker" << std::endl;
+    std::cout << "Destroying SpecificWorker" << std::endl;
 }
 
 void SpecificWorker::initialize()
 {
-	std::cout << "initialize worker" << std::endl;
+    std::cout << "initialize worker" << std::endl;
 
-	this->dimensions = QRectF(-6000, -3000, 12000, 6000);
-	viewer = new AbstractGraphicViewer(this->frame, this->dimensions);
-	viewer->show();
-	const auto rob = viewer->add_robot(ROBOT_LENGTH, ROBOT_LENGTH, 0, 190, QColor("Blue"));
-	robot_polygon = std::get<0>(rob);
+    this->dimensions = QRectF(-6000, -3000, 12000, 6000);
+    viewer = new AbstractGraphicViewer(this->frame, this->dimensions);
+    viewer->show();
+    const auto rob = viewer->add_robot(ROBOT_LENGTH, ROBOT_LENGTH, 0, 190, QColor("Blue"));
+    robot_polygon = std::get<0>(rob);
 
-	connect(viewer, &AbstractGraphicViewer::new_mouse_coordinates, this, &SpecificWorker::new_target_slot);
+    connect(viewer, &AbstractGraphicViewer::new_mouse_coordinates, this, &SpecificWorker::new_target_slot);
+    
 
-	current_mode = Mode::IDLE;
+    current_mode = Mode::IDLE;
 }
 
 /**
@@ -53,100 +54,77 @@ void SpecificWorker::initialize()
  */
 void SpecificWorker::compute()
 {
-	std::vector<RoboCompLidar3D::TPoint> points;
+    std::vector<RoboCompLidar3D::TPoint> points;
 
-	try
-	{
-		const auto data = lidar3d_proxy->getLidarDataWithThreshold2d("helios", 5000, 1);
-		const auto filtered = filter_lidar(data.points);
-		if (filtered.has_value())
-		{
-			draw_lidar(filtered.value(), &viewer->scene);
-			points = filtered.value();
-		}
-	}
-	catch (const Ice::Exception &e)
-	{
-		std::cout << e.what() << std::endl;
-		return;
-	}
+    try
+    {
+        const auto data = lidar3d_proxy->getLidarDataWithThreshold2d("helios", 5000, 1);
+        const auto filtered = filter_lidar(data.points);
+        if (filtered.has_value())
+        {
+            draw_lidar(filtered.value(), &viewer->scene);
+            points = filtered.value();
+        }
+    }
+    catch (const Ice::Exception &e)
+    {
+        std::cout << e.what() << std::endl;
+        return;
+    }
 
-	if (points.empty()) return;
+    if (points.empty()) return;
 
-	// === Cálculo de distancias laterales y frontal ===
-	int size = points.size();
-	int mid_index = size / 2;
-<<<<<<< HEAD
-	int left_index = size * 0.30;
-	int right_index = size * 0.70;
-=======
-	int left_index = size * 0.35;
-	int right_index = size * 0.65;
->>>>>>> fa944a1 (switch hecho y espiral)
+    // === Cálculo de distancias laterales y frontal ===
+    int size = points.size();
+    int mid_index = size / 2;
+    int left_index = size * 0.35;
+    int right_index = size * 0.65;
 
-	float frontal_dist = points[mid_index].distance2d;
-	float left_dist = points[left_index].distance2d;
-	float right_dist = points[right_index].distance2d;
+    float frontal_dist = points[mid_index].distance2d;
+    float left_dist = points[left_index].distance2d;
+    float right_dist = points[right_index].distance2d;
 
-	qInfo() << "Mode:" << static_cast<int>(current_mode)
-			<< " | Frontal:" << frontal_dist
-			<< " | Left:" << left_dist
-			<< " | Right:" << right_dist;
+    qInfo() << "Mode:" << static_cast<int>(current_mode)
+            << " | Frontal:" << frontal_dist
+            << " | Left:" << left_dist
+            << " | Right:" << right_dist;
 
-	// === Ejecutar el modo actual ===
-	std::tuple<Mode, float, float, float> result;
+    // === Ejecutar el modo actual ===
+    std::tuple<Mode, float, float, float> result;
 
-	switch (current_mode)
-	{
-<<<<<<< HEAD
-		case Mode::IDLE:
-			result = mode_idle(frontal_dist, left_dist, right_dist);
-			break;
+    switch (current_mode)
+    {
+        case Mode::IDLE:
+            result = mode_idle(frontal_dist, left_dist, right_dist);
+            break;
 
-		case Mode::FORWARD:
-			result = mode_forward(frontal_dist, left_dist, right_dist);
-			break;
+        case Mode::FORWARD:
+            result = mode_forward(frontal_dist, left_dist, right_dist);
+            break;
 
-		case Mode::TURN:
-			result = mode_turn(frontal_dist, left_dist, right_dist);
-			break;
-	}
+        case Mode::TURN:
+            result = mode_turn(frontal_dist, left_dist, right_dist);
+            break;
 
-=======
-	case Mode::IDLE:
-		result = mode_idle(frontal_dist, left_dist, right_dist);
-		break;
+        case Mode::SPIRAL:
+            result = mode_spiral(frontal_dist, left_dist, right_dist);
+            break;
+    }
 
-	case Mode::FORWARD:
-		result = mode_forward(frontal_dist, left_dist, right_dist);
-		break;
+    current_mode = std::get<0>(result);
+    float side = std::get<1>(result);
+    float adv = std::get<2>(result);
+    float rot = std::get<3>(result);
 
-	case Mode::TURN:
-		result = mode_turn(frontal_dist, left_dist, right_dist);
-		break;
-
-	case Mode::SPIRAL:
-		result = mode_spiral(frontal_dist, left_dist, right_dist);
-		break;
-	}
-
-
->>>>>>> fa944a1 (switch hecho y espiral)
-	current_mode = std::get<0>(result);
-	float side = std::get<1>(result);
-	float adv = std::get<2>(result);
-	float rot = std::get<3>(result);
-<<<<<<< HEAD
-
-	// === Enviar velocidades al robot ===
-	try
-	{
-		omnirobot_proxy->setSpeedBase(side, adv, rot);
-	}
-	catch (const Ice::Exception &e)
-	{
-		std::cout << e.what() << std::endl;
-	}
+    // === Enviar velocidades al robot ===
+    try
+    {
+        omnirobot_proxy->setSpeedBase(side, adv, rot);
+    }
+    catch (const Ice::Exception &e)
+    {
+        std::cout << e.what() << std::endl;
+    }
 }
 
 /**
@@ -154,120 +132,15 @@ void SpecificWorker::compute()
  */
 std::tuple<SpecificWorker::Mode, float, float, float> SpecificWorker::mode_idle(float frontal, float left, float right)
 {
-	const float CLEAR_THRESHOLD = 800.f;
-
-	if (frontal > CLEAR_THRESHOLD)
-	{
-		qInfo() << "Switching to FORWARD mode";
-		return {Mode::FORWARD, 0.f, 1000.f, 0.f};
-	}
-	else
-		return {Mode::IDLE, 0.f, 0.f, 0.f};
-}
-
-/**
- * === MODO FORWARD ===
- */
-std::tuple<SpecificWorker::Mode, float, float, float> SpecificWorker::mode_forward(float frontal, float left, float right)
-{
-	const float OBSTACLE_THRESHOLD = 500.f;
-	const float CLEAR_THRESHOLD = 800.f;
-
-	bool obstacle_front = frontal < OBSTACLE_THRESHOLD;
-	bool obstacle_side = (left < OBSTACLE_THRESHOLD || right < OBSTACLE_THRESHOLD);
-
-	if (obstacle_front || obstacle_side)
-	{
-		qInfo() << "Obstacle detected -> Switching to TURN mode";
-		return {Mode::TURN, 0.f, 0.f, 1.2f};
-	}
-
-	if (frontal > CLEAR_THRESHOLD)
-		return {Mode::FORWARD, 0.f, 1000.f, 0.f};
-	else
-		return {Mode::FORWARD, 0.f, 500.f, 0.f};
-}
-
-/**
- * === MODO TURN ===
- */
-std::tuple<SpecificWorker::Mode, float, float, float> SpecificWorker::mode_turn(float frontal, float left, float right)
-{
-    static auto turn_start = std::chrono::steady_clock::now();
-    static float rotation_duration = 1.0f;
-    static float rotation_direction = 1.f;
-    static bool initialized = false;
-
-    const float OBSTACLE_THRESHOLD = 500.f;
     const float CLEAR_THRESHOLD = 800.f;
 
-    // Inicialización al entrar en modo TURN
-    if (!initialized)
+    if (frontal > CLEAR_THRESHOLD)
     {
-        turn_start = std::chrono::steady_clock::now();
-
-        // Determinar dirección según el lado con menos espacio
-        if (left < OBSTACLE_THRESHOLD && right > OBSTACLE_THRESHOLD)
-        {
-            rotation_direction = 1.f;   // Obstáculo a la izquierda → girar a la derecha
-            rotation_duration = 0.9f + static_cast<float>(std::rand() % 301) / 1000.f;  // [0.9, 1.2]
-        }
-        else if (right < OBSTACLE_THRESHOLD && left > OBSTACLE_THRESHOLD)
-        {
-            rotation_direction = -1.f;  // Obstáculo a la derecha → girar a la izquierda
-            rotation_duration = 0.9f + static_cast<float>(std::rand() % 301) / 1000.f;
-        }
-        else if (frontal < OBSTACLE_THRESHOLD)
-        {
-            // Obstáculo frontal → dirección aleatoria
-            rotation_direction = ((std::rand() % 2000) / 1000.f) - 1.f;  // [-1, 1]
-            rotation_duration = 1.f + static_cast<float>(std::rand() % 500) / 1000.f;   // [1.0, 1.5]
-        }
-
-        initialized = true;
-
-        qInfo() << "TURN mode: direction =" << rotation_direction
-                << " duration =" << rotation_duration << "s";
+        qInfo() << "Switching to FORWARD mode";
+        return {Mode::FORWARD, 0.f, 1000.f, 0.f};
     }
-
-    // Calcular tiempo transcurrido
-    auto now = std::chrono::steady_clock::now();
-    float elapsed = std::chrono::duration<float>(now - turn_start).count();
-
-    // Mientras dura el giro → seguir girando
-    if (elapsed < rotation_duration)
-    {
-        return {Mode::TURN, 0.f, 0.f, 1.2f * rotation_direction};
-    }
-
-    // Al finalizar el giro → comprobar si ya hay espacio libre
-=======
-
-	// === Enviar velocidades al robot ===
-	try
-	{
-		omnirobot_proxy->setSpeedBase(side, adv, rot);
-	}
-	catch (const Ice::Exception &e)
-	{
-		std::cout << e.what() << std::endl;
-	}
-}
-
-/**
- * === MODO IDLE ===
- */
-std::tuple<SpecificWorker::Mode, float, float, float> SpecificWorker::mode_idle(float frontal, float left, float right)
-{
-	const float CLEAR_THRESHOLD = 800.f;
-
-	if (frontal > CLEAR_THRESHOLD)
-	{
-		qInfo() << "Switching to FORWARD mode";
-		return {Mode::FORWARD, 0.f, 1000.f, 0.f};
-	}
-	else
-		return {Mode::IDLE, 0.f, 0.f, 0.f};
+    else
+        return {Mode::IDLE, 0.f, 0.f, 0.f};
 }
 
 /**
@@ -277,29 +150,29 @@ std::tuple<SpecificWorker::Mode, float, float, float>
 SpecificWorker::mode_forward(float frontal, float left, float right)
 {
     const float OBSTACLE_THRESHOLD = 500.f;
-    const float SPIRAL_THRESHOLD = 800.f;  // umbral de espacio amplio razonable
+    const float SPIRAL_THRESHOLD = 800.f;
 
     bool obstacle_front = frontal < OBSTACLE_THRESHOLD;
     bool obstacle_side = (left < OBSTACLE_THRESHOLD || right < OBSTACLE_THRESHOLD);
 
-    // ---- 1️⃣ Si hay obstáculo: girar ----
     if (obstacle_front || obstacle_side)
     {
         qInfo() << "Obstacle detected -> Switching to TURN mode";
         return {Mode::TURN, 0.f, 0.f, 1.2f};
     }
 
-    // ---- 2️⃣ Si hay espacio libre suficiente: entrar en espiral ----
     if (frontal > SPIRAL_THRESHOLD && left > SPIRAL_THRESHOLD && right > SPIRAL_THRESHOLD)
     {
         qInfo() << "Wide open space -> Switching to SPIRAL mode";
         return {Mode::SPIRAL, 0.f, 1000.f, 0.3f};
     }
 
-    // ---- 3️⃣ Caso normal: seguir hacia adelante ----
     return {Mode::FORWARD, 0.f, 1000.f, 0.f};
 }
 
+/**
+ * === MODO TURN ===
+ */
 std::tuple<SpecificWorker::Mode, float, float, float>
 SpecificWorker::mode_turn(float frontal, float left, float right)
 {
@@ -315,21 +188,14 @@ SpecificWorker::mode_turn(float frontal, float left, float right)
     {
         turn_start = std::chrono::steady_clock::now();
 
-        // Duración aleatoria entre 0.4 y 0.7 s
         rotation_duration = 0.4f + static_cast<float>(std::rand() % 301) / 1000.f; // 0.4–0.7
 
         if (left < OBSTACLE_THRESHOLD && right > OBSTACLE_THRESHOLD)
-        {
             rotation_direction = 1.f; // Obstáculo a la izquierda → girar a la derecha
-        }
         else if (right < OBSTACLE_THRESHOLD && left > OBSTACLE_THRESHOLD)
-        {
             rotation_direction = -1.f; // Obstáculo a la derecha → girar a la izquierda
-        }
         else if (frontal < OBSTACLE_THRESHOLD)
-        {
-            rotation_direction = (std::rand() % 2 == 0) ? 1.f : -1.f; // frontal → dirección aleatoria
-        }
+            rotation_direction = (std::rand() % 2 == 0) ? 1.f : -1.f;
 
         initialized = true;
         qInfo() << "TURN mode: direction =" << rotation_direction
@@ -340,11 +206,8 @@ SpecificWorker::mode_turn(float frontal, float left, float right)
     float elapsed = std::chrono::duration<float>(now - turn_start).count();
 
     if (elapsed < rotation_duration)
-    {
         return {Mode::TURN, 0.f, 0.f, 1.2f * rotation_direction};
-    }
 
->>>>>>> fa944a1 (switch hecho y espiral)
     if (frontal > CLEAR_THRESHOLD)
     {
         initialized = false;
@@ -353,33 +216,22 @@ SpecificWorker::mode_turn(float frontal, float left, float right)
     }
     else
     {
-<<<<<<< HEAD
-        // Si todavía hay obstáculos, continuar girando un poco más
-        turn_start = now;
-        rotation_duration = 0.8f + static_cast<float>(std::rand() % 400) / 1000.f;  // 0.8–1.2 s
-=======
-        // Continuar girando si hay obstáculo
         turn_start = now;
         rotation_duration = 0.3f + static_cast<float>(std::rand() % 301) / 1000.f; // 0.4–0.7 s
->>>>>>> fa944a1 (switch hecho y espiral)
         qInfo() << "Obstáculo aún presente → continuando giro";
         return {Mode::TURN, 0.f, 0.f, 1.2f * rotation_direction};
     }
 }
 
-
 /**
-<<<<<<< HEAD
-=======
  * === MODO SPIRAL ===
  */
 std::tuple<SpecificWorker::Mode, float, float, float>
 SpecificWorker::mode_spiral(float frontal, float left, float right)
 {
     const float OBSTACLE_THRESHOLD = 500.f;
-
-    const float ADV_SPEED = 1000.f;  // avance constante
-    const float ROT_SPEED = 0.3f;    // giro suave para espiral
+    const float ADV_SPEED = 1000.f;
+    const float ROT_SPEED = 0.3f;
 
     static bool initialized = false;
     if (!initialized)
@@ -403,25 +255,24 @@ SpecificWorker::mode_spiral(float frontal, float left, float right)
 }
 
 /**
->>>>>>> fa944a1 (switch hecho y espiral)
  * === FILTRADO DE LIDAR ===
  */
 std::optional<RoboCompLidar3D::TPoints> SpecificWorker::filter_lidar(const RoboCompLidar3D::TPoints &points)
 {
-	if (points.empty()) return {};
+    if (points.empty()) return {};
 
-	RoboCompLidar3D::TPoints filtered;
-	for (auto &&[angle, pts] : iter::groupby(points, [](const auto &p)
-	{
-		float multiplier = std::pow(10.f, 2);
-		return std::floor(p.phi * multiplier) / multiplier;
-	}))
-	{
-		auto min_it = std::min_element(pts.begin(), pts.end(),
-									   [](const auto &a, const auto &b) { return a.r < b.r; });
-		filtered.emplace_back(*min_it);
-	}
-	return filtered;
+    RoboCompLidar3D::TPoints filtered;
+    for (auto &&[angle, pts] : iter::groupby(points, [](const auto &p)
+    {
+        float multiplier = std::pow(10.f, 2);
+        return std::floor(p.phi * multiplier) / multiplier;
+    }))
+    {
+        auto min_it = std::min_element(pts.begin(), pts.end(),
+                                       [](const auto &a, const auto &b) { return a.r < b.r; });
+        filtered.emplace_back(*min_it);
+    }
+    return filtered;
 }
 
 /**
@@ -429,24 +280,24 @@ std::optional<RoboCompLidar3D::TPoints> SpecificWorker::filter_lidar(const RoboC
  */
 void SpecificWorker::draw_lidar(const RoboCompLidar3D::TPoints &points, QGraphicsScene *scene)
 {
-	static std::vector<QGraphicsItem *> draw_points;
+    static std::vector<QGraphicsItem *> draw_points;
 
-	for (const auto &p : draw_points)
-	{
-		scene->removeItem(p);
-		delete p;
-	}
-	draw_points.clear();
+    for (const auto &p : draw_points)
+    {
+        scene->removeItem(p);
+        delete p;
+    }
+    draw_points.clear();
 
-	const QColor color("LightGreen");
-	const QPen pen(color, 10);
+    const QColor color("LightGreen");
+    const QPen pen(color, 10);
 
-	for (const auto &p : points)
-	{
-		auto dp = scene->addRect(-25, -25, 50, 50, pen);
-		dp->setPos(p.x, p.y);
-		draw_points.push_back(dp);
-	}
+    for (const auto &p : points)
+    {
+        auto dp = scene->addRect(-25, -25, 50, 50, pen);
+        dp->setPos(p.x, p.y);
+        draw_points.push_back(dp);
+    }
 }
 
 /**
@@ -454,48 +305,36 @@ void SpecificWorker::draw_lidar(const RoboCompLidar3D::TPoints &points, QGraphic
  */
 void SpecificWorker::update_robot_position()
 {
-	try
-	{
-		RoboCompGenericBase::TBaseState bState;
-		omnirobot_proxy->getBaseState(bState);
-		robot_polygon->setRotation(bState.alpha * 180 / M_1_PI);
-		robot_polygon->setPos(bState.x, bState.z);
-	}
-	catch (const Ice::Exception &e)
-	{
-		std::cout << e.what() << std::endl;
-	}
+    try
+    {
+        RoboCompGenericBase::TBaseState bState;
+        omnirobot_proxy->getBaseState(bState);
+        robot_polygon->setRotation(bState.alpha * 180 / M_1_PI);
+        robot_polygon->setPos(bState.x, bState.z);
+    }
+    catch (const Ice::Exception &e)
+    {
+        std::cout << e.what() << std::endl;
+    }
 }
 
 /**
  * === EMERGENCIA Y RESTAURACIÓN ===
  */
-void SpecificWorker::emergency()
-{
-	std::cout << "Emergency worker" << std::endl;
-}
-
-void SpecificWorker::restore()
-{
-	std::cout << "Restore worker" << std::endl;
-}
+void SpecificWorker::emergency() { std::cout << "Emergency worker" << std::endl; }
+void SpecificWorker::restore() { std::cout << "Restore worker" << std::endl; }
 
 /**
  * === STARTUP CHECK ===
  */
 int SpecificWorker::startup_check()
 {
-	std::cout << "Startup check" << std::endl;
-	QTimer::singleShot(200, QCoreApplication::instance(), SLOT(quit()));
-	return 0;
+    std::cout << "Startup check" << std::endl;
+    QTimer::singleShot(200, QCoreApplication::instance(), SLOT(quit()));
+    return 0;
 }
 
 void SpecificWorker::new_target_slot(QPointF p)
 {
-	Q_UNUSED(p);
-<<<<<<< HEAD
+    Q_UNUSED(p);
 }
-
-=======
-}
->>>>>>> fa944a1 (switch hecho y espiral)
