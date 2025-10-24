@@ -1,3 +1,4 @@
+
 #ifndef SPECIFICWORKER_H
 #define SPECIFICWORKER_H
 
@@ -33,13 +34,15 @@ public slots:
 private:
 
 	// === ENUM de modos del robot ===
-	enum class Mode { IDLE, FORWARD, TURN };
+	enum class Mode { IDLE, FORWARD, TURN, SPIRAL };
 	Mode current_mode = Mode::IDLE;
 
 	// === Métodos de comportamiento ===
 	std::tuple<Mode, float, float, float> mode_idle(float frontal, float left, float right);
 	std::tuple<Mode, float, float, float> mode_forward(float frontal, float left, float right);
 	std::tuple<Mode, float, float, float> mode_turn(float frontal, float left, float right);
+	std::tuple<Mode, float, float, float> mode_spiral(float frontal, float left, float right);
+
 
 	// === Herramientas gráficas y variables internas ===
 	bool startup_check_flag = false;

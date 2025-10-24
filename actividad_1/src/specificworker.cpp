@@ -76,8 +76,13 @@ void SpecificWorker::compute()
 	// === Cálculo de distancias laterales y frontal ===
 	int size = points.size();
 	int mid_index = size / 2;
+<<<<<<< HEAD
 	int left_index = size * 0.30;
 	int right_index = size * 0.70;
+=======
+	int left_index = size * 0.35;
+	int right_index = size * 0.65;
+>>>>>>> fa944a1 (switch hecho y espiral)
 
 	float frontal_dist = points[mid_index].distance2d;
 	float left_dist = points[left_index].distance2d;
@@ -93,6 +98,7 @@ void SpecificWorker::compute()
 
 	switch (current_mode)
 	{
+<<<<<<< HEAD
 		case Mode::IDLE:
 			result = mode_idle(frontal_dist, left_dist, right_dist);
 			break;
@@ -106,10 +112,31 @@ void SpecificWorker::compute()
 			break;
 	}
 
+=======
+	case Mode::IDLE:
+		result = mode_idle(frontal_dist, left_dist, right_dist);
+		break;
+
+	case Mode::FORWARD:
+		result = mode_forward(frontal_dist, left_dist, right_dist);
+		break;
+
+	case Mode::TURN:
+		result = mode_turn(frontal_dist, left_dist, right_dist);
+		break;
+
+	case Mode::SPIRAL:
+		result = mode_spiral(frontal_dist, left_dist, right_dist);
+		break;
+	}
+
+
+>>>>>>> fa944a1 (switch hecho y espiral)
 	current_mode = std::get<0>(result);
 	float side = std::get<1>(result);
 	float adv = std::get<2>(result);
 	float rot = std::get<3>(result);
+<<<<<<< HEAD
 
 	// === Enviar velocidades al robot ===
 	try
@@ -214,6 +241,110 @@ std::tuple<SpecificWorker::Mode, float, float, float> SpecificWorker::mode_turn(
     }
 
     // Al finalizar el giro → comprobar si ya hay espacio libre
+=======
+
+	// === Enviar velocidades al robot ===
+	try
+	{
+		omnirobot_proxy->setSpeedBase(side, adv, rot);
+	}
+	catch (const Ice::Exception &e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+}
+
+/**
+ * === MODO IDLE ===
+ */
+std::tuple<SpecificWorker::Mode, float, float, float> SpecificWorker::mode_idle(float frontal, float left, float right)
+{
+	const float CLEAR_THRESHOLD = 800.f;
+
+	if (frontal > CLEAR_THRESHOLD)
+	{
+		qInfo() << "Switching to FORWARD mode";
+		return {Mode::FORWARD, 0.f, 1000.f, 0.f};
+	}
+	else
+		return {Mode::IDLE, 0.f, 0.f, 0.f};
+}
+
+/**
+ * === MODO FORWARD ===
+ */
+std::tuple<SpecificWorker::Mode, float, float, float>
+SpecificWorker::mode_forward(float frontal, float left, float right)
+{
+    const float OBSTACLE_THRESHOLD = 500.f;
+    const float SPIRAL_THRESHOLD = 800.f;  // umbral de espacio amplio razonable
+
+    bool obstacle_front = frontal < OBSTACLE_THRESHOLD;
+    bool obstacle_side = (left < OBSTACLE_THRESHOLD || right < OBSTACLE_THRESHOLD);
+
+    // ---- 1️⃣ Si hay obstáculo: girar ----
+    if (obstacle_front || obstacle_side)
+    {
+        qInfo() << "Obstacle detected -> Switching to TURN mode";
+        return {Mode::TURN, 0.f, 0.f, 1.2f};
+    }
+
+    // ---- 2️⃣ Si hay espacio libre suficiente: entrar en espiral ----
+    if (frontal > SPIRAL_THRESHOLD && left > SPIRAL_THRESHOLD && right > SPIRAL_THRESHOLD)
+    {
+        qInfo() << "Wide open space -> Switching to SPIRAL mode";
+        return {Mode::SPIRAL, 0.f, 1000.f, 0.3f};
+    }
+
+    // ---- 3️⃣ Caso normal: seguir hacia adelante ----
+    return {Mode::FORWARD, 0.f, 1000.f, 0.f};
+}
+
+std::tuple<SpecificWorker::Mode, float, float, float>
+SpecificWorker::mode_turn(float frontal, float left, float right)
+{
+    static auto turn_start = std::chrono::steady_clock::now();
+    static float rotation_duration = 1.0f;
+    static float rotation_direction = 1.f;
+    static bool initialized = false;
+
+    const float OBSTACLE_THRESHOLD = 500.f;
+    const float CLEAR_THRESHOLD = 800.f;
+
+    if (!initialized)
+    {
+        turn_start = std::chrono::steady_clock::now();
+
+        // Duración aleatoria entre 0.4 y 0.7 s
+        rotation_duration = 0.4f + static_cast<float>(std::rand() % 301) / 1000.f; // 0.4–0.7
+
+        if (left < OBSTACLE_THRESHOLD && right > OBSTACLE_THRESHOLD)
+        {
+            rotation_direction = 1.f; // Obstáculo a la izquierda → girar a la derecha
+        }
+        else if (right < OBSTACLE_THRESHOLD && left > OBSTACLE_THRESHOLD)
+        {
+            rotation_direction = -1.f; // Obstáculo a la derecha → girar a la izquierda
+        }
+        else if (frontal < OBSTACLE_THRESHOLD)
+        {
+            rotation_direction = (std::rand() % 2 == 0) ? 1.f : -1.f; // frontal → dirección aleatoria
+        }
+
+        initialized = true;
+        qInfo() << "TURN mode: direction =" << rotation_direction
+                << " duration =" << rotation_duration << "s";
+    }
+
+    auto now = std::chrono::steady_clock::now();
+    float elapsed = std::chrono::duration<float>(now - turn_start).count();
+
+    if (elapsed < rotation_duration)
+    {
+        return {Mode::TURN, 0.f, 0.f, 1.2f * rotation_direction};
+    }
+
+>>>>>>> fa944a1 (switch hecho y espiral)
     if (frontal > CLEAR_THRESHOLD)
     {
         initialized = false;
@@ -222,9 +353,15 @@ std::tuple<SpecificWorker::Mode, float, float, float> SpecificWorker::mode_turn(
     }
     else
     {
+<<<<<<< HEAD
         // Si todavía hay obstáculos, continuar girando un poco más
         turn_start = now;
         rotation_duration = 0.8f + static_cast<float>(std::rand() % 400) / 1000.f;  // 0.8–1.2 s
+=======
+        // Continuar girando si hay obstáculo
+        turn_start = now;
+        rotation_duration = 0.3f + static_cast<float>(std::rand() % 301) / 1000.f; // 0.4–0.7 s
+>>>>>>> fa944a1 (switch hecho y espiral)
         qInfo() << "Obstáculo aún presente → continuando giro";
         return {Mode::TURN, 0.f, 0.f, 1.2f * rotation_direction};
     }
@@ -232,6 +369,41 @@ std::tuple<SpecificWorker::Mode, float, float, float> SpecificWorker::mode_turn(
 
 
 /**
+<<<<<<< HEAD
+=======
+ * === MODO SPIRAL ===
+ */
+std::tuple<SpecificWorker::Mode, float, float, float>
+SpecificWorker::mode_spiral(float frontal, float left, float right)
+{
+    const float OBSTACLE_THRESHOLD = 500.f;
+
+    const float ADV_SPEED = 1000.f;  // avance constante
+    const float ROT_SPEED = 0.3f;    // giro suave para espiral
+
+    static bool initialized = false;
+    if (!initialized)
+    {
+        initialized = true;
+        qInfo() << "Entering SPIRAL mode";
+    }
+
+    bool obstacle_front = frontal < OBSTACLE_THRESHOLD;
+    bool obstacle_side = (left < OBSTACLE_THRESHOLD || right < OBSTACLE_THRESHOLD);
+
+    if (obstacle_front || obstacle_side)
+    {
+        initialized = false;
+        qInfo() << "Obstacle detected -> switching to TURN";
+        return {Mode::TURN, 0.f, 0.f, 1.2f};
+    }
+
+    qInfo() << "SPIRAL mode | adv:" << ADV_SPEED << " rot:" << ROT_SPEED;
+    return {Mode::SPIRAL, 0.f, ADV_SPEED, ROT_SPEED};
+}
+
+/**
+>>>>>>> fa944a1 (switch hecho y espiral)
  * === FILTRADO DE LIDAR ===
  */
 std::optional<RoboCompLidar3D::TPoints> SpecificWorker::filter_lidar(const RoboCompLidar3D::TPoints &points)
@@ -321,5 +493,9 @@ int SpecificWorker::startup_check()
 void SpecificWorker::new_target_slot(QPointF p)
 {
 	Q_UNUSED(p);
+<<<<<<< HEAD
 }
 
+=======
+}
+>>>>>>> fa944a1 (switch hecho y espiral)
