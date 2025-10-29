@@ -1,5 +1,5 @@
 cmake_minimum_required( VERSION 3.10 )
-PROJECT( localiser)
+PROJECT( localiser )
 
 IF ( "$ENV{ROBOCOMP}" STREQUAL "")
   MESSAGE(WARNING "ROBOCOMP variable not set. Using the default value: /home/robocomp/robocomp")

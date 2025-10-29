@@ -21,6 +21,8 @@
 
 #include <stdint.h>
 
+#define USE_QTGUI
+
 #if Qt5_FOUND
 	#include <QtWidgets>
 #else
@@ -67,10 +69,6 @@ public:
 	RoboCompLidar3D::Lidar3DPrxPtr lidar3d_proxy;
 	RoboCompOmniRobot::OmniRobotPrxPtr omnirobot_proxy;
 
-	// bool is_rotating = false;
-	// std::chrono::steady_clock::time_point rotation_start_time;
-	// float rotation_duration = 0.f;
-	// float rotation_direction = 1.f;
 
 protected:
 	std::unordered_map<std::string, std::unique_ptr<GRAFCETStep>> states;
