@@ -1,0 +1,8 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/usuario/ROBOTICAG12/actividad_2/cmake_install.cmake",
+		"/home/usuario/ROBOTICAG12/actividad_2/generated/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

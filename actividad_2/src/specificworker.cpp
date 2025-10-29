@@ -56,77 +56,12 @@ void SpecificWorker::initialize()
  */
 void SpecificWorker::compute()
 {
-    std::vector<RoboCompLidar3D::TPoint> points;
+    // read_data();
+    // state_machine.update();
+    // send_velocity_commands();
+    // auto corners = extract_corners(lidar_data);
 
-    try
-    {
-        const auto data = lidar3d_proxy->getLidarDataWithThreshold2d("helios", 5000, 1);
-        const auto filtered = filter_lidar(data.points);
-        if (filtered.has_value())
-        {
-            draw_lidar(filtered.value(), &viewer->scene);
-            points = filtered.value();
-        }
-    }
-    catch (const Ice::Exception &e)
-    {
-        std::cout << e.what() << std::endl;
-        return;
-    }
 
-    if (points.empty()) return;
-
-    // === Cálculo de distancias laterales y frontal ===
-    int size = points.size();
-    int mid_index = size / 2;
-    int left_index = size * 0.35;
-    int right_index = size * 0.65;
-
-    float frontal_dist = points[mid_index].distance2d;
-    float left_dist = points[left_index].distance2d;
-    float right_dist = points[right_index].distance2d;
-
-    qInfo() << "Mode:" << static_cast<int>(current_mode)
-            << " | Frontal:" << frontal_dist
-            << " | Left:" << left_dist
-            << " | Right:" << right_dist;
-
-    // === Ejecutar el modo actual ===
-    std::tuple<Mode, float, float, float> result;
-
-    switch (current_mode)
-    {
-        case Mode::IDLE:
-            result = mode_idle(frontal_dist, left_dist, right_dist);
-            break;
-
-        case Mode::FORWARD:
-            result = mode_forward(frontal_dist, left_dist, right_dist);
-            break;
-
-        case Mode::TURN:
-            result = mode_turn(frontal_dist, left_dist, right_dist);
-            break;
-
-        case Mode::SPIRAL:
-            result = mode_spiral(frontal_dist, left_dist, right_dist);
-            break;
-    }
-
-    current_mode = std::get<0>(result);
-    float side = std::get<1>(result);
-    float adv = std::get<2>(result);
-    float rot = std::get<3>(result);
-
-    // === Enviar velocidades al robot ===
-    try
-    {
-        omnirobot_proxy->setSpeedBase(side, adv, rot);
-    }
-    catch (const Ice::Exception &e)
-    {
-        std::cout << e.what() << std::endl;
-    }
 }
 
 /**

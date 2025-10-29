@@ -1,6 +1,7 @@
 # Sources set
 LIST(APPEND SOURCES
   ../src/specificworker.cpp
+
 )
 
 # Headers set

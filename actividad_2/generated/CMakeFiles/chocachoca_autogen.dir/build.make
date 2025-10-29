@@ -53,10 +53,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/usuario/ROBOTICAG12/actividad_1
+CMAKE_SOURCE_DIR = /home/usuario/ROBOTICAG12/actividad_2
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/usuario/ROBOTICAG12/actividad_1
+CMAKE_BINARY_DIR = /home/usuario/ROBOTICAG12/actividad_2
 
 # Utility rule file for chocachoca_autogen.
 
@@ -71,9 +71,9 @@ generated/CMakeFiles/chocachoca_autogen: generated/chocachoca_autogen/timestamp
 generated/chocachoca_autogen/timestamp: /usr/lib/qt6/libexec/moc
 generated/chocachoca_autogen/timestamp: /usr/lib/qt6/libexec/uic
 generated/chocachoca_autogen/timestamp: generated/CMakeFiles/chocachoca_autogen.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/usuario/ROBOTICAG12/actividad_1/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Automatic MOC and UIC for target chocachoca"
-	cd /home/usuario/ROBOTICAG12/actividad_1/generated && /usr/bin/cmake -E cmake_autogen /home/usuario/ROBOTICAG12/actividad_1/generated/CMakeFiles/chocachoca_autogen.dir/AutogenInfo.json ""
-	cd /home/usuario/ROBOTICAG12/actividad_1/generated && /usr/bin/cmake -E touch /home/usuario/ROBOTICAG12/actividad_1/generated/chocachoca_autogen/timestamp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/usuario/ROBOTICAG12/actividad_2/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Automatic MOC and UIC for target chocachoca"
+	cd /home/usuario/ROBOTICAG12/actividad_2/generated && /usr/bin/cmake -E cmake_autogen /home/usuario/ROBOTICAG12/actividad_2/generated/CMakeFiles/chocachoca_autogen.dir/AutogenInfo.json ""
+	cd /home/usuario/ROBOTICAG12/actividad_2/generated && /usr/bin/cmake -E touch /home/usuario/ROBOTICAG12/actividad_2/generated/chocachoca_autogen/timestamp
 
 chocachoca_autogen: generated/CMakeFiles/chocachoca_autogen
 chocachoca_autogen: generated/chocachoca_autogen/timestamp
@@ -85,10 +85,10 @@ generated/CMakeFiles/chocachoca_autogen.dir/build: chocachoca_autogen
 .PHONY : generated/CMakeFiles/chocachoca_autogen.dir/build
 
 generated/CMakeFiles/chocachoca_autogen.dir/clean:
-	cd /home/usuario/ROBOTICAG12/actividad_1/generated && $(CMAKE_COMMAND) -P CMakeFiles/chocachoca_autogen.dir/cmake_clean.cmake
+	cd /home/usuario/ROBOTICAG12/actividad_2/generated && $(CMAKE_COMMAND) -P CMakeFiles/chocachoca_autogen.dir/cmake_clean.cmake
 .PHONY : generated/CMakeFiles/chocachoca_autogen.dir/clean
 
 generated/CMakeFiles/chocachoca_autogen.dir/depend:
-	cd /home/usuario/ROBOTICAG12/actividad_1 && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/usuario/ROBOTICAG12/actividad_1 /home/usuario/ROBOTICAG12/actividad_1/generated /home/usuario/ROBOTICAG12/actividad_1 /home/usuario/ROBOTICAG12/actividad_1/generated /home/usuario/ROBOTICAG12/actividad_1/generated/CMakeFiles/chocachoca_autogen.dir/DependInfo.cmake "--color=$(COLOR)"
+	cd /home/usuario/ROBOTICAG12/actividad_2 && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/usuario/ROBOTICAG12/actividad_2 /home/usuario/ROBOTICAG12/actividad_2/generated /home/usuario/ROBOTICAG12/actividad_2 /home/usuario/ROBOTICAG12/actividad_2/generated /home/usuario/ROBOTICAG12/actividad_2/generated/CMakeFiles/chocachoca_autogen.dir/DependInfo.cmake "--color=$(COLOR)"
 .PHONY : generated/CMakeFiles/chocachoca_autogen.dir/depend
 

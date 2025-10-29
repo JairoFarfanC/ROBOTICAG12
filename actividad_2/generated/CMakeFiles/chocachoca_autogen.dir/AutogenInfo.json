@@ -1,12 +1,12 @@
 {
-	"BUILD_DIR" : "/home/usuario/ROBOTICAG12/actividad_1/generated/chocachoca_autogen",
-	"CMAKE_BINARY_DIR" : "/home/usuario/ROBOTICAG12/actividad_1",
-	"CMAKE_CURRENT_BINARY_DIR" : "/home/usuario/ROBOTICAG12/actividad_1/generated",
-	"CMAKE_CURRENT_SOURCE_DIR" : "/home/usuario/ROBOTICAG12/actividad_1/generated",
+	"BUILD_DIR" : "/home/usuario/ROBOTICAG12/actividad_2/generated/chocachoca_autogen",
+	"CMAKE_BINARY_DIR" : "/home/usuario/ROBOTICAG12/actividad_2",
+	"CMAKE_CURRENT_BINARY_DIR" : "/home/usuario/ROBOTICAG12/actividad_2/generated",
+	"CMAKE_CURRENT_SOURCE_DIR" : "/home/usuario/ROBOTICAG12/actividad_2/generated",
 	"CMAKE_EXECUTABLE" : "/usr/bin/cmake",
 	"CMAKE_LIST_FILES" : 
 	[
-		"/home/usuario/ROBOTICAG12/actividad_1/generated/CMakeLists.txt",
+		"/home/usuario/ROBOTICAG12/actividad_2/generated/CMakeLists.txt",
 		"/home/usuario/robocomp/cmake/robocomp.cmake",
 		"/home/usuario/robocomp/cmake/modules/qt.cmake",
 		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6ConfigVersion.cmake",
@@ -195,7 +195,7 @@
 		"/usr/lib/x86_64-linux-gnu/cmake/Qt6StateMachine/Qt6StateMachineTargets-none.cmake",
 		"/usr/lib/x86_64-linux-gnu/cmake/Qt6StateMachine/Qt6StateMachineAdditionalTargetInfo.cmake",
 		"/usr/lib/x86_64-linux-gnu/cmake/Qt6StateMachine/Qt6StateMachineVersionlessTargets.cmake",
-		"/home/usuario/ROBOTICAG12/actividad_1/src/CMakeLists.txt",
+		"/home/usuario/ROBOTICAG12/actividad_2/src/CMakeLists.txt",
 		"/usr/share/cmake-3.28/Modules/FindIce.cmake",
 		"/usr/share/cmake-3.28/Modules/SelectLibraryConfigurations.cmake",
 		"/usr/share/cmake-3.28/Modules/SelectLibraryConfigurations.cmake",
@@ -214,19 +214,19 @@
 		"/usr/share/cmake-3.28/Modules/FindPackageHandleStandardArgs.cmake",
 		"/usr/share/cmake-3.28/Modules/FindPackageMessage.cmake"
 	],
-	"CMAKE_SOURCE_DIR" : "/home/usuario/ROBOTICAG12/actividad_1",
-	"DEP_FILE" : "/home/usuario/ROBOTICAG12/actividad_1/generated/chocachoca_autogen/deps",
+	"CMAKE_SOURCE_DIR" : "/home/usuario/ROBOTICAG12/actividad_2",
+	"DEP_FILE" : "/home/usuario/ROBOTICAG12/actividad_2/generated/chocachoca_autogen/deps",
 	"DEP_FILE_RULE_NAME" : "chocachoca_autogen/timestamp",
 	"HEADERS" : 
 	[
 		[
-			"/home/usuario/ROBOTICAG12/actividad_1/generated/genericworker.h",
+			"/home/usuario/ROBOTICAG12/actividad_2/generated/genericworker.h",
 			"MU",
 			"EWIEGA46WW/moc_genericworker.cpp",
 			null
 		],
 		[
-			"/home/usuario/ROBOTICAG12/actividad_1/src/specificworker.h",
+			"/home/usuario/ROBOTICAG12/actividad_2/src/specificworker.h",
 			"MU",
 			"VNU7RW3YIC/moc_specificworker.cpp",
 			null
@@ -263,8 +263,8 @@
 		]
 	],
 	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
-	"INCLUDE_DIR" : "/home/usuario/ROBOTICAG12/actividad_1/generated/chocachoca_autogen/include",
-	"MOC_COMPILATION_FILE" : "/home/usuario/ROBOTICAG12/actividad_1/generated/chocachoca_autogen/mocs_compilation.cpp",
+	"INCLUDE_DIR" : "/home/usuario/ROBOTICAG12/actividad_2/generated/chocachoca_autogen/include",
+	"MOC_COMPILATION_FILE" : "/home/usuario/ROBOTICAG12/actividad_2/generated/chocachoca_autogen/mocs_compilation.cpp",
 	"MOC_DEFINITIONS" : 
 	[
 		"ICE_CPP11_MAPPING",
@@ -285,11 +285,11 @@
 	],
 	"MOC_INCLUDES" : 
 	[
-		"/home/usuario/ROBOTICAG12/actividad_1/generated",
-		"/home/usuario/ROBOTICAG12/actividad_1/generated",
+		"/home/usuario/ROBOTICAG12/actividad_2/generated",
+		"/home/usuario/ROBOTICAG12/actividad_2/generated",
 		"/opt/robocomp/include",
 		"/classes",
-		"/home/usuario/ROBOTICAG12/actividad_1",
+		"/home/usuario/ROBOTICAG12/actividad_2",
 		"/home/usuario/robocomp/classes",
 		"/home/usuario/robocomp/libs",
 		"/home/usuario/robocomp/interfaces",
@@ -329,36 +329,37 @@
 		"-c",
 		"/usr/share/cmake-3.28/Modules/CMakeCXXCompilerABI.cpp"
 	],
-	"MOC_PREDEFS_FILE" : "/home/usuario/ROBOTICAG12/actividad_1/generated/chocachoca_autogen/moc_predefs.h",
+	"MOC_PREDEFS_FILE" : "/home/usuario/ROBOTICAG12/actividad_2/generated/chocachoca_autogen/moc_predefs.h",
 	"MOC_RELAXED_MODE" : false,
 	"MOC_SKIP" : 
 	[
-		"/home/usuario/ROBOTICAG12/actividad_1/generated/GenericBase.cpp",
-		"/home/usuario/ROBOTICAG12/actividad_1/generated/Lidar3D.cpp",
-		"/home/usuario/ROBOTICAG12/actividad_1/generated/OmniRobot.cpp"
+		"/home/usuario/ROBOTICAG12/actividad_2/generated/GenericBase.cpp",
+		"/home/usuario/ROBOTICAG12/actividad_2/generated/Lidar3D.cpp",
+		"/home/usuario/ROBOTICAG12/actividad_2/generated/OmniRobot.cpp",
+		"/home/usuario/ROBOTICAG12/actividad_2/generated/ui_mainUI.h"
 	],
 	"MULTI_CONFIG" : false,
 	"PARALLEL" : 8,
-	"PARSE_CACHE_FILE" : "/home/usuario/ROBOTICAG12/actividad_1/generated/CMakeFiles/chocachoca_autogen.dir/ParseCache.txt",
+	"PARSE_CACHE_FILE" : "/home/usuario/ROBOTICAG12/actividad_2/generated/CMakeFiles/chocachoca_autogen.dir/ParseCache.txt",
 	"QT_MOC_EXECUTABLE" : "/usr/lib/qt6/libexec/moc",
 	"QT_UIC_EXECUTABLE" : "/usr/lib/qt6/libexec/uic",
 	"QT_VERSION_MAJOR" : 6,
 	"QT_VERSION_MINOR" : 4,
-	"SETTINGS_FILE" : "/home/usuario/ROBOTICAG12/actividad_1/generated/CMakeFiles/chocachoca_autogen.dir/AutogenUsed.txt",
+	"SETTINGS_FILE" : "/home/usuario/ROBOTICAG12/actividad_2/generated/CMakeFiles/chocachoca_autogen.dir/AutogenUsed.txt",
 	"SOURCES" : 
 	[
 		[
-			"/home/usuario/ROBOTICAG12/actividad_1/generated/genericworker.cpp",
+			"/home/usuario/ROBOTICAG12/actividad_2/generated/genericworker.cpp",
 			"MU",
 			null
 		],
 		[
-			"/home/usuario/ROBOTICAG12/actividad_1/generated/main.cpp",
+			"/home/usuario/ROBOTICAG12/actividad_2/generated/main.cpp",
 			"MU",
 			null
 		],
 		[
-			"/home/usuario/ROBOTICAG12/actividad_1/src/specificworker.cpp",
+			"/home/usuario/ROBOTICAG12/actividad_2/src/specificworker.cpp",
 			"MU",
 			null
 		],
@@ -385,12 +386,13 @@
 		[ "/home/usuario/robocomp/classes/sigwatch/sigwatch.cpp", "MU", null ]
 	],
 	"UIC_OPTIONS" : [],
-	"UIC_SEARCH_PATHS" : [ "/home/usuario/ROBOTICAG12/actividad_1/src" ],
+	"UIC_SEARCH_PATHS" : [ "/home/usuario/ROBOTICAG12/actividad_2/src" ],
 	"UIC_SKIP" : 
 	[
-		"/home/usuario/ROBOTICAG12/actividad_1/generated/GenericBase.cpp",
-		"/home/usuario/ROBOTICAG12/actividad_1/generated/Lidar3D.cpp",
-		"/home/usuario/ROBOTICAG12/actividad_1/generated/OmniRobot.cpp"
+		"/home/usuario/ROBOTICAG12/actividad_2/generated/GenericBase.cpp",
+		"/home/usuario/ROBOTICAG12/actividad_2/generated/Lidar3D.cpp",
+		"/home/usuario/ROBOTICAG12/actividad_2/generated/OmniRobot.cpp",
+		"/home/usuario/ROBOTICAG12/actividad_2/generated/ui_mainUI.h"
 	],
 	"UIC_UI_FILES" : [],
 	"VERBOSITY" : 0
