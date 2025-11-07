@@ -56,10 +56,10 @@ void SpecificWorker::initialize()
  */
 void SpecificWorker::compute()
 {
-    // read_data();
-    // state_machine.update();
-    // send_velocity_commands();
-    // auto corners = extract_corners(lidar_data);
+    //read_data();
+    //state_machine.update();
+    //send_velocity_commands();
+    //auto corners = extract_corners(lidar_data);
 
 
 }
