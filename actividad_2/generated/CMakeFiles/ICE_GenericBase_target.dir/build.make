@@ -68,9 +68,9 @@ include generated/CMakeFiles/ICE_GenericBase_target.dir/progress.make
 
 generated/CMakeFiles/ICE_GenericBase_target: generated/GenericBase.ice
 
-generated/GenericBase.ice: /home/robocomp/robocomp/interfaces/IDSLs/GenericBase.idsl
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/usuario/ROBOTICAG12/actividad_2/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating /home/usuario/ROBOTICAG12/actividad_2/generated/GenericBase.ice from /home/robocomp/robocomp//interfaces/IDSLs/GenericBase.idsl"
-	cd /home/usuario/ROBOTICAG12/actividad_2/generated && robocompdsl /home/robocomp/robocomp//interfaces/IDSLs/GenericBase.idsl /home/usuario/ROBOTICAG12/actividad_2/generated/GenericBase.ice
+generated/GenericBase.ice: /home/usuario/robocomp/interfaces/IDSLs/GenericBase.idsl
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/usuario/ROBOTICAG12/actividad_2/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating /home/usuario/ROBOTICAG12/actividad_2/generated/GenericBase.ice from /home/usuario/robocomp/interfaces/IDSLs/GenericBase.idsl"
+	cd /home/usuario/ROBOTICAG12/actividad_2/generated && robocompdsl /home/usuario/robocomp/interfaces/IDSLs/GenericBase.idsl /home/usuario/ROBOTICAG12/actividad_2/generated/GenericBase.ice
 
 generated/CMakeFiles/ICE_GenericBase_target.dir/codegen:
 .PHONY : generated/CMakeFiles/ICE_GenericBase_target.dir/codegen

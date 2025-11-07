@@ -68,9 +68,9 @@ include generated/CMakeFiles/ICE_OmniRobot_target.dir/progress.make
 
 generated/CMakeFiles/ICE_OmniRobot_target: generated/OmniRobot.ice
 
-generated/OmniRobot.ice: /home/robocomp/robocomp/interfaces/IDSLs/OmniRobot.idsl
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/usuario/ROBOTICAG12/actividad_2/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating /home/usuario/ROBOTICAG12/actividad_2/generated/OmniRobot.ice from /home/robocomp/robocomp//interfaces/IDSLs/OmniRobot.idsl"
-	cd /home/usuario/ROBOTICAG12/actividad_2/generated && robocompdsl /home/robocomp/robocomp//interfaces/IDSLs/OmniRobot.idsl /home/usuario/ROBOTICAG12/actividad_2/generated/OmniRobot.ice
+generated/OmniRobot.ice: /home/usuario/robocomp/interfaces/IDSLs/OmniRobot.idsl
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/usuario/ROBOTICAG12/actividad_2/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating /home/usuario/ROBOTICAG12/actividad_2/generated/OmniRobot.ice from /home/usuario/robocomp/interfaces/IDSLs/OmniRobot.idsl"
+	cd /home/usuario/ROBOTICAG12/actividad_2/generated && robocompdsl /home/usuario/robocomp/interfaces/IDSLs/OmniRobot.idsl /home/usuario/ROBOTICAG12/actividad_2/generated/OmniRobot.ice
 
 generated/CMakeFiles/ICE_OmniRobot_target.dir/codegen:
 .PHONY : generated/CMakeFiles/ICE_OmniRobot_target.dir/codegen

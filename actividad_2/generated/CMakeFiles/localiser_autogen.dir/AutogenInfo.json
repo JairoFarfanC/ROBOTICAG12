@@ -7,8 +7,8 @@
 	"CMAKE_LIST_FILES" : 
 	[
 		"/home/usuario/ROBOTICAG12/actividad_2/generated/CMakeLists.txt",
-		"/home/robocomp/robocomp/cmake/robocomp.cmake",
-		"/home/robocomp/robocomp/cmake/modules/qt.cmake",
+		"/home/usuario/robocomp/cmake/robocomp.cmake",
+		"/home/usuario/robocomp/cmake/modules/qt.cmake",
 		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6ConfigVersion.cmake",
 		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6ConfigVersionImpl.cmake",
 		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6Config.cmake",
@@ -221,36 +221,6 @@
 	"HEADERS" : 
 	[
 		[
-			"/home/robocomp/robocomp/classes/ConfigLoader/ConfigLoader.h",
-			"MU",
-			"EVVQFOUPAI/moc_ConfigLoader.cpp",
-			null
-		],
-		[
-			"/home/robocomp/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.h",
-			"MU",
-			"4B7W4TDGLD/moc_abstract_graphic_viewer.cpp",
-			null
-		],
-		[
-			"/home/robocomp/robocomp/classes/grafcetStep/GRAFCETStep.h",
-			"MU",
-			"UITLZZOD3R/moc_GRAFCETStep.cpp",
-			null
-		],
-		[
-			"/home/robocomp/robocomp/classes/rapplication/rapplication.h",
-			"MU",
-			"EMJXXFBHS2/moc_rapplication.cpp",
-			null
-		],
-		[
-			"/home/robocomp/robocomp/classes/sigwatch/sigwatch.h",
-			"MU",
-			"I7T5MHM6VT/moc_sigwatch.cpp",
-			null
-		],
-		[
 			"/home/usuario/ROBOTICAG12/actividad_2/generated/genericworker.h",
 			"MU",
 			"EWIEGA46WW/moc_genericworker.cpp",
@@ -260,6 +230,36 @@
 			"/home/usuario/ROBOTICAG12/actividad_2/src/specificworker.h",
 			"MU",
 			"VNU7RW3YIC/moc_specificworker.cpp",
+			null
+		],
+		[
+			"/home/usuario/robocomp/classes/ConfigLoader/ConfigLoader.h",
+			"MU",
+			"EVVQFOUPAI/moc_ConfigLoader.cpp",
+			null
+		],
+		[
+			"/home/usuario/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.h",
+			"MU",
+			"4B7W4TDGLD/moc_abstract_graphic_viewer.cpp",
+			null
+		],
+		[
+			"/home/usuario/robocomp/classes/grafcetStep/GRAFCETStep.h",
+			"MU",
+			"UITLZZOD3R/moc_GRAFCETStep.cpp",
+			null
+		],
+		[
+			"/home/usuario/robocomp/classes/rapplication/rapplication.h",
+			"MU",
+			"EMJXXFBHS2/moc_rapplication.cpp",
+			null
+		],
+		[
+			"/home/usuario/robocomp/classes/sigwatch/sigwatch.h",
+			"MU",
+			"I7T5MHM6VT/moc_sigwatch.cpp",
 			null
 		]
 	],
@@ -291,9 +291,9 @@
 		"/opt/robocomp/include",
 		"/classes",
 		"/home/usuario/ROBOTICAG12/actividad_2",
-		"/home/robocomp/robocomp/classes",
-		"/home/robocomp/robocomp/libs",
-		"/home/robocomp/robocomp/interfaces",
+		"/home/usuario/robocomp/classes",
+		"/home/usuario/robocomp/libs",
+		"/home/usuario/robocomp/interfaces",
 		"/include",
 		"/usr/include/x86_64-linux-gnu/qt6/QtGui",
 		"/usr/include/x86_64-linux-gnu/qt6",
@@ -349,27 +349,6 @@
 	"SOURCES" : 
 	[
 		[
-			"/home/robocomp/robocomp/classes/ConfigLoader/ConfigLoader.cpp",
-			"MU",
-			null
-		],
-		[
-			"/home/robocomp/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.cpp",
-			"MU",
-			null
-		],
-		[
-			"/home/robocomp/robocomp/classes/grafcetStep/GRAFCETStep.cpp",
-			"MU",
-			null
-		],
-		[
-			"/home/robocomp/robocomp/classes/rapplication/rapplication.cpp",
-			"MU",
-			null
-		],
-		[ "/home/robocomp/robocomp/classes/sigwatch/sigwatch.cpp", "MU", null ],
-		[
 			"/home/usuario/ROBOTICAG12/actividad_2/generated/genericworker.cpp",
 			"MU",
 			null
@@ -383,7 +362,28 @@
 			"/home/usuario/ROBOTICAG12/actividad_2/src/specificworker.cpp",
 			"MU",
 			null
-		]
+		],
+		[
+			"/home/usuario/robocomp/classes/ConfigLoader/ConfigLoader.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/usuario/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/usuario/robocomp/classes/grafcetStep/GRAFCETStep.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/usuario/robocomp/classes/rapplication/rapplication.cpp",
+			"MU",
+			null
+		],
+		[ "/home/usuario/robocomp/classes/sigwatch/sigwatch.cpp", "MU", null ]
 	],
 	"UIC_OPTIONS" : [],
 	"UIC_SEARCH_PATHS" : [ "/home/usuario/ROBOTICAG12/actividad_2/src" ],
