@@ -1,9 +1,9 @@
-/home/usuario/ROBOTICAG12/actividad_2/generated/localiser_autogen/VNU7RW3YIC/moc_specificworker.cpp: /home/usuario/ROBOTICAG12/actividad_2/src/specificworker.h \
-  /home/usuario/ROBOTICAG12/actividad_2/generated/localiser_autogen/moc_predefs.h \
-  /home/usuario/ROBOTICAG12/actividad_2/generated/GenericBase.h \
-  /home/usuario/ROBOTICAG12/actividad_2/generated/Lidar3D.h \
-  /home/usuario/ROBOTICAG12/actividad_2/generated/OmniRobot.h \
-  /home/usuario/ROBOTICAG12/actividad_2/generated/genericworker.h \
+/home/usuario/ROBOTICAG12/actividad_3/generated/localiser_autogen/VNU7RW3YIC/moc_specificworker.cpp: /home/usuario/ROBOTICAG12/actividad_3/src/specificworker.h \
+  /home/usuario/ROBOTICAG12/actividad_3/generated/localiser_autogen/moc_predefs.h \
+  /home/usuario/ROBOTICAG12/actividad_3/generated/GenericBase.h \
+  /home/usuario/ROBOTICAG12/actividad_3/generated/Lidar3D.h \
+  /home/usuario/ROBOTICAG12/actividad_3/generated/OmniRobot.h \
+  /home/usuario/ROBOTICAG12/actividad_3/generated/genericworker.h \
   /home/usuario/robocomp/core/classes/ConfigLoader/ConfigLoader.h \
   /home/usuario/robocomp/core/classes/ConfigLoader/ConfigLoader.tpp \
   /home/usuario/robocomp/core/classes/abstract_graphic_viewer/abstract_graphic_viewer.h \

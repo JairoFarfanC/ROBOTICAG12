@@ -201,6 +201,12 @@
 		"/snap/clion/393/bin/cmake/linux/x64/share/cmake-4.0/Modules/SelectLibraryConfigurations.cmake",
 		"/snap/clion/393/bin/cmake/linux/x64/share/cmake-4.0/Modules/FindPackageHandleStandardArgs.cmake",
 		"/snap/clion/393/bin/cmake/linux/x64/share/cmake-4.0/Modules/FindPackageMessage.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/opencv4/OpenCVConfig-version.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/opencv4/OpenCVConfig.cmake",
+		"/snap/clion/393/bin/cmake/linux/x64/share/cmake-4.0/Modules/FindPackageHandleStandardArgs.cmake",
+		"/snap/clion/393/bin/cmake/linux/x64/share/cmake-4.0/Modules/FindPackageMessage.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/opencv4/OpenCVModules.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/opencv4/OpenCVModules-release.cmake",
 		"/snap/clion/393/bin/cmake/linux/x64/share/cmake-4.0/Modules/FindThreads.cmake",
 		"/snap/clion/393/bin/cmake/linux/x64/share/cmake-4.0/Modules/CheckLibraryExists.cmake",
 		"/snap/clion/393/bin/cmake/linux/x64/share/cmake-4.0/Modules/CheckIncludeFile.cmake",
@@ -224,12 +230,6 @@
 			"/home/robocomp/robocomp/classes/ConfigLoader/ConfigLoader.h",
 			"MU",
 			"EVVQFOUPAI/moc_ConfigLoader.cpp",
-			null
-		],
-		[
-			"/home/robocomp/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.h",
-			"MU",
-			"4B7W4TDGLD/moc_abstract_graphic_viewer.cpp",
 			null
 		],
 		[
@@ -257,9 +257,45 @@
 			null
 		],
 		[
+			"/home/usuario/ROBOTICAG12/actividad_3/src/door_detector.h",
+			"MU",
+			"VNU7RW3YIC/moc_door_detector.cpp",
+			null
+		],
+		[
+			"/home/usuario/ROBOTICAG12/actividad_3/src/hungarian.h",
+			"MU",
+			"VNU7RW3YIC/moc_hungarian.cpp",
+			null
+		],
+		[
+			"/home/usuario/ROBOTICAG12/actividad_3/src/qcustomplot.h",
+			"MU",
+			"VNU7RW3YIC/moc_qcustomplot.cpp",
+			null
+		],
+		[
+			"/home/usuario/ROBOTICAG12/actividad_3/src/ransac_line_detector.h",
+			"MU",
+			"VNU7RW3YIC/moc_ransac_line_detector.cpp",
+			null
+		],
+		[
+			"/home/usuario/ROBOTICAG12/actividad_3/src/room_detector.h",
+			"MU",
+			"VNU7RW3YIC/moc_room_detector.cpp",
+			null
+		],
+		[
 			"/home/usuario/ROBOTICAG12/actividad_3/src/specificworker.h",
 			"MU",
 			"VNU7RW3YIC/moc_specificworker.cpp",
+			null
+		],
+		[
+			"/home/usuario/ROBOTICAG12/actividad_3/src/time_series_plotter.h",
+			"MU",
+			"VNU7RW3YIC/moc_time_series_plotter.cpp",
 			null
 		]
 	],
@@ -271,7 +307,6 @@
 		"ICE_CPP11_MAPPING",
 		"QT_CORE_LIB",
 		"QT_GUI_LIB",
-		"QT_NO_DEBUG",
 		"QT_OPENGL_LIB",
 		"QT_STATEMACHINE_LIB",
 		"QT_WIDGETS_LIB",
@@ -295,6 +330,7 @@
 		"/home/robocomp/robocomp/libs",
 		"/home/robocomp/robocomp/interfaces",
 		"/include",
+		"/usr/include/opencv4",
 		"/usr/include/x86_64-linux-gnu/qt6/QtGui",
 		"/usr/include/x86_64-linux-gnu/qt6",
 		"/usr/include/x86_64-linux-gnu/qt6/QtCore",
@@ -354,11 +390,6 @@
 			null
 		],
 		[
-			"/home/robocomp/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.cpp",
-			"MU",
-			null
-		],
-		[
 			"/home/robocomp/robocomp/classes/grafcetStep/GRAFCETStep.cpp",
 			"MU",
 			null
@@ -380,7 +411,33 @@
 			null
 		],
 		[
+			"/home/usuario/ROBOTICAG12/actividad_3/src/door_detector.cpp",
+			"MU",
+			null
+		],
+		[ "/home/usuario/ROBOTICAG12/actividad_3/src/hungarian.cpp", "MU", null ],
+		[
+			"/home/usuario/ROBOTICAG12/actividad_3/src/qcustomplot.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/usuario/ROBOTICAG12/actividad_3/src/ransac_line_detector.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/usuario/ROBOTICAG12/actividad_3/src/room_detector.cpp",
+			"MU",
+			null
+		],
+		[
 			"/home/usuario/ROBOTICAG12/actividad_3/src/specificworker.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/usuario/ROBOTICAG12/actividad_3/src/time_series_plotter.cpp",
 			"MU",
 			null
 		]

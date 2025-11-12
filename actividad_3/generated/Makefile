@@ -331,6 +331,126 @@ OmniRobot.cpp.s:
 	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/OmniRobot.cpp.s
 .PHONY : OmniRobot.cpp.s
 
+__/src/door_detector.o: __/src/door_detector.cpp.o
+.PHONY : __/src/door_detector.o
+
+# target to build an object file
+__/src/door_detector.cpp.o:
+	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/__/src/door_detector.cpp.o
+.PHONY : __/src/door_detector.cpp.o
+
+__/src/door_detector.i: __/src/door_detector.cpp.i
+.PHONY : __/src/door_detector.i
+
+# target to preprocess a source file
+__/src/door_detector.cpp.i:
+	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/__/src/door_detector.cpp.i
+.PHONY : __/src/door_detector.cpp.i
+
+__/src/door_detector.s: __/src/door_detector.cpp.s
+.PHONY : __/src/door_detector.s
+
+# target to generate assembly for a file
+__/src/door_detector.cpp.s:
+	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/__/src/door_detector.cpp.s
+.PHONY : __/src/door_detector.cpp.s
+
+__/src/hungarian.o: __/src/hungarian.cpp.o
+.PHONY : __/src/hungarian.o
+
+# target to build an object file
+__/src/hungarian.cpp.o:
+	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/__/src/hungarian.cpp.o
+.PHONY : __/src/hungarian.cpp.o
+
+__/src/hungarian.i: __/src/hungarian.cpp.i
+.PHONY : __/src/hungarian.i
+
+# target to preprocess a source file
+__/src/hungarian.cpp.i:
+	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/__/src/hungarian.cpp.i
+.PHONY : __/src/hungarian.cpp.i
+
+__/src/hungarian.s: __/src/hungarian.cpp.s
+.PHONY : __/src/hungarian.s
+
+# target to generate assembly for a file
+__/src/hungarian.cpp.s:
+	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/__/src/hungarian.cpp.s
+.PHONY : __/src/hungarian.cpp.s
+
+__/src/qcustomplot.o: __/src/qcustomplot.cpp.o
+.PHONY : __/src/qcustomplot.o
+
+# target to build an object file
+__/src/qcustomplot.cpp.o:
+	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/__/src/qcustomplot.cpp.o
+.PHONY : __/src/qcustomplot.cpp.o
+
+__/src/qcustomplot.i: __/src/qcustomplot.cpp.i
+.PHONY : __/src/qcustomplot.i
+
+# target to preprocess a source file
+__/src/qcustomplot.cpp.i:
+	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/__/src/qcustomplot.cpp.i
+.PHONY : __/src/qcustomplot.cpp.i
+
+__/src/qcustomplot.s: __/src/qcustomplot.cpp.s
+.PHONY : __/src/qcustomplot.s
+
+# target to generate assembly for a file
+__/src/qcustomplot.cpp.s:
+	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/__/src/qcustomplot.cpp.s
+.PHONY : __/src/qcustomplot.cpp.s
+
+__/src/ransac_line_detector.o: __/src/ransac_line_detector.cpp.o
+.PHONY : __/src/ransac_line_detector.o
+
+# target to build an object file
+__/src/ransac_line_detector.cpp.o:
+	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/__/src/ransac_line_detector.cpp.o
+.PHONY : __/src/ransac_line_detector.cpp.o
+
+__/src/ransac_line_detector.i: __/src/ransac_line_detector.cpp.i
+.PHONY : __/src/ransac_line_detector.i
+
+# target to preprocess a source file
+__/src/ransac_line_detector.cpp.i:
+	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/__/src/ransac_line_detector.cpp.i
+.PHONY : __/src/ransac_line_detector.cpp.i
+
+__/src/ransac_line_detector.s: __/src/ransac_line_detector.cpp.s
+.PHONY : __/src/ransac_line_detector.s
+
+# target to generate assembly for a file
+__/src/ransac_line_detector.cpp.s:
+	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/__/src/ransac_line_detector.cpp.s
+.PHONY : __/src/ransac_line_detector.cpp.s
+
+__/src/room_detector.o: __/src/room_detector.cpp.o
+.PHONY : __/src/room_detector.o
+
+# target to build an object file
+__/src/room_detector.cpp.o:
+	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/__/src/room_detector.cpp.o
+.PHONY : __/src/room_detector.cpp.o
+
+__/src/room_detector.i: __/src/room_detector.cpp.i
+.PHONY : __/src/room_detector.i
+
+# target to preprocess a source file
+__/src/room_detector.cpp.i:
+	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/__/src/room_detector.cpp.i
+.PHONY : __/src/room_detector.cpp.i
+
+__/src/room_detector.s: __/src/room_detector.cpp.s
+.PHONY : __/src/room_detector.s
+
+# target to generate assembly for a file
+__/src/room_detector.cpp.s:
+	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/__/src/room_detector.cpp.s
+.PHONY : __/src/room_detector.cpp.s
+
 __/src/specificworker.o: __/src/specificworker.cpp.o
 .PHONY : __/src/specificworker.o
 
@@ -354,6 +474,30 @@ __/src/specificworker.s: __/src/specificworker.cpp.s
 __/src/specificworker.cpp.s:
 	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/__/src/specificworker.cpp.s
 .PHONY : __/src/specificworker.cpp.s
+
+__/src/time_series_plotter.o: __/src/time_series_plotter.cpp.o
+.PHONY : __/src/time_series_plotter.o
+
+# target to build an object file
+__/src/time_series_plotter.cpp.o:
+	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/__/src/time_series_plotter.cpp.o
+.PHONY : __/src/time_series_plotter.cpp.o
+
+__/src/time_series_plotter.i: __/src/time_series_plotter.cpp.i
+.PHONY : __/src/time_series_plotter.i
+
+# target to preprocess a source file
+__/src/time_series_plotter.cpp.i:
+	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/__/src/time_series_plotter.cpp.i
+.PHONY : __/src/time_series_plotter.cpp.i
+
+__/src/time_series_plotter.s: __/src/time_series_plotter.cpp.s
+.PHONY : __/src/time_series_plotter.s
+
+# target to generate assembly for a file
+__/src/time_series_plotter.cpp.s:
+	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/__/src/time_series_plotter.cpp.s
+.PHONY : __/src/time_series_plotter.cpp.s
 
 genericworker.o: genericworker.cpp.o
 .PHONY : genericworker.o
@@ -402,30 +546,6 @@ home/robocomp/robocomp/classes/ConfigLoader/ConfigLoader.s: home/robocomp/roboco
 home/robocomp/robocomp/classes/ConfigLoader/ConfigLoader.cpp.s:
 	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/home/robocomp/robocomp/classes/ConfigLoader/ConfigLoader.cpp.s
 .PHONY : home/robocomp/robocomp/classes/ConfigLoader/ConfigLoader.cpp.s
-
-home/robocomp/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.o: home/robocomp/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.cpp.o
-.PHONY : home/robocomp/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.o
-
-# target to build an object file
-home/robocomp/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.cpp.o:
-	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/home/robocomp/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.cpp.o
-.PHONY : home/robocomp/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.cpp.o
-
-home/robocomp/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.i: home/robocomp/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.cpp.i
-.PHONY : home/robocomp/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.i
-
-# target to preprocess a source file
-home/robocomp/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.cpp.i:
-	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/home/robocomp/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.cpp.i
-.PHONY : home/robocomp/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.cpp.i
-
-home/robocomp/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.s: home/robocomp/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.cpp.s
-.PHONY : home/robocomp/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.s
-
-# target to generate assembly for a file
-home/robocomp/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.cpp.s:
-	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/home/robocomp/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.cpp.s
-.PHONY : home/robocomp/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.cpp.s
 
 home/robocomp/robocomp/classes/grafcetStep/GRAFCETStep.o: home/robocomp/robocomp/classes/grafcetStep/GRAFCETStep.cpp.o
 .PHONY : home/robocomp/robocomp/classes/grafcetStep/GRAFCETStep.o
@@ -575,18 +695,33 @@ help:
 	@echo "... OmniRobot.o"
 	@echo "... OmniRobot.i"
 	@echo "... OmniRobot.s"
+	@echo "... __/src/door_detector.o"
+	@echo "... __/src/door_detector.i"
+	@echo "... __/src/door_detector.s"
+	@echo "... __/src/hungarian.o"
+	@echo "... __/src/hungarian.i"
+	@echo "... __/src/hungarian.s"
+	@echo "... __/src/qcustomplot.o"
+	@echo "... __/src/qcustomplot.i"
+	@echo "... __/src/qcustomplot.s"
+	@echo "... __/src/ransac_line_detector.o"
+	@echo "... __/src/ransac_line_detector.i"
+	@echo "... __/src/ransac_line_detector.s"
+	@echo "... __/src/room_detector.o"
+	@echo "... __/src/room_detector.i"
+	@echo "... __/src/room_detector.s"
 	@echo "... __/src/specificworker.o"
 	@echo "... __/src/specificworker.i"
 	@echo "... __/src/specificworker.s"
+	@echo "... __/src/time_series_plotter.o"
+	@echo "... __/src/time_series_plotter.i"
+	@echo "... __/src/time_series_plotter.s"
 	@echo "... genericworker.o"
 	@echo "... genericworker.i"
 	@echo "... genericworker.s"
 	@echo "... home/robocomp/robocomp/classes/ConfigLoader/ConfigLoader.o"
 	@echo "... home/robocomp/robocomp/classes/ConfigLoader/ConfigLoader.i"
 	@echo "... home/robocomp/robocomp/classes/ConfigLoader/ConfigLoader.s"
-	@echo "... home/robocomp/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.o"
-	@echo "... home/robocomp/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.i"
-	@echo "... home/robocomp/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.s"
 	@echo "... home/robocomp/robocomp/classes/grafcetStep/GRAFCETStep.o"
 	@echo "... home/robocomp/robocomp/classes/grafcetStep/GRAFCETStep.i"
 	@echo "... home/robocomp/robocomp/classes/grafcetStep/GRAFCETStep.s"

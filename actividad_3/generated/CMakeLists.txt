@@ -16,7 +16,7 @@ endif()
 
 
 IF(NOT EXISTS $ENV{ROBOCOMP}/cmake)
-  MESSAGE(FATAL_ERROR "Couldn't find RoboComp in $ENV{ROBOCOMP}! Exiting...")
+    MESSAGE(FATAL_ERROR "Couldn't find RoboComp in $ENV{ROBOCOMP}! Exiting...")
 ENDIF(NOT EXISTS $ENV{ROBOCOMP}/cmake)
 
 INCLUDE($ENV{ROBOCOMP}/cmake/robocomp.cmake)
@@ -26,15 +26,25 @@ INCLUDE (../src/CMakeLists.txt)
 ADD_DEFINITIONS ("-DICE_CPP11_MAPPING")
 FIND_PACKAGE( Ice REQUIRED COMPONENTS Ice++11 IceStorm++11)
 
+# Buscar OpenCV
+find_package(OpenCV REQUIRED)
+if(OpenCV_FOUND)
+    message(STATUS "OpenCV found: ${OpenCV_VERSION}")
+    include_directories(${OpenCV_INCLUDE_DIRS})
+    link_libraries(${OpenCV_LIBS})
+else()
+    message(FATAL_ERROR "OpenCV not found! Please install it.")
+endif()
+
 # Sources set
 SET (SOURCES
-  ${SOURCES}
-  $ENV{ROBOCOMP}/classes/rapplication/rapplication.cpp
-  $ENV{ROBOCOMP}/classes/sigwatch/sigwatch.cpp
-  $ENV{ROBOCOMP}/classes/grafcetStep/GRAFCETStep.cpp
-  $ENV{ROBOCOMP}/classes/ConfigLoader/ConfigLoader.cpp
-  main.cpp
-  genericworker.cpp
+        ${SOURCES}
+        $ENV{ROBOCOMP}/classes/rapplication/rapplication.cpp
+        $ENV{ROBOCOMP}/classes/sigwatch/sigwatch.cpp
+        $ENV{ROBOCOMP}/classes/grafcetStep/GRAFCETStep.cpp
+        $ENV{ROBOCOMP}/classes/ConfigLoader/ConfigLoader.cpp
+        main.cpp
+        genericworker.cpp
 )
 
 
@@ -53,7 +63,7 @@ SET_TARGET_PROPERTIES(localiser
         CXX_STANDARD ${CXX_STANDARD}
         CXX_STANDARD_REQUIRED ON
         CXX_EXTENSIONS OFF
-        )
+)
 
 
 INSTALL(FILES ${EXECUTABLE_OUTPUT_PATH}/localiser DESTINATION ${RC_COMPONENT_INSTALL_PATH}/bin/ PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE )

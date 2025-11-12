@@ -72,7 +72,7 @@ generated/localiser_autogen/timestamp: /usr/lib/qt6/libexec/moc
 generated/localiser_autogen/timestamp: /usr/lib/qt6/libexec/uic
 generated/localiser_autogen/timestamp: generated/CMakeFiles/localiser_autogen.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/usuario/ROBOTICAG12/actividad_3/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Automatic MOC and UIC for target localiser"
-	cd /home/usuario/ROBOTICAG12/actividad_3/generated && /snap/clion/393/bin/cmake/linux/x64/bin/cmake -E cmake_autogen /home/usuario/ROBOTICAG12/actividad_3/generated/CMakeFiles/localiser_autogen.dir/AutogenInfo.json ""
+	cd /home/usuario/ROBOTICAG12/actividad_3/generated && /snap/clion/393/bin/cmake/linux/x64/bin/cmake -E cmake_autogen /home/usuario/ROBOTICAG12/actividad_3/generated/CMakeFiles/localiser_autogen.dir/AutogenInfo.json Debug
 	cd /home/usuario/ROBOTICAG12/actividad_3/generated && /snap/clion/393/bin/cmake/linux/x64/bin/cmake -E touch /home/usuario/ROBOTICAG12/actividad_3/generated/localiser_autogen/timestamp
 
 generated/CMakeFiles/localiser_autogen.dir/codegen:

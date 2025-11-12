@@ -1,5 +1,5 @@
-/home/usuario/ROBOTICAG12/actividad_2/generated/localiser_autogen/include/moc_sigwatch.cpp: /home/usuario/robocomp/classes/sigwatch/sigwatch.h \
-  /home/usuario/ROBOTICAG12/actividad_2/generated/localiser_autogen/moc_predefs.h \
+/home/usuario/ROBOTICAG12/actividad_3/generated/localiser_autogen/include/moc_sigwatch.cpp: /home/robocomp/robocomp/classes/sigwatch/sigwatch.h \
+  /home/usuario/ROBOTICAG12/actividad_3/generated/localiser_autogen/moc_predefs.h \
   /usr/include/alloca.h \
   /usr/include/asm-generic/errno-base.h \
   /usr/include/asm-generic/errno.h \

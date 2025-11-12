@@ -1,5 +1,5 @@
-/home/usuario/ROBOTICAG12/actividad_2/generated/localiser_autogen/4B7W4TDGLD/moc_abstract_graphic_viewer.cpp: /home/usuario/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.h \
-  /home/usuario/ROBOTICAG12/actividad_2/generated/localiser_autogen/moc_predefs.h \
+/home/usuario/ROBOTICAG12/actividad_3/generated/localiser_autogen/4B7W4TDGLD/moc_abstract_graphic_viewer.cpp: /home/usuario/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.h \
+  /home/usuario/ROBOTICAG12/actividad_3/generated/localiser_autogen/moc_predefs.h \
   /usr/include/alloca.h \
   /usr/include/asm-generic/errno-base.h \
   /usr/include/asm-generic/errno.h \
