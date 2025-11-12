@@ -18,7 +18,7 @@
 #include <cmath>
 
 // =====================================================
-
+////////////HOLAAAAAAAAAAAAAAAAA
 SpecificWorker::SpecificWorker(const ConfigLoader& configLoader, TuplePrx tprx, bool startup_check)
     : GenericWorker(configLoader, tprx), startup_check_flag(startup_check)
 {
