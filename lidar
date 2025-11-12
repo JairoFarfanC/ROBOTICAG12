@@ -1,0 +1,55 @@
+d ROBOTICAG12
+  807  git pull https://github.com/JairoFarfanC/ROBOTICAG12.git
+  808  cd ..
+  809  cd .
+  810  ls
+  811  x
+  812  cd ../../..
+  813  cd ..
+  814  ls
+  815  git clone https://github.com/JairoFarfanC/ROBOTICAG12.git
+  816  ls
+  817  cd ROBOTICA12
+  818  cd ROBOTICAG12
+  819  LS
+  820  ls
+  821  sudo dmks remove xone/v0.3-57-g29ec357 --all
+  822  sudo dkms remove xone/v0.3-57-g29ec357 --all 
+  823  sudo apt remove xone-dkms
+  824  sudo apt upgrade
+  825  cd 
+  826  cd software
+  827  git clone https://github.com/RoboSense-LiDAR/rs_driver
+  828  cd
+  829  cd software/
+  830  ls
+  831  cd rs_driver/
+  832  ls
+  833  cmake .
+  834  make
+  835  sudo make install
+  836  cd robocomp/components/robocomp-robolab/components/hardware/laser/lidar3D
+  837  cd 
+  838  cd robocomp/components/robocomp-robolab/components/hardware/laser/lidar3D
+  839  ls
+  840  bin/Lidar3D etc/config_helios_webots
+  841  cd ..
+  842  ls
+  843  cd ..
+  844  ls
+  845  cd laser
+  846  cd lidar3D/
+  847  ls
+  848  cd bin
+  849  ls
+  850  cd ..
+  851  bin/Lidar3D etc/config_helios_webots
+  852  cd bin
+  853  ls
+  854  ls -l
+  855  cd ..
+  856  bin/Lidar3D etc/config_helios_webots
+  857  more etc/config_helios_webots 
+  858  bin/Lidar3D etc/config_helios_webots
+  859  nano src/specificworker.h
+  860  bin/Lidar3D etc/config_helios_webots
