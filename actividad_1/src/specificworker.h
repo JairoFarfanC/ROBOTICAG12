@@ -23,6 +23,8 @@ public:
 	~SpecificWorker();
 
 public slots:
+	void connect(AbstractGraphicViewer * viewer, void(AbstractGraphicViewer::* new_mouse_coordinates)(QPointF), SpecificWorker * specific_worker, void(SpecificWorker::* new_target_slot)(QPointF));
+
 	void initialize();
 	void compute();
 	void emergency();

@@ -1,7 +1,6 @@
 file(REMOVE_RECURSE
   "../bin/localiser"
   "../bin/localiser.pdb"
-  "CMakeFiles/localiser.dir/link.d"
   "CMakeFiles/localiser_autogen.dir/AutogenUsed.txt"
   "CMakeFiles/localiser_autogen.dir/ParseCache.txt"
   "localiser_autogen"

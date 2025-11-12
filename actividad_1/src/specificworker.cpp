@@ -5,6 +5,7 @@
 #include <QRect>
 #include <cppitertools/groupby.hpp>
 #include <QLoggingCategory>
+#include <sys/socket.h>
 
 SpecificWorker::SpecificWorker(const ConfigLoader& configLoader, TuplePrx tprx, bool startup_check)
     : GenericWorker(configLoader, tprx), startup_check_flag(startup_check)

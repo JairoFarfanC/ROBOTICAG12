@@ -335,7 +335,8 @@
 	[
 		"/home/usuario/ROBOTICAG12/actividad_1/generated/GenericBase.cpp",
 		"/home/usuario/ROBOTICAG12/actividad_1/generated/Lidar3D.cpp",
-		"/home/usuario/ROBOTICAG12/actividad_1/generated/OmniRobot.cpp"
+		"/home/usuario/ROBOTICAG12/actividad_1/generated/OmniRobot.cpp",
+		"/home/usuario/ROBOTICAG12/actividad_1/generated/ui_mainUI.h"
 	],
 	"MULTI_CONFIG" : false,
 	"PARALLEL" : 8,
@@ -390,7 +391,8 @@
 	[
 		"/home/usuario/ROBOTICAG12/actividad_1/generated/GenericBase.cpp",
 		"/home/usuario/ROBOTICAG12/actividad_1/generated/Lidar3D.cpp",
-		"/home/usuario/ROBOTICAG12/actividad_1/generated/OmniRobot.cpp"
+		"/home/usuario/ROBOTICAG12/actividad_1/generated/OmniRobot.cpp",
+		"/home/usuario/ROBOTICAG12/actividad_1/generated/ui_mainUI.h"
 	],
 	"UIC_UI_FILES" : [],
 	"VERBOSITY" : 0

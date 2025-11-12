@@ -14,3 +14,4 @@ LIST(APPEND LIBS ${LIBS})
 # no-char8_t to avoid a problem with ICE Connection lib.
 add_definitions(-fmax-errors=1 -fno-char8_t)
 
+qt_wrap_ui(UIS_HEADERS mainUI.ui)
