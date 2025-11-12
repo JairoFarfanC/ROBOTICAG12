@@ -1,9 +1,0 @@
-[Desktop Entry]
-Name=Eclipse202312R_DMSS
-Type=Application
-Exec=/home/usuario/eclipse-202312R-linux-DMSS/eclipse/eclipse
-Icon=/home/usuario/eclipse-202312R-linux-DMSS/eclipse/icon.xpm
-Comment=IDE Eclipse para C/C++, Java, etc.
-Categories=Development;IDE;
-Terminal=false
-

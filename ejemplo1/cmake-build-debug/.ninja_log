@@ -1,8 +1,0 @@
-# ninja log v6
-4	739	1759137104363698473	ejemplo1_autogen/timestamp	f656fed5b0db3651
-4	739	1759137104363698473	ejemplo1_autogen/mocs_compilation.cpp	f656fed5b0db3651
-739	6610	1759137104367698559	CMakeFiles/ejemplo1.dir/ejemplo1_autogen/mocs_compilation.cpp.o	42446509890a0911
-992	2898	1759134150028211313	CMakeFiles/ejemplo1.dir/Timer.cpp.o	45e6e84430a06e9d
-740	6762	1759137104368698581	CMakeFiles/ejemplo1.dir/ejemplo1.cpp.o	9688268646d2014c
-740	7053	1759137104369727639	CMakeFiles/ejemplo1.dir/main.cpp.o	ece5f2dbd7ed5254
-7053	7340	1759137110681834528	ejemplo1	cf336cd28e182995

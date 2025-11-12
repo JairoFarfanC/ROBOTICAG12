@@ -26,6 +26,16 @@ INCLUDE (../src/CMakeLists.txt)
 ADD_DEFINITIONS ("-DICE_CPP11_MAPPING")
 FIND_PACKAGE( Ice REQUIRED COMPONENTS Ice++11 IceStorm++11)
 
+# Buscar OpenCV
+find_package(OpenCV REQUIRED)
+if(OpenCV_FOUND)
+    message(STATUS "OpenCV found: ${OpenCV_VERSION}")
+    include_directories(${OpenCV_INCLUDE_DIRS})
+    link_libraries(${OpenCV_LIBS})
+else()
+    message(FATAL_ERROR "OpenCV not found! Please install it.")
+endif()
+
 # Sources set
 SET (SOURCES
   ${SOURCES}
