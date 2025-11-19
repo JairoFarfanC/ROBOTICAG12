@@ -190,18 +190,18 @@ ICE_Lidar3D_target/fast:
 .PHONY : ICE_Lidar3D_target/fast
 
 # Convenience name for target.
-generated/CMakeFiles/ICE_OmniRobot_target.dir/rule:
-	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 generated/CMakeFiles/ICE_OmniRobot_target.dir/rule
-.PHONY : generated/CMakeFiles/ICE_OmniRobot_target.dir/rule
+generated/CMakeFiles/ICE_Camera360RGB_target.dir/rule:
+	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 generated/CMakeFiles/ICE_Camera360RGB_target.dir/rule
+.PHONY : generated/CMakeFiles/ICE_Camera360RGB_target.dir/rule
 
 # Convenience name for target.
-ICE_OmniRobot_target: generated/CMakeFiles/ICE_OmniRobot_target.dir/rule
-.PHONY : ICE_OmniRobot_target
+ICE_Camera360RGB_target: generated/CMakeFiles/ICE_Camera360RGB_target.dir/rule
+.PHONY : ICE_Camera360RGB_target
 
 # fast build rule for target.
-ICE_OmniRobot_target/fast:
-	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/ICE_OmniRobot_target.dir/build.make generated/CMakeFiles/ICE_OmniRobot_target.dir/build
-.PHONY : ICE_OmniRobot_target/fast
+ICE_Camera360RGB_target/fast:
+	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/ICE_Camera360RGB_target.dir/build.make generated/CMakeFiles/ICE_Camera360RGB_target.dir/build
+.PHONY : ICE_Camera360RGB_target/fast
 
 # Convenience name for target.
 generated/CMakeFiles/ICE_GenericBase_target.dir/rule:
@@ -216,6 +216,20 @@ ICE_GenericBase_target: generated/CMakeFiles/ICE_GenericBase_target.dir/rule
 ICE_GenericBase_target/fast:
 	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/ICE_GenericBase_target.dir/build.make generated/CMakeFiles/ICE_GenericBase_target.dir/build
 .PHONY : ICE_GenericBase_target/fast
+
+# Convenience name for target.
+generated/CMakeFiles/ICE_OmniRobot_target.dir/rule:
+	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 generated/CMakeFiles/ICE_OmniRobot_target.dir/rule
+.PHONY : generated/CMakeFiles/ICE_OmniRobot_target.dir/rule
+
+# Convenience name for target.
+ICE_OmniRobot_target: generated/CMakeFiles/ICE_OmniRobot_target.dir/rule
+.PHONY : ICE_OmniRobot_target
+
+# fast build rule for target.
+ICE_OmniRobot_target/fast:
+	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/ICE_OmniRobot_target.dir/build.make generated/CMakeFiles/ICE_OmniRobot_target.dir/build
+.PHONY : ICE_OmniRobot_target/fast
 
 # Convenience name for target.
 generated/CMakeFiles/localiser.dir/rule:
@@ -258,6 +272,30 @@ localiser_autogen: generated/CMakeFiles/localiser_autogen.dir/rule
 localiser_autogen/fast:
 	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser_autogen.dir/build.make generated/CMakeFiles/localiser_autogen.dir/build
 .PHONY : localiser_autogen/fast
+
+Camera360RGB.o: Camera360RGB.cpp.o
+.PHONY : Camera360RGB.o
+
+# target to build an object file
+Camera360RGB.cpp.o:
+	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/Camera360RGB.cpp.o
+.PHONY : Camera360RGB.cpp.o
+
+Camera360RGB.i: Camera360RGB.cpp.i
+.PHONY : Camera360RGB.i
+
+# target to preprocess a source file
+Camera360RGB.cpp.i:
+	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/Camera360RGB.cpp.i
+.PHONY : Camera360RGB.cpp.i
+
+Camera360RGB.s: Camera360RGB.cpp.s
+.PHONY : Camera360RGB.s
+
+# target to generate assembly for a file
+Camera360RGB.cpp.s:
+	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/Camera360RGB.cpp.s
+.PHONY : Camera360RGB.cpp.s
 
 GenericBase.o: GenericBase.cpp.o
 .PHONY : GenericBase.o
@@ -331,6 +369,30 @@ OmniRobot.cpp.s:
 	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/OmniRobot.cpp.s
 .PHONY : OmniRobot.cpp.s
 
+__/src/door_detector.o: __/src/door_detector.cpp.o
+.PHONY : __/src/door_detector.o
+
+# target to build an object file
+__/src/door_detector.cpp.o:
+	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/__/src/door_detector.cpp.o
+.PHONY : __/src/door_detector.cpp.o
+
+__/src/door_detector.i: __/src/door_detector.cpp.i
+.PHONY : __/src/door_detector.i
+
+# target to preprocess a source file
+__/src/door_detector.cpp.i:
+	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/__/src/door_detector.cpp.i
+.PHONY : __/src/door_detector.cpp.i
+
+__/src/door_detector.s: __/src/door_detector.cpp.s
+.PHONY : __/src/door_detector.s
+
+# target to generate assembly for a file
+__/src/door_detector.cpp.s:
+	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/__/src/door_detector.cpp.s
+.PHONY : __/src/door_detector.cpp.s
+
 __/src/hungarian.o: __/src/hungarian.cpp.o
 .PHONY : __/src/hungarian.o
 
@@ -354,6 +416,30 @@ __/src/hungarian.s: __/src/hungarian.cpp.s
 __/src/hungarian.cpp.s:
 	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/__/src/hungarian.cpp.s
 .PHONY : __/src/hungarian.cpp.s
+
+__/src/qcustomplot.o: __/src/qcustomplot.cpp.o
+.PHONY : __/src/qcustomplot.o
+
+# target to build an object file
+__/src/qcustomplot.cpp.o:
+	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/__/src/qcustomplot.cpp.o
+.PHONY : __/src/qcustomplot.cpp.o
+
+__/src/qcustomplot.i: __/src/qcustomplot.cpp.i
+.PHONY : __/src/qcustomplot.i
+
+# target to preprocess a source file
+__/src/qcustomplot.cpp.i:
+	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/__/src/qcustomplot.cpp.i
+.PHONY : __/src/qcustomplot.cpp.i
+
+__/src/qcustomplot.s: __/src/qcustomplot.cpp.s
+.PHONY : __/src/qcustomplot.s
+
+# target to generate assembly for a file
+__/src/qcustomplot.cpp.s:
+	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/__/src/qcustomplot.cpp.s
+.PHONY : __/src/qcustomplot.cpp.s
 
 __/src/ransac_line_detector.o: __/src/ransac_line_detector.cpp.o
 .PHONY : __/src/ransac_line_detector.o
@@ -426,6 +512,30 @@ __/src/specificworker.s: __/src/specificworker.cpp.s
 __/src/specificworker.cpp.s:
 	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/__/src/specificworker.cpp.s
 .PHONY : __/src/specificworker.cpp.s
+
+__/src/time_series_plotter.o: __/src/time_series_plotter.cpp.o
+.PHONY : __/src/time_series_plotter.o
+
+# target to build an object file
+__/src/time_series_plotter.cpp.o:
+	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/__/src/time_series_plotter.cpp.o
+.PHONY : __/src/time_series_plotter.cpp.o
+
+__/src/time_series_plotter.i: __/src/time_series_plotter.cpp.i
+.PHONY : __/src/time_series_plotter.i
+
+# target to preprocess a source file
+__/src/time_series_plotter.cpp.i:
+	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/__/src/time_series_plotter.cpp.i
+.PHONY : __/src/time_series_plotter.cpp.i
+
+__/src/time_series_plotter.s: __/src/time_series_plotter.cpp.s
+.PHONY : __/src/time_series_plotter.s
+
+# target to generate assembly for a file
+__/src/time_series_plotter.cpp.s:
+	cd /home/usuario/ROBOTICAG12/actividad_3 && $(MAKE) $(MAKESILENT) -f generated/CMakeFiles/localiser.dir/build.make generated/CMakeFiles/localiser.dir/__/src/time_series_plotter.cpp.s
+.PHONY : __/src/time_series_plotter.cpp.s
 
 genericworker.o: genericworker.cpp.o
 .PHONY : genericworker.o
@@ -632,12 +742,16 @@ help:
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... ICES__home_usuario_ROBOTICAG12_actividad_3_generated"
+	@echo "... ICE_Camera360RGB_target"
 	@echo "... ICE_GenericBase_target"
 	@echo "... ICE_Lidar3D_target"
 	@echo "... ICE_OmniRobot_target"
 	@echo "... localiser_autogen"
 	@echo "... localiser_autogen_timestamp_deps"
 	@echo "... localiser"
+	@echo "... Camera360RGB.o"
+	@echo "... Camera360RGB.i"
+	@echo "... Camera360RGB.s"
 	@echo "... GenericBase.o"
 	@echo "... GenericBase.i"
 	@echo "... GenericBase.s"
@@ -647,9 +761,15 @@ help:
 	@echo "... OmniRobot.o"
 	@echo "... OmniRobot.i"
 	@echo "... OmniRobot.s"
+	@echo "... __/src/door_detector.o"
+	@echo "... __/src/door_detector.i"
+	@echo "... __/src/door_detector.s"
 	@echo "... __/src/hungarian.o"
 	@echo "... __/src/hungarian.i"
 	@echo "... __/src/hungarian.s"
+	@echo "... __/src/qcustomplot.o"
+	@echo "... __/src/qcustomplot.i"
+	@echo "... __/src/qcustomplot.s"
 	@echo "... __/src/ransac_line_detector.o"
 	@echo "... __/src/ransac_line_detector.i"
 	@echo "... __/src/ransac_line_detector.s"
@@ -659,6 +779,9 @@ help:
 	@echo "... __/src/specificworker.o"
 	@echo "... __/src/specificworker.i"
 	@echo "... __/src/specificworker.s"
+	@echo "... __/src/time_series_plotter.o"
+	@echo "... __/src/time_series_plotter.i"
+	@echo "... __/src/time_series_plotter.s"
 	@echo "... genericworker.o"
 	@echo "... genericworker.i"
 	@echo "... genericworker.s"

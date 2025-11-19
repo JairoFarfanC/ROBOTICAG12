@@ -1,85 +1,53 @@
 #ifndef SPECIFICWORKER_H
 #define SPECIFICWORKER_H
 
+// If you want to reduce the period automatically due to lack of use, you must uncomment the following line
 //#define HIBERNATION_ENABLED
 
 #include <genericworker.h>
-#include <QObject>
-#include <qtmetamacros.h>
-#include <abstract_graphic_viewer/abstract_graphic_viewer.h>
+#include "abstract_graphic_viewer/abstract_graphic_viewer.h"
+
+#include <expected>
+#include <random>
 #include <tuple>
-#include <optional>
+#include <utility>
+#include <vector>
 #include <chrono>
 
-#include <QGraphicsPolygonItem>
-#include <QPointF>
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 
-#include "common_types.h"     // Corners, Lines, etc.
+#include <QGraphicsPolygonItem>
+#include <QRectF>
+
+#include <doublebuffer/DoubleBuffer.h>
+#include "time_series_plotter.h"
+
+#ifdef emit
+#undef emit
+#endif
+#include <execution>
+
+#include "common_types.h"     // Corners, Match, Lines, etc.
 #include "room_detector.h"    // rc::Room_Detector
+#include "hungarian.h"        // rc::Hungarian (versión nueva)
+#include "nominal_room.h"     // NominalRoom (del repo del profe)
+#include "door_detector.h"
+#include "image_processor.h"
 
-// =====================================================================
-// NominalRoom: sala ideal de la TASK 2 (del documento)
-// =====================================================================
-struct NominalRoom
-{
-    float   width;    // mm
-    float   length;   // mm
-    Corners corners;  // esquinas nominales en el frame de la sala
-
-    explicit NominalRoom(float width_  = 10000.f,
-                         float length_ = 5000.f,
-                         Corners corners_ = {})
-        : width(width_)
-        , length(length_)
-        , corners(std::move(corners_))
-    {}
-
-    /// Transforma las esquinas nominales con una transformación SE(2)
-    /// Para pasar de room -> robot se usa el inverso de robot_pose.
-    [[nodiscard]]
-    Corners transform_corners_to(const Eigen::Isometry2d &transform) const
-    {
-        Corners transformed_corners;
-        transformed_corners.reserve(corners.size());
-
-        for (const auto &[p, _, __] : corners)
-        {
-            Eigen::Vector2d ep{p.x(), p.y()};
-            Eigen::Vector2d tp = transform * ep;   // aplica traslación + rotación
-
-            transformed_corners.emplace_back(
-                QPointF{static_cast<float>(tp.x()), static_cast<float>(tp.y())},
-                0.f,
-                0.f
-            );
-        }
-        return transformed_corners;
-    }
-};
-
-// Sala nominal de 10x5 m centrada en el origen (TASK 2)
-static const NominalRoom DEFAULT_ROOM{
-    10000.f, 5000.f,
-    {
-        { QPointF{-5000.f, -2500.f}, 0.f, 0.f },
-        { QPointF{ 5000.f, -2500.f}, 0.f, 0.f },
-        { QPointF{ 5000.f,  2500.f}, 0.f, 0.f },
-        { QPointF{-5000.f,  2500.f}, 0.f, 0.f }
-    }
-};
-
-// =====================================================================
-// SpecificWorker
-// =====================================================================
-
-class SpecificWorker : public GenericWorker
+/**
+ * \brief Class SpecificWorker implements the core functionality of the component.
+ */
+class SpecificWorker final : public GenericWorker
 {
     Q_OBJECT
+
 public:
-    explicit SpecificWorker(const ConfigLoader& configLoader, TuplePrx tprx, bool startup_check);
+    SpecificWorker(const ConfigLoader& configLoader, TuplePrx tprx, bool startup_check);
     ~SpecificWorker();
+
+    // // joystick (si lo usas en esta práctica)
+    // void JoystickAdapter_sendData(RoboCompJoystickAdapter::TData data);
 
 public slots:
     void initialize() override;
@@ -87,68 +55,181 @@ public slots:
     void emergency() override;
     void restore() override;
     int  startup_check();
-    void new_target_slot(QPointF);
-    void update_robot_position();   // de momento la puedes dejar vacía
 
 private:
+    bool startup_check_flag;
+    // ============================
+    // PARÁMETROS DEL ROBOT / MUNDO
+    // ============================
+    struct Params
+    {
+        float ROBOT_WIDTH  = 460.f;   // mm
+        float ROBOT_LENGTH = 480.f;   // mm
 
-    // === ENUM de modos del robot (para TASK 3) ===
-    enum class Mode { IDLE, FORWARD, TURN, SPIRAL };
-    Mode current_mode = Mode::IDLE;
+        float MAX_ADV_SPEED  = 1000.f; // mm/s
+        float MAX_ROT_SPEED  = 1.f;    // rad/s
+        float MAX_SIDE_SPEED = 50.f;   // mm/s
 
-    // === Métodos de comportamiento (se rellenarán en TASK 3) ===
-    std::tuple<Mode, float, float, float> mode_idle   (float frontal, float left, float right);
-    std::tuple<Mode, float, float, float> mode_forward(float frontal, float left, float right);
-    std::tuple<Mode, float, float, float> mode_turn   (float frontal, float left, float right);
-    std::tuple<Mode, float, float, float> mode_spiral (float frontal, float left, float right);
+        float MAX_TRANSLATION = 500.f; // mm/s
+        float MAX_ROTATION    = 0.2f;  // rad/s
 
-    // === Herramientas gráficas y variables internas ===
-    bool   startup_check_flag = false;
-    QRectF dimensions;                         // rectángulo de dibujo (mm)
+        float STOP_THRESHOLD    = 700.f;           // mm
+        float ADVANCE_THRESHOLD = ROBOT_WIDTH * 3; // mm
 
-    // visor izquierda (LiDAR + localización)
-    AbstractGraphicViewer *viewer = nullptr;
-    QGraphicsPolygonItem  *robot_polygon = nullptr;
+        // LIDAR secciones
+        float LIDAR_FRONT_SECTION      = 0.2f;      // rad, ~12 deg
+        float LIDAR_RIGHT_SIDE_SECTION =  M_PI/3.f; // rad
+        float LIDAR_LEFT_SIDE_SECTION  = -M_PI/3.f; // rad
 
-    // visor derecha (mapa fijo de la sala)
-    AbstractGraphicViewer *viewer_room = nullptr;
-    QGraphicsPolygonItem  *robot_polygon_room = nullptr;
+        float WALL_MIN_DISTANCE = ROBOT_WIDTH * 1.2f;
 
-    const int ROBOT_LENGTH = 400;              // lado del cuadrado del robot en mm
+        // match error correction
+        float MATCH_ERROR_SIGMA         = 150.f;  // mm
+        float DOOR_REACHED_DIST         = 300.f;  // mm
+        std::string LIDAR_NAME_LOW      = "bpearl";
+        std::string LIDAR_NAME_HIGH     = "helios";
+        QRectF GRID_MAX_DIM             = QRectF{-5000, 2500, 10000, -5000};
 
-    // === Localización (pose estimada del robot en el mundo) ===
-    Eigen::Isometry2d robot_pose;              // se pone a Identity en initialize()
+        // relocalization
+        float RELOCAL_CENTER_EPS              = 300.f;              // mm
+        float RELOCAL_KP                      = 0.002f;             // mm -> speed
+        float RELOCAL_MAX_ADV                 = 300.f;              // mm/s
+        float RELOCAL_MAX_SIDE                = 300.f;              // mm/s
+        float RELOCAL_ROT_SPEED               = 0.3f;               // rad/s
+        float RELOCAL_DELTA                   = 5.0f * M_PI/180.f;  // rad
+        float RELOCAL_MATCH_MAX_DIST          = 2000.f;             // mm (gating)
+        float RELOCAL_DONE_COST               = 500.f;
+        float RELOCAL_DONE_MATCH_MAX_ERROR    = 1000.f;
+    };
+    Params params;
 
-    // === Objetos de la TASK 2 ===
-    rc::Room_Detector room_detector;           // detector de esquinas (namespace rc)
-    NominalRoom       room = DEFAULT_ROOM;     // sala nominal
+    // ============
+    // VIEWERS / UI
+    // ============
+    AbstractGraphicViewer *viewer      = nullptr; // izquierda
+    AbstractGraphicViewer *viewer_room = nullptr; // derecha
 
-    // === Funciones auxiliares ===
-    void draw_lidar(const RoboCompLidar3D::TPoints &points, QGraphicsScene *scene);
-    std::optional<RoboCompLidar3D::TPoints> filter_lidar(const RoboCompLidar3D::TPoints &points);
+    QGraphicsPolygonItem *robot_draw      = nullptr; // robot en viewer
+    QGraphicsPolygonItem *robot_room_draw = nullptr; // robot en viewer_room
 
-    void update_right_from_odo();                                // usada en compute()
-    void draw_room(QGraphicsScene *scene, const QRectF &dims);   // usada en initialize()
+    // =============
+    // ROBOT POSE
+    // =============
+    Eigen::Affine2d robot_pose = Eigen::Affine2d::Identity();
 
+    // =============
+    // ROOMS & MATCH
+    // =============
+    std::vector<NominalRoom> nominal_rooms{
+        NominalRoom{5500.f, 4000.f},
+        NominalRoom{8000.f, 4000.f}
+    };
 
-    // === Parámetros de control (mm, rad/s) ===
-    const float DTH    = 500.f;   // obstáculo
-    const float DCLEAR = 800.f;   // espacio libre
-    const float DSP    = 800.f;   // entrar en SPIRAL
-    const float VMAX   = 1000.f;  // mm/s
-    const float W_TURN = 1.2f;    // rad/s
-    const float W_SP   = 0.3f;    // rad/s
+    rc::Room_Detector room_detector;
+    rc::Hungarian     hungarian;
 
-    // ángulos de sectores del LiDAR
-    const float FRONT_HALF_ANGLE = 0.35f;        // ~±20°
-    const float SIDE_HALF_ANGLE  = 0.35f;        // ventana lateral
+    // =============
+    // STATE MACHINE
+    // =============
+    enum class STATE
+    {
+        GOTO_DOOR,
+        ORIENT_TO_DOOR,
+        LOCALISE,
+        GOTO_ROOM_CENTER,
+        TURN,
+        IDLE,
+        CROSS_DOOR
+    };
 
-    // devuelve (frontal, left, right) en mm
-    std::tuple<float,float,float>
-    lidar_distances(const RoboCompLidar3D::TPoints &points);
+    inline const char* to_string(STATE s) const
+    {
+        switch (s)
+        {
+            case STATE::IDLE:             return "IDLE";
+            case STATE::LOCALISE:         return "LOCALISE";
+            case STATE::GOTO_DOOR:        return "GOTO_DOOR";
+            case STATE::TURN:             return "TURN";
+            case STATE::ORIENT_TO_DOOR:   return "ORIENT_TO_DOOR";
+            case STATE::GOTO_ROOM_CENTER: return "GOTO_ROOM_CENTER";
+            case STATE::CROSS_DOOR:       return "CROSS_DOOR";
+            default:                      return "UNKNOWN";
+        }
+    }
 
+    STATE state = STATE::LOCALISE;
+    using RetVal = std::tuple<STATE, float, float>;
 
+    // estados de la máquina
+    RetVal goto_door       (const RoboCompLidar3D::TPoints &points);
+    RetVal orient_to_door  (const RoboCompLidar3D::TPoints &points);
+    RetVal cross_door      (const RoboCompLidar3D::TPoints &points);
+    RetVal localise        (const Match &match);
+    RetVal goto_room_center(const RoboCompLidar3D::TPoints &points);
+    RetVal update_pose     (const Corners &corners, const Match &match);
+    RetVal turn            (const Corners &corners);
+    RetVal process_state   (const RoboCompLidar3D::TPoints &data,
+                            const Corners &corners,
+                            const Match   &match,
+                            AbstractGraphicViewer *viewer);
 
+    // =============
+    // DRAW
+    // =============
+    void draw_lidar(const RoboCompLidar3D::TPoints &filtered_points,
+                    std::optional<Eigen::Vector2d> center,
+                    QGraphicsScene *scene);
+
+    // =============
+    // AUX
+    // =============
+    RoboCompLidar3D::TPoints read_data();
+
+    std::expected<int, std::string>
+    closest_lidar_index_to_given_angle(const auto &points, float angle);
+
+    RoboCompLidar3D::TPoints filter_same_phi       (const RoboCompLidar3D::TPoints &points);
+    RoboCompLidar3D::TPoints filter_isolated_points(const RoboCompLidar3D::TPoints &points, float d);
+
+    void print_match(const Match &match, float error = 1.f) const;
+
+    // RNG
+    std::random_device rd;
+
+    // DoubleBuffer para comandos de velocidad
+    DoubleBuffer<std::tuple<float, float, float, long>,
+                 std::tuple<float, float, float, long>> commands_buffer;
+
+    std::tuple<float, float, float, long> last_velocities{0.f, 0.f, 0.f, 0.f};
+
+    // Plotter
+    std::unique_ptr<TimeSeriesPlotter> time_series_plotter;
+    int match_error_graph = -1; // índice del gráfico en el plotter
+
+    // Doors
+    DoorDetector door_detector;
+
+    // Image processor (para la parte visual de puertas)
+    rc::ImageProcessor image_processor;
+
+    // Timing
+    std::chrono::time_point<std::chrono::high_resolution_clock>
+        last_time = std::chrono::high_resolution_clock::now();
+
+    // Relocalization flags
+    bool relocal_centered = false;
+    bool localised        = false;
+
+    // Pose update & control
+    bool update_robot_pose(const Corners &corners, const Match &match);
+    void move_robot      (float adv, float rot, float max_match_error);
+    Eigen::Vector3d solve_pose      (const Corners &corners, const Match &match);
+    void           predict_robot_pose();
+    std::tuple<float, float> robot_controller(const Eigen::Vector2f &target);
+
+signals:
+    // aquí puedes añadir señales Qt si las necesitas
+    // void customSignal();
 };
 
-#endif
+#endif // SPECIFICWORKER_H

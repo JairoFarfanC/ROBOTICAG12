@@ -26,16 +26,6 @@ INCLUDE (../src/CMakeLists.txt)
 ADD_DEFINITIONS ("-DICE_CPP11_MAPPING")
 FIND_PACKAGE( Ice REQUIRED COMPONENTS Ice++11 IceStorm++11)
 
-# Buscar OpenCV
-find_package(OpenCV REQUIRED)
-if(OpenCV_FOUND)
-    message(STATUS "OpenCV found: ${OpenCV_VERSION}")
-    include_directories(${OpenCV_INCLUDE_DIRS})
-    link_libraries(${OpenCV_LIBS})
-else()
-    message(FATAL_ERROR "OpenCV not found! Please install it.")
-endif()
-
 # Sources set
 SET (SOURCES
   ${SOURCES}
@@ -50,8 +40,8 @@ SET (SOURCES
 
 #ROBOCOMP
 ROBOCOMP_INITIALIZE( $ENV{ROBOCOMP}/ )
-ROBOCOMP_IDSL_TO_ICE(Lidar3D OmniRobot GenericBase)
-ROBOCOMP_ICE_TO_SRC(Lidar3D OmniRobot GenericBase)
+ROBOCOMP_IDSL_TO_ICE(Lidar3D Camera360RGB GenericBase OmniRobot)
+ROBOCOMP_ICE_TO_SRC(Lidar3D Camera360RGB GenericBase OmniRobot)
 SET (EXECUTABLE_OUTPUT_PATH ${RC_COMPONENT_DEVEL_PATH}/bin)
 set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/../src)
 

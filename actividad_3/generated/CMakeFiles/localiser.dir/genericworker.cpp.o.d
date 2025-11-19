@@ -1024,7 +1024,7 @@ generated/CMakeFiles/localiser.dir/genericworker.cpp.o: \
  /usr/include/x86_64-linux-gnu/qt6/QtCore/QEvent \
  /usr/include/x86_64-linux-gnu/qt6/QtCore/QString \
  /usr/include/x86_64-linux-gnu/qt6/QtCore/QtCore \
- /home/usuario/ROBOTICAG12/actividad_3/generated/GenericBase.h \
+ /home/usuario/ROBOTICAG12/actividad_3/generated/Camera360RGB.h \
  /usr/include/IceUtil/PushDisableWarnings.h /usr/include/Ice/ProxyF.h \
  /usr/include/Ice/Config.h /usr/include/IceUtil/Config.h \
  /usr/include/c++/13/cassert /usr/include/Ice/ProxyHandle.h \
@@ -1067,5 +1067,6 @@ generated/CMakeFiles/localiser.dir/genericworker.cpp.o: \
  /usr/include/c++/13/deque /usr/include/c++/13/bits/stl_deque.h \
  /usr/include/c++/13/bits/deque.tcc /usr/include/Ice/FactoryTableInit.h \
  /usr/include/Ice/DefaultValueFactory.h \
+ /home/usuario/ROBOTICAG12/actividad_3/generated/GenericBase.h \
  /home/usuario/ROBOTICAG12/actividad_3/generated/Lidar3D.h \
  /home/usuario/ROBOTICAG12/actividad_3/generated/OmniRobot.h

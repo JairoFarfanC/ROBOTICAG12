@@ -1276,12 +1276,12 @@ generated/CMakeFiles/localiser.dir/main.cpp.o: \
  /usr/include/x86_64-linux-gnu/qt6/QtStateMachine/qstate.h \
  /usr/include/x86_64-linux-gnu/qt6/QtCore/QEvent \
  /usr/include/x86_64-linux-gnu/qt6/QtCore/QString \
+ /home/usuario/ROBOTICAG12/actividad_3/generated/Camera360RGB.h \
  /home/usuario/ROBOTICAG12/actividad_3/generated/GenericBase.h \
  /home/usuario/ROBOTICAG12/actividad_3/generated/Lidar3D.h \
  /home/usuario/ROBOTICAG12/actividad_3/generated/OmniRobot.h \
  /home/usuario/ROBOTICAG12/actividad_3/generated/../src/specificworker.h \
  /home/usuario/ROBOTICAG12/actividad_3/generated/genericworker.h \
- /usr/include/x86_64-linux-gnu/qt6/QtCore/qtmetamacros.h \
  /home/usuario/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.h \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QWidget \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QGraphicsScene \
@@ -1296,8 +1296,8 @@ generated/CMakeFiles/localiser.dir/main.cpp.o: \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QApplication \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QVBoxLayout \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QGraphicsPolygonItem \
- /usr/include/x86_64-linux-gnu/qt6/QtCore/QPointF \
- /usr/include/Eigen/Dense /usr/include/Eigen/Core \
+ /usr/include/c++/13/expected /usr/include/Eigen/Dense \
+ /usr/include/Eigen/Core \
  /usr/include/Eigen/src/Core/util/DisableStupidWarnings.h \
  /usr/include/Eigen/src/Core/util/Macros.h \
  /usr/include/Eigen/src/Core/util/ConfigureVectorization.h \
@@ -1479,7 +1479,116 @@ generated/CMakeFiles/localiser.dir/main.cpp.o: \
  /usr/include/Eigen/src/Eigenvalues/./RealQZ.h \
  /usr/include/Eigen/src/Eigenvalues/MatrixBaseEigenvalues.h \
  /usr/include/Eigen/Geometry \
+ /usr/include/x86_64-linux-gnu/qt6/QtCore/QRectF \
+ /home/usuario/robocomp/classes/doublebuffer/DoubleBuffer.h \
+ /usr/include/c++/13/shared_mutex \
+ /home/usuario/robocomp/classes/threadpool/threadpool.h \
+ /usr/include/c++/13/queue /usr/include/c++/13/bits/stl_queue.h \
+ /usr/include/c++/13/thread \
+ /home/usuario/ROBOTICAG12/actividad_3/generated/../src/time_series_plotter.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtGui/QColor \
+ /usr/include/x86_64-linux-gnu/qt6/QtCore/QVector \
+ /usr/include/x86_64-linux-gnu/qt6/QtCore/QElapsedTimer \
+ /home/usuario/ROBOTICAG12/actividad_3/generated/../src/qcustomplot.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtCore/QPointer \
+ /usr/include/x86_64-linux-gnu/qt6/QtCore/QSharedPointer \
+ /usr/include/x86_64-linux-gnu/qt6/QtCore/QTimer \
+ /usr/include/x86_64-linux-gnu/qt6/QtGui/QPainter \
+ /usr/include/x86_64-linux-gnu/qt6/QtGui/QPainterPath \
+ /usr/include/x86_64-linux-gnu/qt6/QtGui/QPaintEvent \
+ /usr/include/x86_64-linux-gnu/qt6/QtGui/QMouseEvent \
+ /usr/include/x86_64-linux-gnu/qt6/QtGui/QWheelEvent \
+ /usr/include/x86_64-linux-gnu/qt6/QtGui/QPixmap \
+ /usr/include/x86_64-linux-gnu/qt6/QtCore/QVector \
+ /usr/include/x86_64-linux-gnu/qt6/QtCore/QDateTime \
+ /usr/include/x86_64-linux-gnu/qt6/QtCore/QMultiMap \
+ /usr/include/x86_64-linux-gnu/qt6/QtCore/QFlags \
+ /usr/include/x86_64-linux-gnu/qt6/QtCore/QDebug \
+ /usr/include/x86_64-linux-gnu/qt6/QtCore/QStack \
+ /usr/include/x86_64-linux-gnu/qt6/QtCore/QCache \
+ /usr/include/x86_64-linux-gnu/qt6/QtCore/qmath.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtCore/QtNumeric \
+ /usr/include/x86_64-linux-gnu/qt6/QtPrintSupport/QtPrintSupport \
+ /usr/include/x86_64-linux-gnu/qt6/QtPrintSupport/QtPrintSupportDepends \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QtWidgets \
+ /usr/include/x86_64-linux-gnu/qt6/QtPrintSupport/qtprintsupportglobal.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtPrintSupport/qtprintsupport-config.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtPrintSupport/qtprintsupportexports.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtPrintSupport/qabstractprintdialog.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtPrintSupport/qtprintsupportglobal.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtPrintSupport/qpagesetupdialog.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtPrintSupport/qprintdialog.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtPrintSupport/qabstractprintdialog.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtPrintSupport/qprintengine.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtPrintSupport/qprinter.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtPrintSupport/qprinter.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtPrintSupport/qprinterinfo.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtCore/QPair \
+ /usr/include/x86_64-linux-gnu/qt6/QtPrintSupport/qprintpreviewdialog.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtPrintSupport/qprintpreviewwidget.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtPrintSupport/qtprintsupportversion.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtCore/QElapsedTimer \
+ /usr/include/x86_64-linux-gnu/qt6/QtCore/QTimeZone \
+ /usr/include/c++/13/execution \
+ /usr/include/c++/13/pstl/glue_execution_defs.h \
+ /usr/include/c++/13/pstl/algorithm_impl.h \
+ /usr/include/c++/13/pstl/execution_impl.h \
+ /usr/include/c++/13/pstl/memory_impl.h \
+ /usr/include/c++/13/pstl/unseq_backend_simd.h \
+ /usr/include/c++/13/pstl/utils.h \
+ /usr/include/c++/13/pstl/parallel_backend_utils.h \
+ /usr/include/c++/13/pstl/parallel_backend.h \
+ /usr/include/c++/13/pstl/parallel_backend_tbb.h \
+ /usr/include/tbb/blocked_range.h /usr/include/oneapi/tbb/blocked_range.h \
+ /usr/include/oneapi/tbb/detail/_range_common.h \
+ /usr/include/oneapi/tbb/detail/_config.h \
+ /usr/include/oneapi/tbb/detail/_export.h \
+ /usr/include/oneapi/tbb/detail/_utils.h \
+ /usr/include/oneapi/tbb/detail/_assert.h \
+ /usr/include/oneapi/tbb/detail/_machine.h \
+ /usr/include/oneapi/tbb/detail/_namespace_injection.h \
+ /usr/include/oneapi/tbb/version.h \
+ /usr/include/oneapi/tbb/detail/_config.h /usr/include/tbb/parallel_for.h \
+ /usr/include/oneapi/tbb/parallel_for.h \
+ /usr/include/oneapi/tbb/detail/_exception.h \
+ /usr/include/oneapi/tbb/detail/_task.h \
+ /usr/include/oneapi/tbb/detail/_template_helpers.h \
+ /usr/include/oneapi/tbb/detail/_small_object_pool.h \
+ /usr/include/oneapi/tbb/profiling.h \
+ /usr/include/oneapi/tbb/detail/_string_resource.h \
+ /usr/include/oneapi/tbb/detail/_small_object_pool.h \
+ /usr/include/oneapi/tbb/profiling.h \
+ /usr/include/oneapi/tbb/partitioner.h \
+ /usr/include/oneapi/tbb/detail/_aligned_space.h \
+ /usr/include/oneapi/tbb/detail/_utils.h \
+ /usr/include/oneapi/tbb/detail/_template_helpers.h \
+ /usr/include/oneapi/tbb/cache_aligned_allocator.h \
+ /usr/include/c++/13/memory_resource /usr/include/oneapi/tbb/task_group.h \
+ /usr/include/oneapi/tbb/detail/_assert.h \
+ /usr/include/oneapi/tbb/detail/_intrusive_list_node.h \
+ /usr/include/oneapi/tbb/detail/_task_handle.h \
+ /usr/include/oneapi/tbb/detail/_task.h \
+ /usr/include/oneapi/tbb/task_arena.h \
+ /usr/include/oneapi/tbb/detail/_attach.h /usr/include/oneapi/tbb/info.h \
+ /usr/include/oneapi/tbb/blocked_range.h \
+ /usr/include/tbb/parallel_reduce.h \
+ /usr/include/oneapi/tbb/parallel_reduce.h \
+ /usr/include/tbb/parallel_scan.h /usr/include/oneapi/tbb/parallel_scan.h \
+ /usr/include/tbb/parallel_invoke.h \
+ /usr/include/oneapi/tbb/parallel_invoke.h /usr/include/tbb/task_arena.h \
+ /usr/include/oneapi/tbb/task_arena.h /usr/include/tbb/tbb_allocator.h \
+ /usr/include/oneapi/tbb/tbb_allocator.h \
+ /usr/include/oneapi/tbb/detail/_utils.h /usr/include/tbb/task.h \
+ /usr/include/oneapi/tbb/task.h /usr/include/c++/13/pstl/parallel_impl.h \
+ /usr/include/c++/13/pstl/numeric_impl.h \
+ /usr/include/c++/13/pstl/pstl_config.h \
+ /usr/include/c++/13/pstl/algorithm_fwd.h \
+ /usr/include/c++/13/pstl/glue_algorithm_impl.h \
+ /usr/include/c++/13/pstl/numeric_fwd.h \
+ /usr/include/c++/13/pstl/glue_numeric_impl.h \
+ /usr/include/c++/13/pstl/glue_memory_impl.h \
  /home/usuario/ROBOTICAG12/actividad_3/generated/../src/common_types.h \
+ /usr/include/x86_64-linux-gnu/qt6/QtCore/QPointF \
  /usr/include/boost/circular_buffer.hpp \
  /usr/include/boost/circular_buffer_fwd.hpp /usr/include/boost/config.hpp \
  /usr/include/boost/config/user.hpp \
@@ -1668,4 +1777,92 @@ generated/CMakeFiles/localiser.dir/main.cpp.o: \
  /usr/include/opencv4/opencv2/core/optim.hpp \
  /usr/include/opencv4/opencv2/core/ovx.hpp \
  /usr/include/opencv4/opencv2/core/cvdef.h /usr/include/c++/13/ranges \
- /home/usuario/ROBOTICAG12/actividad_3/generated/../src/ransac_line_detector.h
+ /home/usuario/ROBOTICAG12/actividad_3/generated/../src/ransac_line_detector.h \
+ /home/usuario/ROBOTICAG12/actividad_3/generated/../src/hungarian.h \
+ /home/usuario/ROBOTICAG12/actividad_3/generated/../src/munkres.hpp \
+ /home/usuario/ROBOTICAG12/actividad_3/generated/../src/nominal_room.h \
+ /home/usuario/ROBOTICAG12/actividad_3/src/common_types.h \
+ /home/usuario/ROBOTICAG12/actividad_3/generated/../src/door_detector.h \
+ /home/usuario/ROBOTICAG12/actividad_3/generated/../src/image_processor.h \
+ /usr/include/opencv4/opencv2/opencv.hpp \
+ /usr/include/opencv4/opencv2/calib3d.hpp \
+ /usr/include/opencv4/opencv2/features2d.hpp \
+ /usr/include/opencv4/opencv2/flann/miniflann.hpp \
+ /usr/include/opencv4/opencv2/flann/defines.h \
+ /usr/include/opencv4/opencv2/flann/config.h \
+ /usr/include/opencv4/opencv2/core/affine.hpp \
+ /usr/include/opencv4/opencv2/dnn.hpp \
+ /usr/include/opencv4/opencv2/dnn/dnn.hpp \
+ /usr/include/opencv4/opencv2/core/async.hpp \
+ /usr/include/opencv4/opencv2/dnn/version.hpp \
+ /usr/include/opencv4/opencv2/dnn/dict.hpp \
+ /usr/include/opencv4/opencv2/dnn/layer.hpp \
+ /usr/include/opencv4/opencv2/dnn/dnn.inl.hpp \
+ /usr/include/opencv4/opencv2/dnn/utils/inference_engine.hpp \
+ /usr/include/opencv4/opencv2/dnn/dnn.hpp \
+ /usr/include/opencv4/opencv2/flann.hpp \
+ /usr/include/opencv4/opencv2/flann/flann_base.hpp \
+ /usr/include/opencv4/opencv2/flann/general.h \
+ /usr/include/opencv4/opencv2/flann/matrix.h \
+ /usr/include/opencv4/opencv2/flann/params.h \
+ /usr/include/opencv4/opencv2/flann/any.h \
+ /usr/include/opencv4/opencv2/flann/defines.h \
+ /usr/include/opencv4/opencv2/flann/saving.h \
+ /usr/include/opencv4/opencv2/flann/nn_index.h \
+ /usr/include/opencv4/opencv2/flann/result_set.h \
+ /usr/include/opencv4/opencv2/flann/all_indices.h \
+ /usr/include/opencv4/opencv2/flann/kdtree_index.h \
+ /usr/include/opencv4/opencv2/flann/dynamic_bitset.h \
+ /usr/include/opencv4/opencv2/flann/dist.h \
+ /usr/include/opencv4/opencv2/flann/heap.h \
+ /usr/include/opencv4/opencv2/flann/allocator.h \
+ /usr/include/opencv4/opencv2/flann/random.h \
+ /usr/include/opencv4/opencv2/flann/kdtree_single_index.h \
+ /usr/include/opencv4/opencv2/flann/kmeans_index.h \
+ /usr/include/opencv4/opencv2/flann/logger.h \
+ /usr/include/opencv4/opencv2/flann/composite_index.h \
+ /usr/include/opencv4/opencv2/flann/linear_index.h \
+ /usr/include/opencv4/opencv2/flann/hierarchical_clustering_index.h \
+ /usr/include/opencv4/opencv2/flann/lsh_index.h \
+ /usr/include/opencv4/opencv2/flann/lsh_table.h \
+ /usr/include/c++/13/math.h \
+ /usr/include/opencv4/opencv2/flann/autotuned_index.h \
+ /usr/include/opencv4/opencv2/flann/ground_truth.h \
+ /usr/include/opencv4/opencv2/flann/index_testing.h \
+ /usr/include/opencv4/opencv2/flann/timer.h \
+ /usr/include/opencv4/opencv2/flann/sampling.h \
+ /usr/include/opencv4/opencv2/highgui.hpp \
+ /usr/include/opencv4/opencv2/imgcodecs.hpp \
+ /usr/include/opencv4/opencv2/videoio.hpp \
+ /usr/include/opencv4/opencv2/imgproc.hpp \
+ /usr/include/opencv4/opencv2/imgproc/segmentation.hpp \
+ /usr/include/opencv4/opencv2/ml.hpp \
+ /usr/include/opencv4/opencv2/ml/ml.inl.hpp \
+ /usr/include/opencv4/opencv2/objdetect.hpp \
+ /usr/include/opencv4/opencv2/objdetect/detection_based_tracker.hpp \
+ /usr/include/opencv4/opencv2/objdetect/face.hpp \
+ /usr/include/opencv4/opencv2/photo.hpp \
+ /usr/include/opencv4/opencv2/stitching.hpp \
+ /usr/include/opencv4/opencv2/stitching/warpers.hpp \
+ /usr/include/opencv4/opencv2/stitching/detail/warpers.hpp \
+ /usr/include/opencv4/opencv2/core/cuda.hpp \
+ /usr/include/opencv4/opencv2/core/cuda_types.hpp \
+ /usr/include/opencv4/opencv2/core/cuda.inl.hpp \
+ /usr/include/opencv4/opencv2/stitching/detail/warpers_inl.hpp \
+ /usr/include/opencv4/opencv2/stitching/detail/warpers.hpp \
+ /usr/include/opencv4/opencv2/stitching/detail/matchers.hpp \
+ /usr/include/opencv4/opencv2/stitching/detail/motion_estimators.hpp \
+ /usr/include/opencv4/opencv2/stitching/detail/matchers.hpp \
+ /usr/include/opencv4/opencv2/stitching/detail/util.hpp \
+ /usr/include/opencv4/opencv2/stitching/detail/util_inl.hpp \
+ /usr/include/opencv4/opencv2/stitching/detail/camera.hpp \
+ /usr/include/opencv4/opencv2/stitching/detail/exposure_compensate.hpp \
+ /usr/include/opencv4/opencv2/stitching/detail/seam_finders.hpp \
+ /usr/include/opencv4/opencv2/stitching/detail/blenders.hpp \
+ /usr/include/opencv4/opencv2/stitching/detail/camera.hpp \
+ /usr/include/opencv4/opencv2/video.hpp \
+ /usr/include/opencv4/opencv2/video/tracking.hpp \
+ /usr/include/opencv4/opencv2/video/background_segm.hpp \
+ /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QLabel \
+ /usr/include/x86_64-linux-gnu/qt6/QtGui/QImage \
+ /usr/include/x86_64-linux-gnu/qt6/QtGui/QPixmap

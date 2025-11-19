@@ -3,17 +3,24 @@
   /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/crti.o \
   /usr/lib/gcc/x86_64-linux-gnu/13/crtbeginS.o \
   CMakeFiles/localiser.dir/localiser_autogen/mocs_compilation.cpp.o \
-  CMakeFiles/localiser.dir/home/usuario/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.cpp.o \
+  CMakeFiles/localiser.dir/home/robocomp/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.cpp.o \
   CMakeFiles/localiser.dir/__/src/specificworker.cpp.o \
-  CMakeFiles/localiser.dir/home/usuario/robocomp/classes/rapplication/rapplication.cpp.o \
-  CMakeFiles/localiser.dir/home/usuario/robocomp/classes/sigwatch/sigwatch.cpp.o \
-  CMakeFiles/localiser.dir/home/usuario/robocomp/classes/grafcetStep/GRAFCETStep.cpp.o \
-  CMakeFiles/localiser.dir/home/usuario/robocomp/classes/ConfigLoader/ConfigLoader.cpp.o \
+  CMakeFiles/localiser.dir/__/src/room_detector.cpp.o \
+  CMakeFiles/localiser.dir/__/src/ransac_line_detector.cpp.o \
+  CMakeFiles/localiser.dir/__/src/hungarian.cpp.o \
+  CMakeFiles/localiser.dir/__/src/door_detector.cpp.o \
+  CMakeFiles/localiser.dir/__/src/qcustomplot.cpp.o \
+  CMakeFiles/localiser.dir/__/src/time_series_plotter.cpp.o \
+  CMakeFiles/localiser.dir/home/robocomp/robocomp/classes/rapplication/rapplication.cpp.o \
+  CMakeFiles/localiser.dir/home/robocomp/robocomp/classes/sigwatch/sigwatch.cpp.o \
+  CMakeFiles/localiser.dir/home/robocomp/robocomp/classes/grafcetStep/GRAFCETStep.cpp.o \
+  CMakeFiles/localiser.dir/home/robocomp/robocomp/classes/ConfigLoader/ConfigLoader.cpp.o \
   CMakeFiles/localiser.dir/main.cpp.o \
   CMakeFiles/localiser.dir/genericworker.cpp.o \
-  CMakeFiles/localiser.dir/Lidar3D.cpp.o \
-  CMakeFiles/localiser.dir/OmniRobot.cpp.o \
   CMakeFiles/localiser.dir/GenericBase.cpp.o \
+  CMakeFiles/localiser.dir/Lidar3D.cpp.o \
+  CMakeFiles/localiser.dir/Camera360RGB.cpp.o \
+  CMakeFiles/localiser.dir/OmniRobot.cpp.o \
   /usr/lib/x86_64-linux-gnu/libopencv_stitching.so.4.6.0 \
   /usr/lib/x86_64-linux-gnu/libopencv_alphamat.so.4.6.0 \
   /usr/lib/x86_64-linux-gnu/libopencv_aruco.so.4.6.0 \
@@ -50,6 +57,8 @@
   /usr/lib/x86_64-linux-gnu/libopencv_wechat_qrcode.so.4.6.0 \
   /usr/lib/x86_64-linux-gnu/libopencv_xobjdetect.so.4.6.0 \
   /usr/lib/x86_64-linux-gnu/libopencv_xphoto.so.4.6.0 \
+  /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libtbb.so \
+  /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libQt6PrintSupport.so \
   /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libosgViewer.so \
   /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libosg.so \
   /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libosgUtil.so \
@@ -117,6 +126,7 @@
   /lib/x86_64-linux-gnu/libbz2.so.1.0 \
   /lib/x86_64-linux-gnu/libcrypto.so.3 \
   /lib/x86_64-linux-gnu/libsystemd.so.0 \
+  /usr/lib/x86_64-linux-gnu/libopencv_core.so.4.6.0 \
   /lib/x86_64-linux-gnu/libEGL.so.1 \
   /lib/x86_64-linux-gnu/libfontconfig.so.1 \
   /lib/x86_64-linux-gnu/libX11.so.6 \
@@ -140,6 +150,8 @@
   /lib/x86_64-linux-gnu/libgcrypt.so.20 \
   /lib/x86_64-linux-gnu/liblz4.so.1 \
   /lib/x86_64-linux-gnu/liblzma.so.5 \
+  /lib/x86_64-linux-gnu/liblapack.so.3 \
+  /lib/x86_64-linux-gnu/libblas.so.3 \
   /lib/x86_64-linux-gnu/libGLdispatch.so.0 \
   /lib/x86_64-linux-gnu/libexpat.so.1 \
   /lib/x86_64-linux-gnu/libxcb.so.1 \
@@ -150,6 +162,8 @@
   /lib/x86_64-linux-gnu/libicudata.so.74 \
   /lib/x86_64-linux-gnu/libgomp.so.1 \
   /lib/x86_64-linux-gnu/libgpg-error.so.0 \
+  /lib/x86_64-linux-gnu/libopenblas.so.0 \
+  /lib/x86_64-linux-gnu/libgfortran.so.5 \
   /lib/x86_64-linux-gnu/libXau.so.6 \
   /lib/x86_64-linux-gnu/libXdmcp.so.6 \
   /lib/x86_64-linux-gnu/libbrotlicommon.so.1 \
@@ -164,27 +178,41 @@
 
 CMakeFiles/localiser.dir/localiser_autogen/mocs_compilation.cpp.o:
 
-CMakeFiles/localiser.dir/home/usuario/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.cpp.o:
+CMakeFiles/localiser.dir/home/robocomp/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.cpp.o:
 
 CMakeFiles/localiser.dir/__/src/specificworker.cpp.o:
 
-CMakeFiles/localiser.dir/home/usuario/robocomp/classes/rapplication/rapplication.cpp.o:
+CMakeFiles/localiser.dir/__/src/room_detector.cpp.o:
 
-CMakeFiles/localiser.dir/home/usuario/robocomp/classes/sigwatch/sigwatch.cpp.o:
+CMakeFiles/localiser.dir/__/src/ransac_line_detector.cpp.o:
 
-CMakeFiles/localiser.dir/home/usuario/robocomp/classes/grafcetStep/GRAFCETStep.cpp.o:
+CMakeFiles/localiser.dir/__/src/hungarian.cpp.o:
 
-CMakeFiles/localiser.dir/home/usuario/robocomp/classes/ConfigLoader/ConfigLoader.cpp.o:
+CMakeFiles/localiser.dir/__/src/door_detector.cpp.o:
+
+CMakeFiles/localiser.dir/__/src/qcustomplot.cpp.o:
+
+CMakeFiles/localiser.dir/__/src/time_series_plotter.cpp.o:
+
+CMakeFiles/localiser.dir/home/robocomp/robocomp/classes/rapplication/rapplication.cpp.o:
+
+CMakeFiles/localiser.dir/home/robocomp/robocomp/classes/sigwatch/sigwatch.cpp.o:
+
+CMakeFiles/localiser.dir/home/robocomp/robocomp/classes/grafcetStep/GRAFCETStep.cpp.o:
+
+CMakeFiles/localiser.dir/home/robocomp/robocomp/classes/ConfigLoader/ConfigLoader.cpp.o:
 
 CMakeFiles/localiser.dir/main.cpp.o:
 
 CMakeFiles/localiser.dir/genericworker.cpp.o:
 
+CMakeFiles/localiser.dir/GenericBase.cpp.o:
+
 CMakeFiles/localiser.dir/Lidar3D.cpp.o:
 
-CMakeFiles/localiser.dir/OmniRobot.cpp.o:
+CMakeFiles/localiser.dir/Camera360RGB.cpp.o:
 
-CMakeFiles/localiser.dir/GenericBase.cpp.o:
+CMakeFiles/localiser.dir/OmniRobot.cpp.o:
 
 /usr/lib/x86_64-linux-gnu/libopencv_stitching.so.4.6.0:
 
@@ -257,6 +285,10 @@ CMakeFiles/localiser.dir/GenericBase.cpp.o:
 /usr/lib/x86_64-linux-gnu/libopencv_xobjdetect.so.4.6.0:
 
 /usr/lib/x86_64-linux-gnu/libopencv_xphoto.so.4.6.0:
+
+/usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libtbb.so:
+
+/usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libQt6PrintSupport.so:
 
 /usr/lib/gcc/x86_64-linux-gnu/13/../../../x86_64-linux-gnu/libosgViewer.so:
 
@@ -392,6 +424,8 @@ CMakeFiles/localiser.dir/GenericBase.cpp.o:
 
 /lib/x86_64-linux-gnu/libsystemd.so.0:
 
+/usr/lib/x86_64-linux-gnu/libopencv_core.so.4.6.0:
+
 /lib/x86_64-linux-gnu/libEGL.so.1:
 
 /lib/x86_64-linux-gnu/libfontconfig.so.1:
@@ -438,6 +472,10 @@ CMakeFiles/localiser.dir/GenericBase.cpp.o:
 
 /lib/x86_64-linux-gnu/liblzma.so.5:
 
+/lib/x86_64-linux-gnu/liblapack.so.3:
+
+/lib/x86_64-linux-gnu/libblas.so.3:
+
 /lib/x86_64-linux-gnu/libGLdispatch.so.0:
 
 /lib/x86_64-linux-gnu/libexpat.so.1:
@@ -457,6 +495,10 @@ CMakeFiles/localiser.dir/GenericBase.cpp.o:
 /lib/x86_64-linux-gnu/libgomp.so.1:
 
 /lib/x86_64-linux-gnu/libgpg-error.so.0:
+
+/lib/x86_64-linux-gnu/libopenblas.so.0:
+
+/lib/x86_64-linux-gnu/libgfortran.so.5:
 
 /lib/x86_64-linux-gnu/libXau.so.6:
 

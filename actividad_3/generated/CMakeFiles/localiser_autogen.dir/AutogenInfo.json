@@ -196,17 +196,18 @@
 		"/usr/lib/x86_64-linux-gnu/cmake/Qt6StateMachine/Qt6StateMachineAdditionalTargetInfo.cmake",
 		"/usr/lib/x86_64-linux-gnu/cmake/Qt6StateMachine/Qt6StateMachineVersionlessTargets.cmake",
 		"/home/usuario/ROBOTICAG12/actividad_3/src/CMakeLists.txt",
-		"/usr/share/cmake-3.28/Modules/FindIce.cmake",
-		"/usr/share/cmake-3.28/Modules/SelectLibraryConfigurations.cmake",
-		"/usr/share/cmake-3.28/Modules/SelectLibraryConfigurations.cmake",
-		"/usr/share/cmake-3.28/Modules/FindPackageHandleStandardArgs.cmake",
-		"/usr/share/cmake-3.28/Modules/FindPackageMessage.cmake",
+		"/home/usuario/robocomp/cmake/modules/opencv4.cmake",
 		"/usr/lib/x86_64-linux-gnu/cmake/opencv4/OpenCVConfig-version.cmake",
 		"/usr/lib/x86_64-linux-gnu/cmake/opencv4/OpenCVConfig.cmake",
 		"/usr/share/cmake-3.28/Modules/FindPackageHandleStandardArgs.cmake",
 		"/usr/share/cmake-3.28/Modules/FindPackageMessage.cmake",
 		"/usr/lib/x86_64-linux-gnu/cmake/opencv4/OpenCVModules.cmake",
 		"/usr/lib/x86_64-linux-gnu/cmake/opencv4/OpenCVModules-release.cmake",
+		"/usr/share/cmake-3.28/Modules/FindIce.cmake",
+		"/usr/share/cmake-3.28/Modules/SelectLibraryConfigurations.cmake",
+		"/usr/share/cmake-3.28/Modules/SelectLibraryConfigurations.cmake",
+		"/usr/share/cmake-3.28/Modules/FindPackageHandleStandardArgs.cmake",
+		"/usr/share/cmake-3.28/Modules/FindPackageMessage.cmake",
 		"/usr/share/cmake-3.28/Modules/FindThreads.cmake",
 		"/usr/share/cmake-3.28/Modules/CheckLibraryExists.cmake",
 		"/usr/share/cmake-3.28/Modules/CheckIncludeFile.cmake",
@@ -232,9 +233,21 @@
 			null
 		],
 		[
+			"/home/usuario/ROBOTICAG12/actividad_3/src/door_detector.h",
+			"MU",
+			"VNU7RW3YIC/moc_door_detector.cpp",
+			null
+		],
+		[
 			"/home/usuario/ROBOTICAG12/actividad_3/src/hungarian.h",
 			"MU",
 			"VNU7RW3YIC/moc_hungarian.cpp",
+			null
+		],
+		[
+			"/home/usuario/ROBOTICAG12/actividad_3/src/qcustomplot.h",
+			"MU",
+			"VNU7RW3YIC/moc_qcustomplot.cpp",
 			null
 		],
 		[
@@ -253,6 +266,12 @@
 			"/home/usuario/ROBOTICAG12/actividad_3/src/specificworker.h",
 			"MU",
 			"VNU7RW3YIC/moc_specificworker.cpp",
+			null
+		],
+		[
+			"/home/usuario/ROBOTICAG12/actividad_3/src/time_series_plotter.h",
+			"MU",
+			"VNU7RW3YIC/moc_time_series_plotter.cpp",
 			null
 		],
 		[
@@ -294,7 +313,6 @@
 		"ICE_CPP11_MAPPING",
 		"QT_CORE_LIB",
 		"QT_GUI_LIB",
-		"QT_NO_DEBUG",
 		"QT_OPENGL_LIB",
 		"QT_STATEMACHINE_LIB",
 		"QT_WIDGETS_LIB",
@@ -358,6 +376,7 @@
 	"MOC_RELAXED_MODE" : false,
 	"MOC_SKIP" : 
 	[
+		"/home/usuario/ROBOTICAG12/actividad_3/generated/Camera360RGB.cpp",
 		"/home/usuario/ROBOTICAG12/actividad_3/generated/GenericBase.cpp",
 		"/home/usuario/ROBOTICAG12/actividad_3/generated/Lidar3D.cpp",
 		"/home/usuario/ROBOTICAG12/actividad_3/generated/OmniRobot.cpp"
@@ -382,7 +401,17 @@
 			"MU",
 			null
 		],
+		[
+			"/home/usuario/ROBOTICAG12/actividad_3/src/door_detector.cpp",
+			"MU",
+			null
+		],
 		[ "/home/usuario/ROBOTICAG12/actividad_3/src/hungarian.cpp", "MU", null ],
+		[
+			"/home/usuario/ROBOTICAG12/actividad_3/src/qcustomplot.cpp",
+			"MU",
+			null
+		],
 		[
 			"/home/usuario/ROBOTICAG12/actividad_3/src/ransac_line_detector.cpp",
 			"MU",
@@ -395,6 +424,11 @@
 		],
 		[
 			"/home/usuario/ROBOTICAG12/actividad_3/src/specificworker.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/usuario/ROBOTICAG12/actividad_3/src/time_series_plotter.cpp",
 			"MU",
 			null
 		],
@@ -424,6 +458,7 @@
 	"UIC_SEARCH_PATHS" : [ "/home/usuario/ROBOTICAG12/actividad_3/src" ],
 	"UIC_SKIP" : 
 	[
+		"/home/usuario/ROBOTICAG12/actividad_3/generated/Camera360RGB.cpp",
 		"/home/usuario/ROBOTICAG12/actividad_3/generated/GenericBase.cpp",
 		"/home/usuario/ROBOTICAG12/actividad_3/generated/Lidar3D.cpp",
 		"/home/usuario/ROBOTICAG12/actividad_3/generated/OmniRobot.cpp"

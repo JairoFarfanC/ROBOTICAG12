@@ -1,17 +1,47 @@
-# Sources set
+###############################################
+# CMakeLists.txt for src/
+###############################################
+
+# Incluir OpenCV requerido por ImageProcessor
+INCLUDE($ENV{ROBOCOMP}/cmake/modules/opencv4.cmake)
+
+# Añadir librerías extra necesarias para Task 3
+SET(LIBS ${LIBS} tbb Qt6PrintSupport)
+
+# ============================
+# SOURCES
+# ============================
 LIST(APPEND SOURCES
-        ../src/specificworker.cpp
-        ../src/hungarian.cpp
-        ../src/ransac_line_detector.cpp
-        ../src/room_detector.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/specificworker.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/room_detector.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/ransac_line_detector.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/hungarian.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/door_detector.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/qcustomplot.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/time_series_plotter.cpp
+
 )
 
-# Headers set
+# ============================
+# HEADERS
+# ============================
 LIST(APPEND HEADERS
-        ../src/specificworker.h
+        ${CMAKE_CURRENT_LIST_DIR}/specificworker.h
+        ${CMAKE_CURRENT_LIST_DIR}/room_detector.h
+        ${CMAKE_CURRENT_LIST_DIR}/ransac_line_detector.h
+        ${CMAKE_CURRENT_LIST_DIR}/hungarian.h
+        ${CMAKE_CURRENT_LIST_DIR}/door_detector.h
+        ${CMAKE_CURRENT_LIST_DIR}/munkres.hpp
+        ${CMAKE_CURRENT_LIST_DIR}/common_types.h
+        ${CMAKE_CURRENT_LIST_DIR}/image_processor.h
+        ${CMAKE_CURRENT_LIST_DIR}/nominal_room.h
+        ${CMAKE_CURRENT_LIST_DIR}/qcustomplot.h
+        ${CMAKE_CURRENT_LIST_DIR}/time_series_plotter.h
 )
 
-LIST(APPEND LIBS ${LIBS})
-
-# no-char8_t to avoid a problem with ICE Connection lib.
-add_definitions(-fmax-errors=1 -fno-char8_t)
+# ============================
+# UI FILES
+# ============================
+LIST(APPEND UI_HEADERS
+        ${CMAKE_CURRENT_LIST_DIR}/mainUI.ui
+)

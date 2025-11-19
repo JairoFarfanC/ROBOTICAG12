@@ -22,13 +22,16 @@ CMAKE_AR:FILEPATH=/usr/bin/ar
 
 //Choose the type of build, options are: None Debug Release RelWithDebInfo
 // MinSizeRel ...
-CMAKE_BUILD_TYPE:STRING=
+CMAKE_BUILD_TYPE:STRING=Debug
+
+//Enable colored diagnostics throughout.
+CMAKE_COLOR_DIAGNOSTICS:BOOL=ON
 
 //Enable/Disable color output during build.
 CMAKE_COLOR_MAKEFILE:BOOL=ON
 
 //CXX compiler
-CMAKE_CXX_COMPILER:FILEPATH=/usr/bin/c++
+CMAKE_CXX_COMPILER:STRING=/usr/bin/c++
 
 //A wrapper around 'ar' adding the appropriate '--plugin' option
 // for the GCC compiler
@@ -54,7 +57,7 @@ CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG
 CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG
 
 //C compiler
-CMAKE_C_COMPILER:FILEPATH=/usr/bin/cc
+CMAKE_C_COMPILER:STRING=/usr/bin/cc
 
 //A wrapper around 'ar' adding the appropriate '--plugin' option
 // for the GCC compiler
@@ -456,6 +459,9 @@ OPENGL_GLES2_INCLUDE_DIR:PATH=/usr/include
 OPENGL_GLES3_INCLUDE_DIR:PATH=/usr/include
 
 //Path to a file.
+OPENGL_GLU_INCLUDE_DIR:PATH=/usr/include
+
+//Path to a file.
 OPENGL_GLX_INCLUDE_DIR:PATH=/usr/include
 
 //Path to a file.
@@ -706,6 +712,8 @@ CMAKE_INSTALL_SO_NO_EXE:INTERNAL=1
 CMAKE_INSTALL_SYSCONFDIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_LINKER
 CMAKE_LINKER-ADVANCED:INTERNAL=1
+//Name of CMakeLists files to read
+CMAKE_LIST_FILE_NAME:INTERNAL=CMakeLists.txt
 //ADVANCED property for variable: CMAKE_MAKE_PROGRAM
 CMAKE_MAKE_PROGRAM-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_MODULE_LINKER_FLAGS
@@ -769,7 +777,7 @@ CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
 //Details about finding Ice
 FIND_PACKAGE_MESSAGE_DETAILS_Ice:INTERNAL=[/usr/bin/slice2cpp][/usr/include][/usr/share/ice/slice][/usr/lib/x86_64-linux-gnu/libIce++11.so;/usr/lib/x86_64-linux-gnu/libIceStorm++11.so;/usr/lib/x86_64-linux-gnu/libIce.so;/usr/lib/x86_64-linux-gnu/libIceStorm.so][ON][v3.7.10()]
 //Details about finding OpenCV
-FIND_PACKAGE_MESSAGE_DETAILS_OpenCV:INTERNAL=[/usr][v4.6.0()]
+FIND_PACKAGE_MESSAGE_DETAILS_OpenCV:INTERNAL=[/usr][v4.6.0(4)]
 //Details about finding OpenGL
 FIND_PACKAGE_MESSAGE_DETAILS_OpenGL:INTERNAL=[/usr/lib/x86_64-linux-gnu/libOpenGL.so][/usr/lib/x86_64-linux-gnu/libGLX.so][/usr/include][c ][v()]
 //Details about finding Threads
@@ -808,6 +816,8 @@ OPENGL_EGL_INCLUDE_DIR-ADVANCED:INTERNAL=1
 OPENGL_GLES2_INCLUDE_DIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: OPENGL_GLES3_INCLUDE_DIR
 OPENGL_GLES3_INCLUDE_DIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: OPENGL_GLU_INCLUDE_DIR
+OPENGL_GLU_INCLUDE_DIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: OPENGL_GLX_INCLUDE_DIR
 OPENGL_GLX_INCLUDE_DIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: OPENGL_INCLUDE_DIR

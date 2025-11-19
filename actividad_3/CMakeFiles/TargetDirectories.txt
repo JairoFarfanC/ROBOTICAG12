@@ -6,8 +6,9 @@
 /home/usuario/ROBOTICAG12/actividad_3/CMakeFiles/install/strip.dir
 /home/usuario/ROBOTICAG12/actividad_3/generated/CMakeFiles/ICES__home_usuario_ROBOTICAG12_actividad_3_generated.dir
 /home/usuario/ROBOTICAG12/actividad_3/generated/CMakeFiles/ICE_Lidar3D_target.dir
-/home/usuario/ROBOTICAG12/actividad_3/generated/CMakeFiles/ICE_OmniRobot_target.dir
+/home/usuario/ROBOTICAG12/actividad_3/generated/CMakeFiles/ICE_Camera360RGB_target.dir
 /home/usuario/ROBOTICAG12/actividad_3/generated/CMakeFiles/ICE_GenericBase_target.dir
+/home/usuario/ROBOTICAG12/actividad_3/generated/CMakeFiles/ICE_OmniRobot_target.dir
 /home/usuario/ROBOTICAG12/actividad_3/generated/CMakeFiles/localiser.dir
 /home/usuario/ROBOTICAG12/actividad_3/generated/CMakeFiles/edit_cache.dir
 /home/usuario/ROBOTICAG12/actividad_3/generated/CMakeFiles/rebuild_cache.dir

@@ -188,17 +188,17 @@ ICE_Lidar3D_target/fast:
 .PHONY : ICE_Lidar3D_target/fast
 
 #=============================================================================
-# Target rules for targets named ICE_OmniRobot_target
+# Target rules for targets named ICE_Camera360RGB_target
 
 # Build rule for target.
-ICE_OmniRobot_target: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 ICE_OmniRobot_target
-.PHONY : ICE_OmniRobot_target
+ICE_Camera360RGB_target: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 ICE_Camera360RGB_target
+.PHONY : ICE_Camera360RGB_target
 
 # fast build rule for target.
-ICE_OmniRobot_target/fast:
-	$(MAKE) $(MAKESILENT) -f generated/CMakeFiles/ICE_OmniRobot_target.dir/build.make generated/CMakeFiles/ICE_OmniRobot_target.dir/build
-.PHONY : ICE_OmniRobot_target/fast
+ICE_Camera360RGB_target/fast:
+	$(MAKE) $(MAKESILENT) -f generated/CMakeFiles/ICE_Camera360RGB_target.dir/build.make generated/CMakeFiles/ICE_Camera360RGB_target.dir/build
+.PHONY : ICE_Camera360RGB_target/fast
 
 #=============================================================================
 # Target rules for targets named ICE_GenericBase_target
@@ -212,6 +212,19 @@ ICE_GenericBase_target: cmake_check_build_system
 ICE_GenericBase_target/fast:
 	$(MAKE) $(MAKESILENT) -f generated/CMakeFiles/ICE_GenericBase_target.dir/build.make generated/CMakeFiles/ICE_GenericBase_target.dir/build
 .PHONY : ICE_GenericBase_target/fast
+
+#=============================================================================
+# Target rules for targets named ICE_OmniRobot_target
+
+# Build rule for target.
+ICE_OmniRobot_target: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 ICE_OmniRobot_target
+.PHONY : ICE_OmniRobot_target
+
+# fast build rule for target.
+ICE_OmniRobot_target/fast:
+	$(MAKE) $(MAKESILENT) -f generated/CMakeFiles/ICE_OmniRobot_target.dir/build.make generated/CMakeFiles/ICE_OmniRobot_target.dir/build
+.PHONY : ICE_OmniRobot_target/fast
 
 #=============================================================================
 # Target rules for targets named localiser
@@ -265,6 +278,7 @@ help:
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... ICES__home_usuario_ROBOTICAG12_actividad_3_generated"
+	@echo "... ICE_Camera360RGB_target"
 	@echo "... ICE_GenericBase_target"
 	@echo "... ICE_Lidar3D_target"
 	@echo "... ICE_OmniRobot_target"

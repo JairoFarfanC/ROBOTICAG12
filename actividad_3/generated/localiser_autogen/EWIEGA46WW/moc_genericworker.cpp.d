@@ -1,5 +1,6 @@
 /home/usuario/ROBOTICAG12/actividad_3/generated/localiser_autogen/EWIEGA46WW/moc_genericworker.cpp: /home/usuario/ROBOTICAG12/actividad_3/generated/genericworker.h \
   /home/usuario/ROBOTICAG12/actividad_3/generated/localiser_autogen/moc_predefs.h \
+  /home/usuario/ROBOTICAG12/actividad_3/generated/Camera360RGB.h \
   /home/usuario/ROBOTICAG12/actividad_3/generated/GenericBase.h \
   /home/usuario/ROBOTICAG12/actividad_3/generated/Lidar3D.h \
   /home/usuario/ROBOTICAG12/actividad_3/generated/OmniRobot.h \
