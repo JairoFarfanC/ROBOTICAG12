@@ -16,7 +16,7 @@ endif()
 
 
 IF(NOT EXISTS $ENV{ROBOCOMP}/cmake)
-    MESSAGE(FATAL_ERROR "Couldn't find RoboComp in $ENV{ROBOCOMP}! Exiting...")
+  MESSAGE(FATAL_ERROR "Couldn't find RoboComp in $ENV{ROBOCOMP}! Exiting...")
 ENDIF(NOT EXISTS $ENV{ROBOCOMP}/cmake)
 
 INCLUDE($ENV{ROBOCOMP}/cmake/robocomp.cmake)
@@ -38,13 +38,13 @@ endif()
 
 # Sources set
 SET (SOURCES
-        ${SOURCES}
-        $ENV{ROBOCOMP}/classes/rapplication/rapplication.cpp
-        $ENV{ROBOCOMP}/classes/sigwatch/sigwatch.cpp
-        $ENV{ROBOCOMP}/classes/grafcetStep/GRAFCETStep.cpp
-        $ENV{ROBOCOMP}/classes/ConfigLoader/ConfigLoader.cpp
-        main.cpp
-        genericworker.cpp
+  ${SOURCES}
+  $ENV{ROBOCOMP}/classes/rapplication/rapplication.cpp
+  $ENV{ROBOCOMP}/classes/sigwatch/sigwatch.cpp
+  $ENV{ROBOCOMP}/classes/grafcetStep/GRAFCETStep.cpp
+  $ENV{ROBOCOMP}/classes/ConfigLoader/ConfigLoader.cpp
+  main.cpp
+  genericworker.cpp
 )
 
 
@@ -63,7 +63,7 @@ SET_TARGET_PROPERTIES(localiser
         CXX_STANDARD ${CXX_STANDARD}
         CXX_STANDARD_REQUIRED ON
         CXX_EXTENSIONS OFF
-)
+        )
 
 
 INSTALL(FILES ${EXECUTABLE_OUTPUT_PATH}/localiser DESTINATION ${RC_COMPONENT_INSTALL_PATH}/bin/ PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE )
