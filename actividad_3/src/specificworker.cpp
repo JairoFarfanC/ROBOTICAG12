@@ -145,7 +145,7 @@ void SpecificWorker::initialize()
 
 void SpecificWorker::compute()
 {
-    // 1) Lidar + filtros
+    // 1) Lidar + filtros (incluye filtro de puerta)
     RoboCompLidar3D::TPoints data = read_data();
     if (data.empty())
         return;
@@ -176,18 +176,21 @@ void SpecificWorker::compute()
             time_series_plotter->addDataPoint(match_error_graph, max_match_error);
     }
 
-    // 5) Actualizar pose si estamos localizados
+    // 5) Localised: nº de matches y error
+    localised = (match.size() >= 3 && max_match_error < params.RELOCAL_DONE_MATCH_MAX_ERROR);
+
+    // 6) Actualizar pose si estamos localizados (cuando implementes update_robot_pose)
     if (localised)
         update_robot_pose(corners, match);
 
-    // 6) State machine de alto nivel (por ahora, stub)
-    auto [st, adv, rot] = process_state(data, corners, match, viewer);
+    // 7) State machine (por ahora sólo GOTO_ROOM_CENTER)
+    auto [st, adv, rot] = process_state(data, corners, lines, match, viewer);
     state = st;
 
-    // 7) Enviar comandos al robot
+    // 8) Enviar comandos al robot
     move_robot(adv, rot, max_match_error);
 
-    // 8) Dibujar robot en viewer_room con la pose estimada
+    // 9) Dibujar robot en viewer_room con la pose estimada
     robot_room_draw->setPos(robot_pose.translation().x(),
                             robot_pose.translation().y());
 
@@ -195,12 +198,13 @@ void SpecificWorker::compute()
                                     robot_pose.linear()(0, 0));
     robot_room_draw->setRotation(qRadiansToDegrees(angle));
 
-    // 9) Actualizar GUI
+    // 10) Actualizar GUI
     if (time_series_plotter)
         time_series_plotter->update();
 
     last_time = std::chrono::high_resolution_clock::now();
 }
+
 
 
 // =======================
@@ -317,6 +321,7 @@ void SpecificWorker::draw_lidar(const RoboCompLidar3D::TPoints &points,
 SpecificWorker::RetVal
 SpecificWorker::process_state(const RoboCompLidar3D::TPoints &data,
                               const Corners &corners,
+                              const Lines   &lines,
                               const Match   &match,
                               AbstractGraphicViewer *viewer)
 {
@@ -325,9 +330,11 @@ SpecificWorker::process_state(const RoboCompLidar3D::TPoints &data,
     Q_UNUSED(match);
     Q_UNUSED(viewer);
 
-    // De momento no movemos el robot: se queda parado en LOCALISE
-    return {state, 0.f, 0.f};
+    // Por ahora, siempre vamos al centro de la habitación
+    state = STATE::GOTO_ROOM_CENTER;
+    return goto_room_center(data, lines);
 }
+
 
 SpecificWorker::RetVal
 SpecificWorker::goto_door(const RoboCompLidar3D::TPoints &points)
@@ -358,11 +365,33 @@ SpecificWorker::localise(const Match &match)
 }
 
 SpecificWorker::RetVal
-SpecificWorker::goto_room_center(const RoboCompLidar3D::TPoints &points)
+SpecificWorker::goto_room_center(const RoboCompLidar3D::TPoints &points, const Lines &lines)
 {
     Q_UNUSED(points);
-    return {STATE::GOTO_ROOM_CENTER, 0.f, 0.f};
+
+    // Estimamos el centro de la sala a partir de las paredes
+    const auto center_opt = room_detector.estimate_center_from_walls(lines);
+    if (not center_opt.has_value())
+    {
+        // No sabemos bien el centro -> no nos movemos
+        return {STATE::GOTO_ROOM_CENTER, 0.f, 0.f};
+    }
+
+    Eigen::Vector2d center_world = center_opt.value();
+
+    // Vector desde robot a centro en coordenadas mundo
+    Eigen::Vector2d diff_world = center_world - robot_pose.translation();
+
+    // Pasar a frame del robot: R^T * (center - pos)
+    Eigen::Vector2d diff_robot = robot_pose.linear().transpose() * diff_world;
+
+    Eigen::Vector2f target_robot(static_cast<float>(diff_robot.x()),
+                                 static_cast<float>(diff_robot.y()));
+
+    auto [adv, rot] = robot_controller(target_robot);
+    return {STATE::GOTO_ROOM_CENTER, adv, rot};
 }
+
 
 SpecificWorker::RetVal
 SpecificWorker::update_pose(const Corners &corners, const Match &match)
@@ -443,10 +472,36 @@ void SpecificWorker::predict_robot_pose()
 std::tuple<float, float>
 SpecificWorker::robot_controller(const Eigen::Vector2f &target)
 {
-    Q_UNUSED(target);
-    // Stub: no movemos el robot
-    return {0.f, 0.f};
+    // target está en el frame del ROBOT: x hacia delante, y hacia la izquierda
+    const float tx = target.x();
+    const float ty = target.y();
+
+    const float dist  = std::sqrt(tx*tx + ty*ty);
+    const float angle = std::atan2(ty, tx);   // ángulo hacia el objetivo en el frame del robot
+
+    // Si ya estamos suficientemente cerca del centro, paramos
+    if (dist < params.RELOCAL_CENTER_EPS)
+        return {0.f, 0.f};
+
+    // Ganancias (puedes ajustarlas si va muy brusco)
+    const float k_v = params.RELOCAL_KP;      // pasa distancia (mm) a velocidad
+    const float k_w = 1.0f;                   // ganancia para rotación
+
+    float adv = k_v * dist;      // mm/s
+    float rot = k_w * angle;     // rad/s
+
+    // Reducir avance si el ángulo es grande (no avances de espaldas)
+    adv *= std::cos(angle);
+    if (adv < 0.f)
+        adv = 0.f;
+
+    // Saturaciones
+    adv = std::clamp(adv, -params.RELOCAL_MAX_ADV,  params.RELOCAL_MAX_ADV);
+    rot = std::clamp(rot, -params.RELOCAL_ROT_SPEED, params.RELOCAL_ROT_SPEED);
+
+    return {adv, rot};
 }
+
 
 void SpecificWorker::move_robot(float adv, float rot, float max_match_error)
 {

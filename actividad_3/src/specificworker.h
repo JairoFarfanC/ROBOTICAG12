@@ -159,19 +159,22 @@ private:
 
     STATE state = STATE::LOCALISE;
     using RetVal = std::tuple<STATE, float, float>;
+    RetVal goto_door(const RoboCompLidar3D::TPoints &points);
+    RetVal orient_to_door(const RoboCompLidar3D::TPoints &points);
+    RetVal cross_door(const RoboCompLidar3D::TPoints &points);
+    RetVal localise(const Match &match);
 
-    // estados de la máquina
-    RetVal goto_door       (const RoboCompLidar3D::TPoints &points);
-    RetVal orient_to_door  (const RoboCompLidar3D::TPoints &points);
-    RetVal cross_door      (const RoboCompLidar3D::TPoints &points);
-    RetVal localise        (const Match &match);
-    RetVal goto_room_center(const RoboCompLidar3D::TPoints &points);
-    RetVal update_pose     (const Corners &corners, const Match &match);
-    RetVal turn            (const Corners &corners);
-    RetVal process_state   (const RoboCompLidar3D::TPoints &data,
-                            const Corners &corners,
-                            const Match   &match,
-                            AbstractGraphicViewer *viewer);
+    // AHORA goto_room_center usa también las líneas de la sala
+    RetVal goto_room_center(const RoboCompLidar3D::TPoints &points, const Lines &lines);
+    RetVal update_pose(const Corners &corners, const Match &match);
+    RetVal turn(const Corners &corners);
+
+    // process_state también recibe las líneas
+    RetVal process_state(const RoboCompLidar3D::TPoints &data,
+                         const Corners &corners,
+                         const Lines   &lines,
+                         const Match   &match,
+                         AbstractGraphicViewer *viewer);
 
     // =============
     // DRAW
