@@ -16,6 +16,8 @@
 #include <optional>
 #include <chrono>
 #include <cmath>
+#include <limits>
+
 
 // =====================================================
 ////////////HOLAAAAAAAAAAAAAAAAA
@@ -117,7 +119,8 @@ void SpecificWorker::compute()
         try
         {
             // 21.a) extraer esquinas medidas
-            Corners measured = room_detector.compute_corners(*filtered, viewer ? &viewer->scene : nullptr);
+            auto [measured, lines] = room_detector.compute_corners(*filtered, viewer ? &viewer->scene : nullptr);
+
 
             if (!measured.empty())
             {
@@ -201,12 +204,75 @@ void SpecificWorker::compute()
         }
     }
 
-    // --- 3) NO enviar velocidades: JoystickPublish controla OmniRobot ---
-    // (nada aquí)
+    // --- 3) Máquina de estados de navegación ---
+    if (lidar_ok && filtered && !filtered->empty())
+    {
+        auto [frontal, left, right] = lidar_distances(*filtered);
+
+        std::tuple<Mode,float,float,float> result;
+
+        switch (current_mode)
+        {
+            case Mode::IDLE:
+                result = mode_idle(frontal, left, right);
+                break;
+            case Mode::FORWARD:
+                result = mode_forward(frontal, left, right);
+                break;
+            case Mode::TURN:
+                result = mode_turn(frontal, left, right);
+                break;
+            case Mode::SPIRAL:
+                result = mode_spiral(frontal, left, right);
+                break;
+        }
+
+        current_mode        = std::get<0>(result);
+        const float adv     = std::get<1>(result);
+        const float rot     = std::get<2>(result);
+        const float side    = std::get<3>(result);   // ahora mismo será 0
+
+        try
+        {
+            omnirobot_proxy->setSpeedBase(side, adv, rot);
+        }
+        catch(const Ice::Exception &e)
+        {
+            qWarning() << "[OmniRobot] setSpeedBase error:" << e.what();
+        }
+    }
+
 
     // --- 4) Derecha SIEMPRE por odometría ---
     update_right_from_odo();
 }
+
+
+std::tuple<float,float,float>
+SpecificWorker::lidar_distances(const RoboCompLidar3D::TPoints &points)
+{
+    auto min_in_sector = [&](float center, float half) -> float
+    {
+        float best = std::numeric_limits<float>::infinity();
+        for (const auto &p : points)
+        {
+            if (std::abs(p.phi - center) < half)
+                if (p.r < best)
+                    best = p.r;
+        }
+        if (std::isinf(best))
+            best = 5000.f;   // valor grande por defecto
+        return best;
+    };
+
+    const float frontal = min_in_sector(0.f,        FRONT_HALF_ANGLE);
+    const float left    = min_in_sector(+M_PI_2,    SIDE_HALF_ANGLE);
+    const float right   = min_in_sector(-M_PI_2,    SIDE_HALF_ANGLE);
+
+    return {frontal, left, right};
+}
+
+
 
 /**
  * === FILTRADO DE LIDAR (mínimo por ángulo) ===
@@ -300,6 +366,69 @@ void SpecificWorker::draw_room(QGraphicsScene* scene, const QRectF& dims)
     scene->addLine(dims.left(),  dims.bottom(), dims.left(),  dims.top(),    wall); // izquierda
 }
 
+
+std::tuple<SpecificWorker::Mode, float, float, float>
+SpecificWorker::mode_idle(float frontal, float left, float right)
+{
+    Q_UNUSED(left);
+    Q_UNUSED(right);
+
+    if (frontal > DCLEAR)
+        return {Mode::FORWARD, VMAX, 0.f, 0.f};
+
+    return {Mode::IDLE, 0.f, 0.f, 0.f};
+}
+
+std::tuple<SpecificWorker::Mode, float, float, float>
+SpecificWorker::mode_forward(float frontal, float left, float right)
+{
+    // obstáculo frontal o lateral -> TURN
+    if (frontal < DTH || left < DTH || right < DTH)
+    {
+        const float rot = (left > right) ? +W_TURN : -W_TURN;
+        return {Mode::TURN, 0.f, rot, 0.f};
+    }
+
+    // todo despejado -> SPIRAL
+    if (frontal > DSP && left > DSP && right > DSP)
+        return {Mode::SPIRAL, VMAX, W_SP, 0.f};
+
+    // seguir recto
+    return {Mode::FORWARD, VMAX, 0.f, 0.f};
+}
+
+std::tuple<SpecificWorker::Mode, float, float, float>
+SpecificWorker::mode_turn(float frontal, float left, float right)
+{
+    // si ya está despejado -> FORWARD
+    if (frontal > DCLEAR)
+        return {Mode::FORWARD, VMAX, 0.f, 0.f};
+
+    // seguir girando, al lado con más espacio
+    const float rot = (left > right) ? +W_TURN : -W_TURN;
+    return {Mode::TURN, 0.f, rot, 0.f};
+}
+
+std::tuple<SpecificWorker::Mode, float, float, float>
+SpecificWorker::mode_spiral(float frontal, float left, float right)
+{
+    // si aparece obstáculo -> TURN
+    if (frontal < DTH || left < DTH || right < DTH)
+    {
+        const float rot = (left > right) ? +W_TURN : -W_TURN;
+        return {Mode::TURN, 0.f, rot, 0.f};
+    }
+
+    // seguir en espiral
+    return {Mode::SPIRAL, VMAX, W_SP, 0.f};
+}
+
+
+void SpecificWorker::update_robot_position()
+{
+    // De momento vacío. Lo rellenarás si hace falta.
+}
+
 /**
  * === EMERGENCIA Y RESTAURACIÓN ===
  */
@@ -319,9 +448,4 @@ int SpecificWorker::startup_check()
 void SpecificWorker::new_target_slot(QPointF p)
 {
     Q_UNUSED(p);
-}
-
-void SpecificWorker::update_robot_position()
-{
-    // vacío de momento
 }

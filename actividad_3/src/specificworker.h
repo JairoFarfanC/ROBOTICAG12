@@ -129,6 +129,26 @@ private:
 
     void update_right_from_odo();                                // usada en compute()
     void draw_room(QGraphicsScene *scene, const QRectF &dims);   // usada en initialize()
+
+
+    // === Parámetros de control (mm, rad/s) ===
+    const float DTH    = 500.f;   // obstáculo
+    const float DCLEAR = 800.f;   // espacio libre
+    const float DSP    = 800.f;   // entrar en SPIRAL
+    const float VMAX   = 1000.f;  // mm/s
+    const float W_TURN = 1.2f;    // rad/s
+    const float W_SP   = 0.3f;    // rad/s
+
+    // ángulos de sectores del LiDAR
+    const float FRONT_HALF_ANGLE = 0.35f;        // ~±20°
+    const float SIDE_HALF_ANGLE  = 0.35f;        // ventana lateral
+
+    // devuelve (frontal, left, right) en mm
+    std::tuple<float,float,float>
+    lidar_distances(const RoboCompLidar3D::TPoints &points);
+
+
+
 };
 
 #endif
