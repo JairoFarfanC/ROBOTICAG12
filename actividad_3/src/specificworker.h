@@ -138,7 +138,8 @@ private:
         GOTO_ROOM_CENTER,
         TURN,
         IDLE,
-        CROSS_DOOR
+        CROSS_DOOR,
+        UPDATE_POSE // <--- AÑADE ESTO
     };
 
     inline const char* to_string(STATE s) const
@@ -152,6 +153,7 @@ private:
             case STATE::ORIENT_TO_DOOR:   return "ORIENT_TO_DOOR";
             case STATE::GOTO_ROOM_CENTER: return "GOTO_ROOM_CENTER";
             case STATE::CROSS_DOOR:       return "CROSS_DOOR";
+        case STATE::UPDATE_POSE:      return "UPDATE_POSE"; // <--- Y ESTO
             default:                      return "UNKNOWN";
         }
     }
@@ -163,6 +165,7 @@ private:
     RetVal orient_to_door(const RoboCompLidar3D::TPoints &points);
     RetVal cross_door(const RoboCompLidar3D::TPoints &points);
     RetVal localise(const Match &match);
+    // En specificworker.h, dentro de private:
 
     RetVal goto_room_center(const RoboCompLidar3D::TPoints &points, const Lines &lines);
 
@@ -219,8 +222,11 @@ private:
         last_time = std::chrono::high_resolution_clock::now();
 
     // Relocalization flags
+    // Relocalization flags
     bool relocal_centered = false;
     bool localised        = false;
+    bool red_patch_detected = false;   // <-- NUEVO
+
 
     // Pose update & control
     bool update_robot_pose(const Corners &corners, const Match &match);

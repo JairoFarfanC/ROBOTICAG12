@@ -176,8 +176,8 @@ void SpecificWorker::compute()
             time_series_plotter->addDataPoint(match_error_graph, max_match_error);
     }
 
-    if(!localised)
-        state = STATE::GOTO_ROOM_CENTER;
+    // if(!localised)
+    //     state = STATE::GOTO_ROOM_CENTER;
 
     // 5) Localised: nº de matches y error
     localised = (match.size() >= 3 && max_match_error < params.RELOCAL_DONE_MATCH_MAX_ERROR);
@@ -323,7 +323,6 @@ void SpecificWorker::draw_lidar(const RoboCompLidar3D::TPoints &points,
 // =======================
 // STATE MACHINE (stubs)
 // =======================
-
 SpecificWorker::RetVal
 SpecificWorker::process_state(const RoboCompLidar3D::TPoints &data,
                               const Corners &corners,
@@ -331,14 +330,35 @@ SpecificWorker::process_state(const RoboCompLidar3D::TPoints &data,
                               const Match   &match,
                               AbstractGraphicViewer *viewer)
 {
-    Q_UNUSED(corners);
+    Q_UNUSED(data);
     Q_UNUSED(match);
     Q_UNUSED(viewer);
 
-    state = STATE::GOTO_ROOM_CENTER;
-    return goto_room_center(data, lines);
-}
+    switch (state)
+    {
+    case STATE::LOCALISE:
+        // Diagrama: si no estamos centrados -> GOTO_ROOM_CENTER
+        if (!relocal_centered)
+            return goto_room_center(data, lines);
+        // Si ya estamos centrados pero aún no alineados -> TURN
+        else
+            return turn(corners);
 
+    case STATE::GOTO_ROOM_CENTER:
+        return goto_room_center(data, lines);
+
+    case STATE::TURN:
+        return turn(corners);
+
+    case STATE::IDLE:
+        // Quieto
+        return {STATE::IDLE, 0.f, 0.f};
+
+    default:
+        // Por si acaso, volvemos a LOCALISE sin movernos
+        return {STATE::LOCALISE, 0.f, 0.f};
+    }
+}
 
 
 
@@ -434,28 +454,64 @@ SpecificWorker::goto_room_center(const RoboCompLidar3D::TPoints &points,
     // 8. Devolver siguiente estado y velocidades
     return {STATE::GOTO_ROOM_CENTER, adv, vrot};
 }
+SpecificWorker::RetVal
+SpecificWorker::turn(const Corners &corners)
+{
+    Q_UNUSED(corners);
+
+    // 1) Mirar la cámara 360 para buscar el parche rojo
+    //    (usa la función estática que ya tienes en ImageProcessor)
+    bool  detected   = false;
+    int   left_right = 1;
+
+    {
+        auto res = rc::ImageProcessor::check_colour_patch_in_image(
+                        camera360rgb_proxy,           // proxy 360
+                        QColor("red"),                // parche rojo
+                        nullptr,                      // sin QLabel
+                        1500);                        // umbral de píxeles
+        detected   = std::get<0>(res);
+        left_right = std::get<1>(res);   // -1 = izquierda, 1 = derecha
+    }
+
+    // 2) Si lo hemos visto, paramos y cambiamos de estado para que tú lo veas claro
+    if (detected)
+    {
+        if (!red_patch_detected)
+        {
+            red_patch_detected = true;
+            qInfo() << ">>> RED PATCH DETECTED: TURN -> IDLE. Robot parado.";
+        }
+        return {STATE::IDLE, 0.f, 0.f};
+    }
+
+    // 3) Si aún no lo ve, seguimos girando a velocidad moderada
+    red_patch_detected = false;
+
+    float adv = 0.f;
+    float rot = 0.3f * static_cast<float>(left_right);   // rad/s, cambia signo según lado
+
+    return {STATE::TURN, adv, rot};
+}
 
 
 
+
+// =======================
+// AUXILIARES VARIOS
+// =======================
 SpecificWorker::RetVal
 SpecificWorker::update_pose(const Corners &corners, const Match &match)
 {
     Q_UNUSED(corners);
     Q_UNUSED(match);
-    return {STATE::LOCALISE, 0.f, 0.f};
+
+    // Aquí irá la lógica matemática compleja en el futuro.
+    // DE MOMENTO: El robot se queda quieto esperando nuevas órdenes.
+
+    // qInfo() << "State: UPDATE_POSE (Robot Stopped)";
+    return {STATE::UPDATE_POSE, 0.f, 0.f};
 }
-
-SpecificWorker::RetVal
-SpecificWorker::turn(const Corners &corners)
-{
-    Q_UNUSED(corners);
-    return {STATE::TURN, 0.f, 0.f};
-}
-
-// =======================
-// AUXILIARES VARIOS
-// =======================
-
 std::expected<int, std::string>
 SpecificWorker::closest_lidar_index_to_given_angle(const auto &points, float angle)
 {
