@@ -152,9 +152,17 @@ void SpecificWorker::compute()
 
     // 2) Esquinas + centro
     const auto &[corners, lines] = room_detector.compute_corners(data, &viewer->scene);
-    const auto center_opt        = room_detector.estimate_center_from_walls(lines);
+
+    std::optional<Eigen::Vector2d> center_opt;
+
+    // Solo calculamos y dibujamos el centro en la PRIMERA habitación
+    if (!crossed_door)
+    {
+        center_opt = room_detector.estimate_center_from_walls(lines);
+    }
 
     draw_lidar(data, center_opt, &viewer->scene);
+
 
     // 3) Matching nominal vs medido (nominal en frame ROBOT)
     const auto nominal_in_robot =
@@ -176,9 +184,6 @@ void SpecificWorker::compute()
             time_series_plotter->addDataPoint(match_error_graph, max_match_error);
     }
 
-    // if(!localised)
-    //     state = STATE::GOTO_ROOM_CENTER;
-
     // 5) Localised: nº de matches y error
     localised = (match.size() >= 3 && max_match_error < params.RELOCAL_DONE_MATCH_MAX_ERROR);
 
@@ -186,9 +191,9 @@ void SpecificWorker::compute()
     if (localised)
         update_robot_pose(corners, match);
 
-    // 7) State machine (por ahora sólo GOTO_ROOM_CENTER)
     auto [st, adv, rot] = process_state(data, corners, lines, match, viewer);
     state = st;
+
 
     // 8) Enviar comandos al robot
     move_robot(adv, rot, max_match_error);
@@ -343,6 +348,9 @@ SpecificWorker::process_state(const RoboCompLidar3D::TPoints &data,
     case STATE::TURN:
         return turn(corners);
 
+    case STATE::CROSS_DOOR:
+        return cross_door(data);      // <-- NUEVO
+
     case STATE::IDLE:
         return {STATE::IDLE, 0.f, 0.f};
 
@@ -350,6 +358,7 @@ SpecificWorker::process_state(const RoboCompLidar3D::TPoints &data,
         return {STATE::LOCALISE, 0.f, 0.f};
     }
 }
+
 
 SpecificWorker::RetVal
 SpecificWorker::goto_door(const RoboCompLidar3D::TPoints &points)
@@ -397,58 +406,53 @@ SpecificWorker::goto_door(const RoboCompLidar3D::TPoints &points)
     return {STATE::GOTO_DOOR, adv, rot};
 }
 
-
 SpecificWorker::RetVal
 SpecificWorker::orient_to_door(const RoboCompLidar3D::TPoints &points)
 {
     Q_UNUSED(points);
-
-    auto door_exp = door_detector.get_current_door();
-    if (!door_exp.has_value())
-    {
-        // Hemos perdido la puerta: volvemos a buscarla
-        qInfo() << "ORIENT_TO_DOOR: lost door -> back to GOTO_DOOR";
-        door_logged = false;
-        return {STATE::GOTO_DOOR, 0.f, 0.3f};
-    }
-
-    const Door &d = door_exp.value();
-    Eigen::Vector2f center = d.center();
-    float dist  = center.norm();
-    float angle = std::atan2(center.x(), center.y());   // x lateral, y delante
-
-    // Parámetros de orientación
-    const float angle_tol = 0.05f;  // ~3 grados
-    float adv = 0.f;
-    float rot = 0.f;
-
-    // Si ya estamos bien alineados con el centro de la puerta -> parar mirando a la puerta
-    if (std::abs(angle) < angle_tol)
-    {
-        qInfo() << "ORIENT_TO_DOOR: aligned with door. dist:" << dist
-                << " angle:" << angle;
-        return {STATE::IDLE, 0.f, 0.f};   // luego cambiaremos a CROSS_DOOR
-    }
-
-    // Si no, girar proporcionalmente hacia el centro
-    rot = 0.8f * angle;
-    rot = std::clamp(rot, -params.RELOCAL_ROT_SPEED, params.RELOCAL_ROT_SPEED);
-
-    qInfo() << "ORIENT_TO_DOOR: rotating to door."
-            << " angle:" << angle
-            << " dist:"  << dist
-            << " rot:"   << rot;
-
-    return {STATE::ORIENT_TO_DOOR, adv, rot};
+    return {STATE::IDLE, 0.f, 0.f};   // este estado ni se usa ya
 }
-
 
 SpecificWorker::RetVal
 SpecificWorker::cross_door(const RoboCompLidar3D::TPoints &points)
 {
     Q_UNUSED(points);
-    return {STATE::CROSS_DOOR, 0.f, 0.f};
+
+    // Inicializar al entrar por primera vez
+    if (!crossing_door)
+    {
+        crossing_door    = true;
+        cross_door_start = std::chrono::high_resolution_clock::now();
+        qInfo() << "CROSS_DOOR: starting straight crossing. target travel (mm):"
+                << door_travel_target_mm;
+    }
+
+    auto now = std::chrono::high_resolution_clock::now();
+    float elapsed_sec = std::chrono::duration_cast<std::chrono::milliseconds>(
+                            now - cross_door_start).count() / 1000.f;
+
+    // Distancia recorrida aproximada = velocidad * tiempo
+    float travelled_mm = params.CROSS_DOOR_SPEED * elapsed_sec;
+
+    // Mientras no hayamos llegado a la distancia objetivo, avanzamos recto
+    if (travelled_mm < door_travel_target_mm)
+    {
+        float adv = params.CROSS_DOOR_SPEED;  // mm/s hacia delante
+        float rot = 0.f;
+        return {STATE::CROSS_DOOR, adv, rot};
+    }
+
+    // Hemos recorrido suficiente: damos por cruzada la puerta
+    crossing_door = false;
+    crossed_door  = true;
+    red_patch_detected = false;   // por si quieres buscar otra puerta en el futuro
+
+    qInfo() << "CROSS_DOOR: finished crossing. travelled (mm):" << travelled_mm
+            << " -> switching to GOTO_ROOM_CENTER (SECOND room)";
+
+    return {STATE::GOTO_ROOM_CENTER, 0.f, 0.f};
 }
+
 
 SpecificWorker::RetVal
 SpecificWorker::localise(const Match &match)
@@ -463,6 +467,21 @@ SpecificWorker::goto_room_center(const RoboCompLidar3D::TPoints &points,
 {
     Q_UNUSED(points);
 
+    // ================================================
+    // DESPUÉS DE CRUZAR LA PUERTA, IGNORAMOS EL CENTRO
+    // DEL RECTÁNGULO Y NOS QUEDAMOS QUIETOS.
+    // ================================================
+    if (crossed_door)
+    {
+        // Segunda habitación: no perseguimos más el "centro" estimado
+        // para evitar que se vaya a la puerta y rehaga el bucle.
+        return {STATE::IDLE, 0.f, 0.f};
+    }
+
+    // ================================================
+    // PRIMERA HABITACIÓN: IR AL CENTRO ESTIMADO POR LAS PAREDES
+    // ================================================
+
     // 1. Estimar centro de la habitación a partir de las paredes
     auto center_opt = room_detector.estimate_center_from_walls(lines);
 
@@ -473,15 +492,12 @@ SpecificWorker::goto_room_center(const RoboCompLidar3D::TPoints &points,
         return {STATE::GOTO_ROOM_CENTER, 150.f, 0.0f};
     }
 
-    // 2. Centro en coordenadas del robot.
-    // OJO: siguiendo la lógica de tus compañeros, interpretamos:
-    //  - x = lateral (izquierda/derecha)
-    //  - y = hacia delante
+    // 2. Centro en coordenadas del robot (x lateral, y hacia delante)
     Eigen::Vector2d c_world = center_opt.value();
     float cx = static_cast<float>(c_world.x());   // lateral
     float cy = static_cast<float>(c_world.y());   // hacia delante
 
-    // 3. Dibujar el centro en el viewer (por si quieres depurar)
+    // 3. Dibujar el centro en el viewer (debug)
     static QGraphicsEllipseItem *item = nullptr;
     if (item != nullptr)
     {
@@ -494,16 +510,15 @@ SpecificWorker::goto_room_center(const RoboCompLidar3D::TPoints &points,
     item->setPos(c_world.x(), c_world.y());
 
     // 4. Distancia al centro
-    float dist = std::sqrt(cx*cx + cy*cy);
-    if (dist < params.RELOCAL_CENTER_EPS)   // por defecto 300 mm
+    float dist = std::sqrt(cx * cx + cy * cy);
+    if (dist < params.RELOCAL_CENTER_EPS)   // por defecto ~300 mm
     {
         relocal_centered = true;
-        return {STATE::TURN, 0.f, 0.f};    // ya estamos en el centro
+        qInfo() << "GOTO_ROOM_CENTER: center of FIRST room reached -> TURN";
+        return {STATE::TURN, 0.f, 0.f};    // sólo en la primera habitación
     }
 
-
-    // 5. Ángulo hacia el centro.
-    // Copiando la idea de tus compañeros: atan2(x, y)
+    // 5. Ángulo hacia el centro (x lateral, y hacia delante)
     float angle = std::atan2(cx, cy);
 
     // 6. Velocidad angular proporcional al ángulo
@@ -511,15 +526,15 @@ SpecificWorker::goto_room_center(const RoboCompLidar3D::TPoints &points,
     float vrot  = k_rot * angle;
 
     // 7. "Freno" según el ángulo (campana gaussiana)
-    float brake = std::exp(- (angle * angle) / (static_cast<float>(M_PI) / 10.f));
-    // Velocidad de avance máxima (usa tu RELOCAL_MAX_ADV)
-    float adv = params.RELOCAL_MAX_ADV * brake;   // típico: 300 * brake
+    float brake = std::exp(-(angle * angle) / (static_cast<float>(M_PI) / 10.f));
+    float adv   = params.RELOCAL_MAX_ADV * brake;   // típico: 300 * brake
+
     qInfo() << "CENTER:" << cx << cy
             << "dist:" << dist
-            << "adv:" << adv
+            << "adv:"  << adv
             << "vrot:" << vrot;
 
-    // 8. Devolver siguiente estado y velocidades
+    // 8. Seguimos yendo al centro de la PRIMERA habitación
     return {STATE::GOTO_ROOM_CENTER, adv, vrot};
 }
 
@@ -562,7 +577,7 @@ SpecificWorker::turn(const Corners &corners)
     auto door_exp = door_detector.get_current_door();
     const float angle_tol = 0.10f;   // ~6º de tolerancia
     float adv = 0.f;
-    float rot = 0.3f;                // SIEMPRE mismo sentido
+    float rot = 0.6f;                // SIEMPRE mismo sentido
 
     if (door_exp.has_value())
     {
@@ -571,10 +586,22 @@ SpecificWorker::turn(const Corners &corners)
         float dist  = c.norm();
         float angle = std::atan2(c.x(), c.y());    // x lateral, y hacia delante
 
+        // Si ya estamos alineados con la puerta -> empezar a cruzarla
+        // Si ya estamos alineados con la puerta -> preparar cruce recto
         if (std::abs(angle) < angle_tol)
         {
-            qInfo() << "TURN: DOOR ALIGNED. dist:" << dist << " angle:" << angle;
-            return {STATE::IDLE, 0.f, 0.f};
+            // Queremos avanzar dist hasta la puerta + un extra para estar dentro de la segunda sala
+            const float extra_mm = 2000.f;  // 2 metros más allá de la puerta (ajusta a ojo)
+            door_travel_target_mm = dist + extra_mm;
+
+            crossing_door   = false;   // para que cross_door se inicialice
+            crossed_door    = false;   // aún no la hemos cruzado completamente
+
+            qInfo() << "TURN: DOOR ALIGNED. dist:" << dist
+                    << " -> target travel (mm):" << door_travel_target_mm
+                    << " -> switching to CROSS_DOOR";
+
+            return {STATE::CROSS_DOOR, 0.f, 0.f};
         }
 
         qInfo() << "TURN: rotating (door seen). angle:" << angle << " dist:" << dist;

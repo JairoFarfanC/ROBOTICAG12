@@ -99,6 +99,10 @@ private:
         float RELOCAL_MATCH_MAX_DIST       = 2000.f;
         float RELOCAL_DONE_COST            = 500.f;
         float RELOCAL_DONE_MATCH_MAX_ERROR = 1000.f;
+        float CROSS_DOOR_SPEED    = 400.f;   // mm/s
+        float CROSS_DOOR_DURATION = 6.f;     // segundos
+
+
     };
     Params params;
 
@@ -223,11 +227,15 @@ private:
 
     // Relocalization flags
     // Relocalization flags
+    // Relocalization flags
     bool relocal_centered = false;
     bool localised        = false;
-    bool red_patch_detected = false;   // <-- NUEVO
-    bool door_logged = false;      // <-- NUEVO
+    bool red_patch_detected = false;
+    bool crossing_door = false;
+    bool crossed_door  = false;
+    std::chrono::time_point<std::chrono::high_resolution_clock> cross_door_start;
 
+    float door_travel_target_mm = 0.f;   // <-- NUEVO: distancia total a recorrer al cruzar
 
     // Pose update & control
     bool update_robot_pose(const Corners &corners, const Match &match);
