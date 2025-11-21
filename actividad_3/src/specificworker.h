@@ -30,8 +30,8 @@
 
 #include "common_types.h"     // Corners, Match, Lines, etc.
 #include "room_detector.h"    // rc::Room_Detector
-#include "hungarian.h"        // rc::Hungarian (versión nueva)
-#include "nominal_room.h"     // NominalRoom (del repo del profe)
+#include "hungarian.h"        // rc::Hungarian
+#include "nominal_room.h"     // NominalRoom
 #include "door_detector.h"
 #include "image_processor.h"
 
@@ -46,8 +46,6 @@ public:
     SpecificWorker(const ConfigLoader& configLoader, TuplePrx tprx, bool startup_check);
     ~SpecificWorker();
 
-    // // joystick (si lo usas en esta práctica)
-    // void JoystickAdapter_sendData(RoboCompJoystickAdapter::TData data);
 
 public slots:
     void initialize() override;
@@ -58,6 +56,7 @@ public slots:
 
 private:
     bool startup_check_flag;
+
     // ============================
     // PARÁMETROS DEL ROBOT / MUNDO
     // ============================
@@ -91,15 +90,15 @@ private:
         QRectF GRID_MAX_DIM             = QRectF{-5000, 2500, 10000, -5000};
 
         // relocalization
-        float RELOCAL_CENTER_EPS              = 300.f;              // mm
-        float RELOCAL_KP                      = 0.002f;             // mm -> speed
-        float RELOCAL_MAX_ADV                 = 300.f;              // mm/s
-        float RELOCAL_MAX_SIDE                = 300.f;              // mm/s
-        float RELOCAL_ROT_SPEED               = 0.3f;               // rad/s
-        float RELOCAL_DELTA                   = 5.0f * M_PI/180.f;  // rad
-        float RELOCAL_MATCH_MAX_DIST          = 2000.f;             // mm (gating)
-        float RELOCAL_DONE_COST               = 500.f;
-        float RELOCAL_DONE_MATCH_MAX_ERROR    = 1000.f;
+        float RELOCAL_CENTER_EPS           = 300.f;     // radio para considerar "en el centro"
+        float RELOCAL_KP                   = 0.002f;    // ganancia para control de avance (si se usa)
+        float RELOCAL_MAX_ADV              = 300.f;     // mm/s
+        float RELOCAL_MAX_SIDE             = 300.f;
+        float RELOCAL_ROT_SPEED            = 0.6f;      // rad/s
+        float RELOCAL_DELTA                = 5.0f * M_PI/180.f;
+        float RELOCAL_MATCH_MAX_DIST       = 2000.f;
+        float RELOCAL_DONE_COST            = 500.f;
+        float RELOCAL_DONE_MATCH_MAX_ERROR = 1000.f;
     };
     Params params;
 
@@ -159,23 +158,22 @@ private:
 
     STATE state = STATE::LOCALISE;
     using RetVal = std::tuple<STATE, float, float>;
+
     RetVal goto_door(const RoboCompLidar3D::TPoints &points);
     RetVal orient_to_door(const RoboCompLidar3D::TPoints &points);
     RetVal cross_door(const RoboCompLidar3D::TPoints &points);
     RetVal localise(const Match &match);
 
-    // AHORA goto_room_center usa también las líneas de la sala
     RetVal goto_room_center(const RoboCompLidar3D::TPoints &points, const Lines &lines);
+
     RetVal update_pose(const Corners &corners, const Match &match);
     RetVal turn(const Corners &corners);
 
-    // process_state también recibe las líneas
     RetVal process_state(const RoboCompLidar3D::TPoints &data,
-                         const Corners &corners,
-                         const Lines   &lines,
-                         const Match   &match,
-                         AbstractGraphicViewer *viewer);
-
+                     const Corners &corners,
+                     const Lines   &lines,
+                     const Match   &match,
+                     AbstractGraphicViewer *viewer);
     // =============
     // DRAW
     // =============
@@ -191,8 +189,9 @@ private:
     std::expected<int, std::string>
     closest_lidar_index_to_given_angle(const auto &points, float angle);
 
-    RoboCompLidar3D::TPoints filter_same_phi       (const RoboCompLidar3D::TPoints &points);
-    RoboCompLidar3D::TPoints filter_isolated_points(const RoboCompLidar3D::TPoints &points, float d);
+    RoboCompLidar3D::TPoints filter_same_phi        (const RoboCompLidar3D::TPoints &points);
+    RoboCompLidar3D::TPoints filter_isolated_points(const RoboCompLidar3D::TPoints &points,
+                                                    float d);
 
     void print_match(const Match &match, float error = 1.f) const;
 
@@ -212,7 +211,7 @@ private:
     // Doors
     DoorDetector door_detector;
 
-    // Image processor (para la parte visual de puertas)
+    // Image processor (para la parte visual, parche rojo, etc.)
     rc::ImageProcessor image_processor;
 
     // Timing
@@ -231,7 +230,6 @@ private:
     std::tuple<float, float> robot_controller(const Eigen::Vector2f &target);
 
 signals:
-    // aquí puedes añadir señales Qt si las necesitas
     // void customSignal();
 };
 

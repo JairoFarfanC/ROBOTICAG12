@@ -176,6 +176,9 @@ void SpecificWorker::compute()
             time_series_plotter->addDataPoint(match_error_graph, max_match_error);
     }
 
+    if(!localised)
+        state = STATE::GOTO_ROOM_CENTER;
+
     // 5) Localised: nº de matches y error
     localised = (match.size() >= 3 && max_match_error < params.RELOCAL_DONE_MATCH_MAX_ERROR);
 
@@ -217,9 +220,8 @@ RoboCompLidar3D::TPoints SpecificWorker::read_data()
 
     try
     {
-        // usamos el lidar alto por defecto
         auto data = lidar3d_proxy->getLidarDataWithThreshold2d(
-            params.LIDAR_NAME_HIGH, 5000, 1);
+            params.LIDAR_NAME_HIGH, 12000, 1);
         points = data.points;
     }
     catch (const Ice::Exception &e)
@@ -228,15 +230,19 @@ RoboCompLidar3D::TPoints SpecificWorker::read_data()
         return {};
     }
 
-    // filtros propios
+    // 1) Min distancia por phi (equivalente a filter_min_distance de ellos)
     points = filter_same_phi(points);
-    points = filter_isolated_points(points, 200.f);  // umbral provisional
 
-    // filtro de puerta (elimina puntos fuera de la sala)
+    // 2) De momento, no hacemos filtro de aislados agresivo
+    points = filter_isolated_points(points, 200.f);
+
+    // 3) MUY IMPORTANTE: filtrar por puerta igual que ellos
     points = door_detector.filter_points(points, &viewer->scene);
 
     return points;
 }
+
+
 
 RoboCompLidar3D::TPoints
 SpecificWorker::filter_same_phi(const RoboCompLidar3D::TPoints &points)
@@ -325,15 +331,15 @@ SpecificWorker::process_state(const RoboCompLidar3D::TPoints &data,
                               const Match   &match,
                               AbstractGraphicViewer *viewer)
 {
-    Q_UNUSED(data);
     Q_UNUSED(corners);
     Q_UNUSED(match);
     Q_UNUSED(viewer);
 
-    // Por ahora, siempre vamos al centro de la habitación
     state = STATE::GOTO_ROOM_CENTER;
     return goto_room_center(data, lines);
 }
+
+
 
 
 SpecificWorker::RetVal
@@ -365,32 +371,70 @@ SpecificWorker::localise(const Match &match)
 }
 
 SpecificWorker::RetVal
-SpecificWorker::goto_room_center(const RoboCompLidar3D::TPoints &points, const Lines &lines)
+SpecificWorker::goto_room_center(const RoboCompLidar3D::TPoints &points,
+                                 const Lines &lines)
 {
     Q_UNUSED(points);
 
-    // Estimamos el centro de la sala a partir de las paredes
-    const auto center_opt = room_detector.estimate_center_from_walls(lines);
-    if (not center_opt.has_value())
+    // 1. Estimar centro de la habitación a partir de las paredes
+    auto center_opt = room_detector.estimate_center_from_walls(lines);
+
+    // Si aún no hay centro fiable, avanzar suave en línea recta
+    // para ir "barriendo" la sala. Esto evita quedarse oscilando en el sitio.
+    if (!center_opt.has_value())
     {
-        // No sabemos bien el centro -> no nos movemos
-        return {STATE::GOTO_ROOM_CENTER, 0.f, 0.f};
+        return {STATE::GOTO_ROOM_CENTER, 150.f, 0.0f};
     }
 
-    Eigen::Vector2d center_world = center_opt.value();
+    // 2. Centro en coordenadas del robot.
+    // OJO: siguiendo la lógica de tus compañeros, interpretamos:
+    //  - x = lateral (izquierda/derecha)
+    //  - y = hacia delante
+    Eigen::Vector2d c_world = center_opt.value();
+    float cx = static_cast<float>(c_world.x());   // lateral
+    float cy = static_cast<float>(c_world.y());   // hacia delante
 
-    // Vector desde robot a centro en coordenadas mundo
-    Eigen::Vector2d diff_world = center_world - robot_pose.translation();
+    // 3. Dibujar el centro en el viewer (por si quieres depurar)
+    static QGraphicsEllipseItem *item = nullptr;
+    if (item != nullptr)
+    {
+        viewer->scene.removeItem(item);
+        delete item;
+    }
+    item = viewer->scene.addEllipse(-100, -100, 200, 200,
+                                    QPen(Qt::red, 3),
+                                    QBrush(Qt::red, Qt::SolidPattern));
+    item->setPos(c_world.x(), c_world.y());
 
-    // Pasar a frame del robot: R^T * (center - pos)
-    Eigen::Vector2d diff_robot = robot_pose.linear().transpose() * diff_world;
+    // 4. Distancia al centro
+    float dist = std::sqrt(cx*cx + cy*cy);
+    if (dist < params.RELOCAL_CENTER_EPS)   // por defecto 300 mm
+    {
+        relocal_centered = true;
+        return {STATE::TURN, 0.f, 0.f};    // ya estamos en el centro
+    }
 
-    Eigen::Vector2f target_robot(static_cast<float>(diff_robot.x()),
-                                 static_cast<float>(diff_robot.y()));
+    // 5. Ángulo hacia el centro.
+    // Copiando la idea de tus compañeros: atan2(x, y)
+    float angle = std::atan2(cx, cy);
 
-    auto [adv, rot] = robot_controller(target_robot);
-    return {STATE::GOTO_ROOM_CENTER, adv, rot};
+    // 6. Velocidad angular proporcional al ángulo
+    float k_rot = 0.5f;
+    float vrot  = k_rot * angle;
+
+    // 7. "Freno" según el ángulo (campana gaussiana)
+    float brake = std::exp(- (angle * angle) / (static_cast<float>(M_PI) / 10.f));
+    // Velocidad de avance máxima (usa tu RELOCAL_MAX_ADV)
+    float adv = params.RELOCAL_MAX_ADV * brake;   // típico: 300 * brake
+    qInfo() << "CENTER:" << cx << cy
+            << "dist:" << dist
+            << "adv:" << adv
+            << "vrot:" << vrot;
+
+    // 8. Devolver siguiente estado y velocidades
+    return {STATE::GOTO_ROOM_CENTER, adv, vrot};
 }
+
 
 
 SpecificWorker::RetVal
@@ -468,40 +512,53 @@ void SpecificWorker::predict_robot_pose()
 {
     // Stub: no hacemos predicción todavía
 }
-
 std::tuple<float, float>
 SpecificWorker::robot_controller(const Eigen::Vector2f &target)
 {
-    // target está en el frame del ROBOT: x hacia delante, y hacia la izquierda
+    // target en frame robot: x hacia adelante, y hacia la izquierda
     const float tx = target.x();
     const float ty = target.y();
 
     const float dist  = std::sqrt(tx*tx + ty*ty);
-    const float angle = std::atan2(ty, tx);   // ángulo hacia el objetivo en el frame del robot
+    if (dist < 1e-3f)
+        return {0.f, 0.f};
 
-    // Si ya estamos suficientemente cerca del centro, paramos
+    const float angle = std::atan2(ty, tx);   // ángulo hacia el centro
+
+    // Si estamos ya dentro del radio de tolerancia del centro → parar
     if (dist < params.RELOCAL_CENTER_EPS)
         return {0.f, 0.f};
 
-    // Ganancias (puedes ajustarlas si va muy brusco)
-    const float k_v = params.RELOCAL_KP;      // pasa distancia (mm) a velocidad
-    const float k_w = 1.0f;                   // ganancia para rotación
+    // Caso especial: el centro está claramente DETRÁS del robot
+    // cos(angle) < 0 significa ángulo > 90º o < -90º
+    if (std::cos(angle) < 0.f)
+    {
+        // Sólo giramos en el sentido del signo del ángulo, sin avanzar
+        float rot = (angle > 0.f ? 1.f : -1.f) * params.RELOCAL_ROT_SPEED;
+        return {0.f, rot};
+    }
 
-    float adv = k_v * dist;      // mm/s
-    float rot = k_w * angle;     // rad/s
+    // --- Control "tipo campana" sobre el ángulo ---
 
-    // Reducir avance si el ángulo es grande (no avances de espaldas)
-    adv *= std::cos(angle);
-    if (adv < 0.f)
-        adv = 0.f;
-
-    // Saturaciones
-    adv = std::clamp(adv, -params.RELOCAL_MAX_ADV,  params.RELOCAL_MAX_ADV);
+    // Ganancia angular
+    const float k_w = 1.0f;
+    float rot = k_w * angle;
     rot = std::clamp(rot, -params.RELOCAL_ROT_SPEED, params.RELOCAL_ROT_SPEED);
+
+    // Avance máximo mientras re-localizamos
+    const float max_adv = params.RELOCAL_MAX_ADV;   // típico: 300 mm/s
+
+    // Penalización suave en función del ángulo (campana gaussiana)
+    // sigma controla cuánto influye el ángulo
+    const float sigma = static_cast<float>(M_PI) / 4.f;  // 45 grados
+    const float angle2 = angle * angle;
+    float brake = std::exp(- angle2 / (2.f * sigma * sigma));  // entre 0 y 1
+
+    // Avance final: fuerte cuando el centro está delante, más débil cuando está muy lateral
+    float adv = max_adv * brake;
 
     return {adv, rot};
 }
-
 
 void SpecificWorker::move_robot(float adv, float rot, float max_match_error)
 {
