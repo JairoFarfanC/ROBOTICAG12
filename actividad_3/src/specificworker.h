@@ -226,6 +226,7 @@ private:
     bool relocal_centered = false;
     bool localised        = false;
     bool red_patch_detected = false;   // <-- NUEVO
+    bool door_logged = false;      // <-- NUEVO
 
 
     // Pose update & control

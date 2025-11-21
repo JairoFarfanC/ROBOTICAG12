@@ -330,20 +330,13 @@ SpecificWorker::process_state(const RoboCompLidar3D::TPoints &data,
                               const Match   &match,
                               AbstractGraphicViewer *viewer)
 {
-    Q_UNUSED(data);
+    Q_UNUSED(corners);
     Q_UNUSED(match);
     Q_UNUSED(viewer);
 
     switch (state)
     {
     case STATE::LOCALISE:
-        // Diagrama: si no estamos centrados -> GOTO_ROOM_CENTER
-        if (!relocal_centered)
-            return goto_room_center(data, lines);
-        // Si ya estamos centrados pero aún no alineados -> TURN
-        else
-            return turn(corners);
-
     case STATE::GOTO_ROOM_CENTER:
         return goto_room_center(data, lines);
 
@@ -351,30 +344,104 @@ SpecificWorker::process_state(const RoboCompLidar3D::TPoints &data,
         return turn(corners);
 
     case STATE::IDLE:
-        // Quieto
         return {STATE::IDLE, 0.f, 0.f};
 
     default:
-        // Por si acaso, volvemos a LOCALISE sin movernos
         return {STATE::LOCALISE, 0.f, 0.f};
     }
 }
 
-
-
 SpecificWorker::RetVal
 SpecificWorker::goto_door(const RoboCompLidar3D::TPoints &points)
 {
-    Q_UNUSED(points);
-    return {STATE::GOTO_DOOR, 0.f, 0.f};
+    Q_UNUSED(points);  // La puerta ya se detecta en read_data -> filter_points -> detect
+
+    auto door_exp = door_detector.get_current_door();
+    if (!door_exp.has_value())
+    {
+        // No hay puerta en el cache → seguir girando en el sitio
+        qInfo() << "GOTO_DOOR: NO DOOR in cache -> rotating in place";
+        float adv = 0.f;
+        float rot = 0.3f;
+        return {STATE::GOTO_DOOR, adv, rot};
+    }
+
+    const Door &d = door_exp.value();
+    Eigen::Vector2f center = d.center();        // coordenadas en frame robot
+    float dist  = center.norm();
+    float angle = std::atan2(center.x(), center.y());  // x lateral, y hacia delante
+
+    // Parámetros
+    const float angle_tol = 0.05f;                 // ~3 grados
+    float adv = 0.f;
+    float rot = 0.f;
+
+    // Si ya estamos alineados: parar mirando a la puerta
+    if (std::abs(angle) < angle_tol)
+    {
+        qInfo() << "GOTO_DOOR: ALIGNED with door. dist:" << dist
+                << " angle:" << angle;
+        return {STATE::IDLE, 0.f, 0.f};
+    }
+
+    // Si no, girar proporcionalmente hacia el centro de la puerta
+    rot = 0.8f * angle;
+    rot = std::clamp(rot, -params.RELOCAL_ROT_SPEED, params.RELOCAL_ROT_SPEED);
+    adv = 0.f;
+
+    qInfo() << "GOTO_DOOR: rotating toward door."
+            << " angle:" << angle
+            << " dist:"  << dist
+            << " rot:"   << rot;
+
+    return {STATE::GOTO_DOOR, adv, rot};
 }
+
 
 SpecificWorker::RetVal
 SpecificWorker::orient_to_door(const RoboCompLidar3D::TPoints &points)
 {
     Q_UNUSED(points);
-    return {STATE::ORIENT_TO_DOOR, 0.f, 0.f};
+
+    auto door_exp = door_detector.get_current_door();
+    if (!door_exp.has_value())
+    {
+        // Hemos perdido la puerta: volvemos a buscarla
+        qInfo() << "ORIENT_TO_DOOR: lost door -> back to GOTO_DOOR";
+        door_logged = false;
+        return {STATE::GOTO_DOOR, 0.f, 0.3f};
+    }
+
+    const Door &d = door_exp.value();
+    Eigen::Vector2f center = d.center();
+    float dist  = center.norm();
+    float angle = std::atan2(center.x(), center.y());   // x lateral, y delante
+
+    // Parámetros de orientación
+    const float angle_tol = 0.05f;  // ~3 grados
+    float adv = 0.f;
+    float rot = 0.f;
+
+    // Si ya estamos bien alineados con el centro de la puerta -> parar mirando a la puerta
+    if (std::abs(angle) < angle_tol)
+    {
+        qInfo() << "ORIENT_TO_DOOR: aligned with door. dist:" << dist
+                << " angle:" << angle;
+        return {STATE::IDLE, 0.f, 0.f};   // luego cambiaremos a CROSS_DOOR
+    }
+
+    // Si no, girar proporcionalmente hacia el centro
+    rot = 0.8f * angle;
+    rot = std::clamp(rot, -params.RELOCAL_ROT_SPEED, params.RELOCAL_ROT_SPEED);
+
+    qInfo() << "ORIENT_TO_DOOR: rotating to door."
+            << " angle:" << angle
+            << " dist:"  << dist
+            << " rot:"   << rot;
+
+    return {STATE::ORIENT_TO_DOOR, adv, rot};
 }
+
 
 SpecificWorker::RetVal
 SpecificWorker::cross_door(const RoboCompLidar3D::TPoints &points)
@@ -434,6 +501,7 @@ SpecificWorker::goto_room_center(const RoboCompLidar3D::TPoints &points,
         return {STATE::TURN, 0.f, 0.f};    // ya estamos en el centro
     }
 
+
     // 5. Ángulo hacia el centro.
     // Copiando la idea de tus compañeros: atan2(x, y)
     float angle = std::atan2(cx, cy);
@@ -454,48 +522,71 @@ SpecificWorker::goto_room_center(const RoboCompLidar3D::TPoints &points,
     // 8. Devolver siguiente estado y velocidades
     return {STATE::GOTO_ROOM_CENTER, adv, vrot};
 }
+
 SpecificWorker::RetVal
 SpecificWorker::turn(const Corners &corners)
 {
     Q_UNUSED(corners);
 
-    // 1) Mirar la cámara 360 para buscar el parche rojo
-    //    (usa la función estática que ya tienes en ImageProcessor)
-    bool  detected   = false;
-    int   left_right = 1;
-
+    // ============================
+    // FASE 1: BUSCAR PARCHE ROJO
+    // ============================
+    if (!red_patch_detected)
     {
-        auto res = rc::ImageProcessor::check_colour_patch_in_image(
-                        camera360rgb_proxy,           // proxy 360
-                        QColor("red"),                // parche rojo
-                        nullptr,                      // sin QLabel
-                        1500);                        // umbral de píxeles
-        detected   = std::get<0>(res);
-        left_right = std::get<1>(res);   // -1 = izquierda, 1 = derecha
-    }
+        const auto [seen, spin] = rc::ImageProcessor::check_colour_patch_in_image(
+                                      camera360rgb_proxy,
+                                      QColor("red"),
+                                      nullptr,
+                                      1500);      // umbral píxeles rojos
 
-    // 2) Si lo hemos visto, paramos y cambiamos de estado para que tú lo veas claro
-    if (detected)
-    {
-        if (!red_patch_detected)
+        Q_UNUSED(spin);  // NO usamos spin
+
+        if (!seen)
         {
-            red_patch_detected = true;
-            qInfo() << ">>> RED PATCH DETECTED: TURN -> IDLE. Robot parado.";
+            // Todavía no vemos el parche rojo -> girar SIEMPRE en el mismo sentido
+            float adv = 0.f;
+            float rot = 0.3f;   // siempre mismo signo
+
+            return {STATE::TURN, adv, rot};
         }
-        return {STATE::IDLE, 0.f, 0.f};
+
+        // Aquí hemos visto el parche rojo centrado
+        red_patch_detected = true;
+        qInfo() << "TURN: RED PATCH DETECTED -> start looking for DOOR with LIDAR";
+        // seguimos en TURN pero entramos en la FASE 2 (LIDAR)
     }
 
-    // 3) Si aún no lo ve, seguimos girando a velocidad moderada
-    red_patch_detected = false;
-
+    // ============================
+    // FASE 2: GIRAR HASTA TENER LA PUERTA DELANTE
+    // ============================
+    auto door_exp = door_detector.get_current_door();
+    const float angle_tol = 0.10f;   // ~6º de tolerancia
     float adv = 0.f;
-    float rot = 0.3f * static_cast<float>(left_right);   // rad/s, cambia signo según lado
+    float rot = 0.3f;                // SIEMPRE mismo sentido
 
+    if (door_exp.has_value())
+    {
+        const Door &d = door_exp.value();
+        Eigen::Vector2f c = d.center();            // centro de la puerta en frame robot
+        float dist  = c.norm();
+        float angle = std::atan2(c.x(), c.y());    // x lateral, y hacia delante
+
+        if (std::abs(angle) < angle_tol)
+        {
+            qInfo() << "TURN: DOOR ALIGNED. dist:" << dist << " angle:" << angle;
+            return {STATE::IDLE, 0.f, 0.f};
+        }
+
+        qInfo() << "TURN: rotating (door seen). angle:" << angle << " dist:" << dist;
+    }
+    else
+    {
+        qInfo() << "TURN: rotating (door NOT seen yet)";
+    }
+
+    // Mientras no esté alineado: seguir girando siempre igual
     return {STATE::TURN, adv, rot};
 }
-
-
-
 
 // =======================
 // AUXILIARES VARIOS
