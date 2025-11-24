@@ -124,7 +124,7 @@ void SpecificWorker::initialize()
     robot_pose.translate(Eigen::Vector2d(0.0, 0.0));
 
     // =========================
-    // 4) TimeSeriesPlotter (error de match)
+    // 4) TimeSeriesPlotter
     // =========================
     TimeSeriesPlotter::Config plotConfig;
     plotConfig.title             = "Maximum Match Error Over Time";
@@ -153,15 +153,12 @@ void SpecificWorker::compute()
     // 2) Esquinas + centro
     const auto &[corners, lines] = room_detector.compute_corners(data, &viewer->scene);
 
-    std::optional<Eigen::Vector2d> center_opt;
+	std::optional<Eigen::Vector2d> center_opt;
 
-    // Solo calculamos y dibujamos el centro en la PRIMERA habitación
-    if (!crossed_door)
-    {
-        center_opt = room_detector.estimate_center_from_walls(lines);
-    }
+	// Calculamos y dibujamos el centro SIEMPRE
+	center_opt = room_detector.estimate_center_from_walls(lines);
+	draw_lidar(data, center_opt, &viewer->scene);
 
-    draw_lidar(data, center_opt, &viewer->scene);
 
 
     // 3) Matching nominal vs medido (nominal en frame ROBOT)
@@ -467,37 +464,26 @@ SpecificWorker::goto_room_center(const RoboCompLidar3D::TPoints &points,
 {
     Q_UNUSED(points);
 
-    // ================================================
-    // DESPUÉS DE CRUZAR LA PUERTA, IGNORAMOS EL CENTRO
-    // DEL RECTÁNGULO Y NOS QUEDAMOS QUIETOS.
-    // ================================================
-    if (crossed_door)
-    {
-        // Segunda habitación: no perseguimos más el "centro" estimado
-        // para evitar que se vaya a la puerta y rehaga el bucle.
-        return {STATE::IDLE, 0.f, 0.f};
-    }
-
-    // ================================================
-    // PRIMERA HABITACIÓN: IR AL CENTRO ESTIMADO POR LAS PAREDES
-    // ================================================
-
     // 1. Estimar centro de la habitación a partir de las paredes
     auto center_opt = room_detector.estimate_center_from_walls(lines);
 
-    // Si aún no hay centro fiable, avanzar suave en línea recta
-    // para ir "barriendo" la sala. Esto evita quedarse oscilando en el sitio.
+    // ===========================================================
+    // 2. NO HAY CENTRO → girar sobre sí mismo, sin avanzar
+    // ===========================================================
     if (!center_opt.has_value())
     {
-        return {STATE::GOTO_ROOM_CENTER, 150.f, 0.0f};
+        float adv = 0.f;       // NO avanzar
+        float rot = 0.35f;     // Giro constante para “barrer” la sala
+        qInfo() << "GOTO_ROOM_CENTER: no center, rotating to find geometry";
+        return {STATE::GOTO_ROOM_CENTER, adv, rot};
     }
 
-    // 2. Centro en coordenadas del robot (x lateral, y hacia delante)
+    // 3. Convertir centro a coordenadas del robot
     Eigen::Vector2d c_world = center_opt.value();
     float cx = static_cast<float>(c_world.x());   // lateral
     float cy = static_cast<float>(c_world.y());   // hacia delante
 
-    // 3. Dibujar el centro en el viewer (debug)
+    // 4. Dibujar el centro en el viewer (debug)
     static QGraphicsEllipseItem *item = nullptr;
     if (item != nullptr)
     {
@@ -509,34 +495,37 @@ SpecificWorker::goto_room_center(const RoboCompLidar3D::TPoints &points,
                                     QBrush(Qt::red, Qt::SolidPattern));
     item->setPos(c_world.x(), c_world.y());
 
-    // 4. Distancia al centro
+    // 5. Distancia al centro
     float dist = std::sqrt(cx * cx + cy * cy);
-    if (dist < params.RELOCAL_CENTER_EPS)   // por defecto ~300 mm
+
+    // 6. Si ya está en el centro → pasar a TURN SIEMPRE
+    if (dist < params.RELOCAL_CENTER_EPS)
     {
         relocal_centered = true;
-        qInfo() << "GOTO_ROOM_CENTER: center of FIRST room reached -> TURN";
-        return {STATE::TURN, 0.f, 0.f};    // sólo en la primera habitación
+        qInfo() << "GOTO_ROOM_CENTER: center reached -> TURN";
+        return {STATE::TURN, 0.f, 0.f};
     }
 
-    // 5. Ángulo hacia el centro (x lateral, y hacia delante)
+    // 7. Ángulo hacia el centro
     float angle = std::atan2(cx, cy);
 
-    // 6. Velocidad angular proporcional al ángulo
+    // 8. Control proporcional de giro
     float k_rot = 0.5f;
     float vrot  = k_rot * angle;
 
-    // 7. "Freno" según el ángulo (campana gaussiana)
+    // 9. Freno gaussiano
     float brake = std::exp(-(angle * angle) / (static_cast<float>(M_PI) / 10.f));
-    float adv   = params.RELOCAL_MAX_ADV * brake;   // típico: 300 * brake
+    float adv   = params.RELOCAL_MAX_ADV * brake;
 
     qInfo() << "CENTER:" << cx << cy
             << "dist:" << dist
             << "adv:"  << adv
             << "vrot:" << vrot;
 
-    // 8. Seguimos yendo al centro de la PRIMERA habitación
     return {STATE::GOTO_ROOM_CENTER, adv, vrot};
 }
+
+
 
 SpecificWorker::RetVal
 SpecificWorker::turn(const Corners &corners)
