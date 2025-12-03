@@ -1,0 +1,8 @@
+***METODOS NOMIAL ROOM***
+
+1_metodo: Walls->llama a corners, luego en un bucle vamos recorriendo y vamos contruyendo las paredes y lueego retornamos un array creado en el interior. El bucle debe tener las 4 paredes mas otra vez la primera y asi vamos obteniendo las dos esquinas de esa pared, luego contruimos una recta que empiece en c1 y termine en c2, y ahora añadimos a ese array esa recta, el indice que ocupa en la habitacion y las dos esquinas. De esta forma ahora tenemos paredes y ya podemos detectar las puertas, no solo tenemos esquina como antes, ahora tenemos paredes.
+
+2_metodo: point_to_wall(parametros):(a est emetodo se le pasa un parametro 'p' representando un punto que luego se usara en en la lamba para comparar las distancias),debe tener un const auto walls = walls(), luego hacemos un auto m = std::range:min_element(walls-> y ahora a este landa le pasamos dos paredes y nos tiene que decir cual es la mas pequeña. La taupla de vuelve un r1.distance(p) < r2.distance(p); y asi supongo que se obtendra la distancia menor. Y ahora ya tenderemos la pared mas cercana al punto de la puerta
+
+
+luego con algo .project(p) detecta las dos lados de la puerta y con el draw dibujamos dos puntos en los lados de la puerta que sean de color lila y asi puedo el robot detectarlas y pasar entre medio de los puntos lilas, de esta forma las puertas ya tendrian coordenadas en la habitacion y luego hay que transformalas en coordenadas del robot
