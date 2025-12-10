@@ -21,6 +21,10 @@
 #include <QRectF>
 #include <QGraphicsRectItem>
 
+#include <QLCDNumber>
+#include <QLabel>
+
+
 #include <doublebuffer/DoubleBuffer.h>
 #include "time_series_plotter.h"
 
@@ -237,6 +241,11 @@ private:
     // Pose update & control
     bool update_robot_pose(const Corners &corners, const Match &match);
     void move_robot      (float adv, float rot, float max_match_error);
+
+    // Actualiza el panel de debug (X, Y, angle, adv, rot, state...)
+    void update_debug_panel(float adv, float rot);
+
+
     Eigen::Vector3d solve_pose      (const Corners &corners, const Match &match);
     void           predict_robot_pose();
     std::tuple<float, float> robot_controller(const Eigen::Vector2f &target);

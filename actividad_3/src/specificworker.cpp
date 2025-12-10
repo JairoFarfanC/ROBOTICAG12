@@ -295,7 +295,10 @@ void SpecificWorker::compute()
     // 8) Enviar comandos al robot (y actualizar odometría / pose)
     move_robot(adv, rot, max_match_error);
 
-    // 9) Dibujar robot en viewer_room con la pose estimada
+    // 9) Actualizar panel de debug (X, Y, ángulo, velocidades, estado)
+    update_debug_panel(adv, rot);
+
+    // 10) Dibujar robot en viewer_room con la pose estimada
     robot_room_draw->setPos(robot_pose.translation().x(),
                             robot_pose.translation().y());
 
@@ -872,6 +875,41 @@ void SpecificWorker::move_robot(float adv, float rot, float max_match_error)
     // actualizar referencia temporal para la próxima odometría
     last_time = now;
 }
+
+void SpecificWorker::update_debug_panel(float adv, float rot)
+{
+    // Pose actual en el sistema de la sala
+    const double x = robot_pose.translation().x();
+    const double y = robot_pose.translation().y();
+
+    const double angle_rad = std::atan2(
+        robot_pose.linear()(1, 0),
+        robot_pose.linear()(0, 0));
+    const double angle_deg = qRadiansToDegrees(angle_rad);
+
+    // ==== X, Y, ANGLE ====
+    if (auto lcdX = this->findChild<QLCDNumber*>("lcdNumber_x"))
+        lcdX->display(x);              // mm
+
+    if (auto lcdY = this->findChild<QLCDNumber*>("lcdNumber_y"))
+        lcdY->display(y);              // mm
+
+    if (auto lcdAngle = this->findChild<QLCDNumber*>("lcdNumber_angle"))
+        lcdAngle->display(angle_deg);  // grados
+
+    // ==== ADV, ROT ====
+    if (auto lcdAdv = this->findChild<QLCDNumber*>("lcdNumber_adv"))
+        lcdAdv->display(adv);          // mm/s (o lo que estés usando)
+
+    if (auto lcdRot = this->findChild<QLCDNumber*>("lcdNumber_rot"))
+        lcdRot->display(rot);          // rad/s
+
+    // ==== Estado de la FSM (label a la derecha de "state:") ====
+    if (auto lblState = this->findChild<QLabel*>("label_state"))
+        lblState->setText(QString::fromLatin1(to_string(state)));
+}
+
+
 
 // =======================
 // EMERGENCIA / RESTORE / STARTUP
