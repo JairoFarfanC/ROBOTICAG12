@@ -19,6 +19,7 @@
 
 #include <QGraphicsPolygonItem>
 #include <QRectF>
+#include <QGraphicsRectItem>
 
 #include <doublebuffer/DoubleBuffer.h>
 #include "time_series_plotter.h"
@@ -101,8 +102,6 @@ private:
         float RELOCAL_DONE_MATCH_MAX_ERROR = 1000.f;
         float CROSS_DOOR_SPEED    = 400.f;   // mm/s
         float CROSS_DOOR_DURATION = 6.f;     // segundos
-
-
     };
     Params params;
 
@@ -112,7 +111,7 @@ private:
     AbstractGraphicViewer *viewer      = nullptr; // izquierda
     AbstractGraphicViewer *viewer_room = nullptr; // derecha
 
-    QGraphicsPolygonItem *robot_draw      = nullptr; // robot en viewer
+    QGraphicsPolygonItem *robot_draw      = nullptr; // robot en viewer izquierdo
     QGraphicsPolygonItem *robot_room_draw = nullptr; // robot en viewer_room
 
     // =============
@@ -124,8 +123,8 @@ private:
     // ROOMS & MATCH
     // =============
     std::vector<NominalRoom> nominal_rooms{
-        NominalRoom{5500.f, 4000.f},
-        NominalRoom{8000.f, 4000.f}
+        NominalRoom{8000.f, 4000.f},
+        NominalRoom{5500.f, 4000.f}
     };
 
     rc::Room_Detector room_detector;
@@ -143,7 +142,7 @@ private:
         TURN,
         IDLE,
         CROSS_DOOR,
-        UPDATE_POSE // <--- AÑADE ESTO
+        UPDATE_POSE
     };
 
     inline const char* to_string(STATE s) const
@@ -157,7 +156,7 @@ private:
             case STATE::ORIENT_TO_DOOR:   return "ORIENT_TO_DOOR";
             case STATE::GOTO_ROOM_CENTER: return "GOTO_ROOM_CENTER";
             case STATE::CROSS_DOOR:       return "CROSS_DOOR";
-        case STATE::UPDATE_POSE:      return "UPDATE_POSE"; // <--- Y ESTO
+            case STATE::UPDATE_POSE:      return "UPDATE_POSE";
             default:                      return "UNKNOWN";
         }
     }
@@ -169,7 +168,6 @@ private:
     RetVal orient_to_door(const RoboCompLidar3D::TPoints &points);
     RetVal cross_door(const RoboCompLidar3D::TPoints &points);
     RetVal localise(const Match &match);
-    // En specificworker.h, dentro de private:
 
     RetVal goto_room_center(const RoboCompLidar3D::TPoints &points, const Lines &lines);
 
@@ -177,10 +175,11 @@ private:
     RetVal turn(const Corners &corners);
 
     RetVal process_state(const RoboCompLidar3D::TPoints &data,
-                     const Corners &corners,
-                     const Lines   &lines,
-                     const Match   &match,
-                     AbstractGraphicViewer *viewer);
+                         const Corners &corners,
+                         const Lines   &lines,
+                         const Match   &match,
+                         AbstractGraphicViewer *viewer);
+
     // =============
     // DRAW
     // =============
@@ -226,16 +225,14 @@ private:
         last_time = std::chrono::high_resolution_clock::now();
 
     // Relocalization flags
-    // Relocalization flags
-    // Relocalization flags
-    bool relocal_centered = false;
-    bool localised        = false;
+    bool relocal_centered   = false;
+    bool localised          = false;
     bool red_patch_detected = false;
-    bool crossing_door = false;
-    bool crossed_door  = false;
+    bool crossing_door      = false;
+    bool crossed_door       = false;
     std::chrono::time_point<std::chrono::high_resolution_clock> cross_door_start;
 
-    float door_travel_target_mm = 0.f;   // <-- NUEVO: distancia total a recorrer al cruzar
+    float door_travel_target_mm = 0.f;   // distancia total a recorrer al cruzar
 
     // Pose update & control
     bool update_robot_pose(const Corners &corners, const Match &match);
