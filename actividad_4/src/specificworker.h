@@ -35,6 +35,7 @@
 #include "door_detector.h"
 #include "image_processor.h"
 
+
 /**
  * \brief Class SpecificWorker implements the core functionality of the component.
  */
@@ -169,7 +170,6 @@ private:
     RetVal orient_to_door(const RoboCompLidar3D::TPoints &points);
     RetVal cross_door(const RoboCompLidar3D::TPoints &points);
     RetVal localise(const Match &match);
-    // En specificworker.h, dentro de private:
 
     RetVal goto_room_center(const RoboCompLidar3D::TPoints &points, const Lines &lines);
 
@@ -217,6 +217,10 @@ private:
 
     // Doors
     DoorDetector door_detector;
+
+    // Índices para alternar puertas
+    int last_door_used_index     = -1;   // última puerta usada (en doors_cache)
+    int current_target_door_index = -1;  // puerta objetivo actual en TURN
 
     // Image processor (para la parte visual, parche rojo, etc.)
     rc::ImageProcessor image_processor;

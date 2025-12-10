@@ -355,31 +355,31 @@ SpecificWorker::cross_door(const RoboCompLidar3D::TPoints &points)
                 << door_travel_target_mm;
     }
 
-    auto now = std::chrono::high_resolution_clock::now();
+    // Tiempo y distancia recorrida aprox
+    auto  now         = std::chrono::high_resolution_clock::now();
     float elapsed_sec = std::chrono::duration_cast<std::chrono::milliseconds>(
                             now - cross_door_start).count() / 1000.f;
-
-    // Distancia recorrida aproximada = velocidad * tiempo
     float travelled_mm = params.CROSS_DOOR_SPEED * elapsed_sec;
 
     // Mientras no hayamos llegado a la distancia objetivo, avanzamos recto
     if (travelled_mm < door_travel_target_mm)
     {
         float adv = params.CROSS_DOOR_SPEED;  // mm/s hacia delante
-        float rot = 0.f;
+        float rot = 0.f;                      // sin corrección aquí
         return {STATE::CROSS_DOOR, adv, rot};
     }
 
     // Hemos recorrido suficiente: damos por cruzada la puerta
     crossing_door = false;
     crossed_door  = true;
-    red_patch_detected = false;   // por si quieres buscar otra puerta en el futuro
 
     qInfo() << "CROSS_DOOR: finished crossing. travelled (mm):" << travelled_mm
-            << " -> switching to GOTO_ROOM_CENTER (SECOND room)";
+            << " -> switching to GOTO_ROOM_CENTER";
 
     return {STATE::GOTO_ROOM_CENTER, 0.f, 0.f};
 }
+
+
 
 
 SpecificWorker::RetVal
@@ -459,73 +459,101 @@ SpecificWorker::turn(const Corners &corners)
 {
     Q_UNUSED(corners);
 
-    // FASE 1: BUSCAR PARCHE ROJO
-    if (!red_patch_detected)
-    {
-        const auto [seen, spin] = rc::ImageProcessor::check_colour_patch_in_image(
-                                      camera360rgb_proxy,
-                                      QColor("red"),
-                                      nullptr,
-                                      1500);      // umbral píxeles rojos
+    auto doors = door_detector.doors();   // copia de doors_cache
 
-        Q_UNUSED(spin);
-
-        if (!seen)
-        {
-            // Todavía no vemos el parche rojo -> girar SIEMPRE en el mismo sentido
-            float adv = 0.f;
-            float rot = 0.3f;   // siempre mismo signo
-
-            return {STATE::TURN, adv, rot};
-        }
-
-        // Aquí hemos visto el parche rojo centrado
-        red_patch_detected = true;
-        qInfo() << "TURN: RED PATCH DETECTED -> start looking for DOOR with LIDAR";
-        // seguimos en TURN pero entramos en la FASE 2 (LIDAR)
-    }
-
-    // FASE 2: GIRAR HASTA TENER LA PUERTA DELANTE
-    auto door_exp = door_detector.get_current_door();
-    const float angle_tol = 0.10f;   // ~6º de tolerancia
+    const float angle_tol = 0.07f;   // ~4º de tolerancia, antes 0.10
     float adv = 0.f;
-    float rot = 0.6f;                // SIEMPRE mismo sentido
+    float rot = 0.f;
 
-    if (door_exp.has_value())
+    if (doors.empty())
     {
-        const Door &d = door_exp.value();
-        Eigen::Vector2f c = d.center();            // centro de la puerta en frame robot
-        float dist  = c.norm();
-        float angle = std::atan2(c.x(), c.y());    // x lateral, y hacia delante
+        rot = 0.3f;
+        qInfo() << "TURN: NO DOORS -> rotating in place";
+        return {STATE::TURN, adv, rot};
+    }
 
-        // Si ya estamos alineados con la puerta -> empezar a cruzarla
-        // Si ya estamos alineados con la puerta -> preparar cruce recto
-        if (std::abs(angle) < angle_tol)
+    if (current_target_door_index < 0 ||
+        current_target_door_index >= static_cast<int>(doors.size()))
+    {
+        int chosen = 0;
+
+        if (doors.size() == 1)
         {
-            // Queremos avanzar dist hasta la puerta + un extra para estar dentro de la segunda sala
-            const float extra_mm = 2000.f;  // 2 metros más allá de la puerta (ajusta a ojo)
-            door_travel_target_mm = dist + extra_mm;
-
-            crossing_door   = false;   // para que cross_door se inicialice
-            crossed_door    = false;   // aún no la hemos cruzado completamente
-
-            qInfo() << "TURN: DOOR ALIGNED. dist:" << dist
-                    << " -> target travel (mm):" << door_travel_target_mm
-                    << " -> switching to CROSS_DOOR";
-
-            return {STATE::CROSS_DOOR, 0.f, 0.f};
+            chosen = 0;
+        }
+        else
+        {
+            if (last_door_used_index >= 0 &&
+                last_door_used_index < static_cast<int>(doors.size()))
+            {
+                if (doors.size() == 2)
+                    chosen = 1 - last_door_used_index;
+                else
+                    chosen = (last_door_used_index + 1) % static_cast<int>(doors.size());
+            }
+            else
+            {
+                std::mt19937 gen(rd());
+                std::uniform_int_distribution<int> dist(0, static_cast<int>(doors.size()) - 1);
+                chosen = dist(gen);
+            }
         }
 
-        qInfo() << "TURN: rotating (door seen). angle:" << angle << " dist:" << dist;
-    }
-    else
-    {
-        qInfo() << "TURN: rotating (door NOT seen yet)";
+        current_target_door_index = chosen;
+        qInfo() << "TURN: new target door index:" << current_target_door_index
+                << " last used:" << last_door_used_index
+                << " num doors:" << doors.size();
     }
 
-    // Mientras no esté alineado: seguir girando siempre igual
+    if (current_target_door_index < 0 ||
+        current_target_door_index >= static_cast<int>(doors.size()))
+    {
+        rot = 0.3f;
+        qInfo() << "TURN: invalid target door index, rotating in place";
+        return {STATE::TURN, adv, rot};
+    }
+
+    const Door &d = doors[current_target_door_index];
+
+    Eigen::Vector2f center = d.center();
+    float dist  = center.norm();
+    float angle = std::atan2(center.x(), center.y());
+
+    // 3) Alineado -> preparar cruce
+    if (std::abs(angle) < angle_tol)
+    {
+        const float extra_mm = 1200.f;                // un poco más conservador
+        door_travel_target_mm = dist + extra_mm;
+        door_travel_target_mm = std::min(door_travel_target_mm, 3500.f);  // límite por seguridad
+
+        crossing_door = false;
+        crossed_door  = false;
+
+        last_door_used_index      = current_target_door_index;
+        current_target_door_index = -1;
+
+        qInfo() << "TURN: DOOR ALIGNED. dist:" << dist
+                << " -> target travel (mm):" << door_travel_target_mm
+                << " -> switching to CROSS_DOOR"
+                << " (door index:" << last_door_used_index << ")";
+
+        return {STATE::CROSS_DOOR, 0.f, 0.f};
+    }
+
+    // 4) No alineado todavía -> girar hacia la puerta elegida
+    rot = 0.8f * angle;
+    rot = std::clamp(rot, -params.RELOCAL_ROT_SPEED, params.RELOCAL_ROT_SPEED);
+    adv = 0.f;
+
+    qInfo() << "TURN: rotating toward door index" << current_target_door_index
+            << " angle:" << angle
+            << " dist:"  << dist
+            << " rot:"   << rot;
+
     return {STATE::TURN, adv, rot};
 }
+
+
 
 // AUXILIARES VARIOS
 SpecificWorker::RetVal
