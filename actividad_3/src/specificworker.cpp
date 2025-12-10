@@ -424,7 +424,7 @@ SpecificWorker::cross_door(const RoboCompLidar3D::TPoints &points)
                 << door_travel_target_mm;
     }
 
-    auto now = std::chrono::high_resolution_clock::now();
+    auto  now         = std::chrono::high_resolution_clock::now();
     float elapsed_sec = std::chrono::duration_cast<std::chrono::milliseconds>(
                             now - cross_door_start).count() / 1000.f;
 
@@ -439,16 +439,30 @@ SpecificWorker::cross_door(const RoboCompLidar3D::TPoints &points)
         return {STATE::CROSS_DOOR, adv, rot};
     }
 
-    // Hemos recorrido suficiente: damos por cruzada la puerta
-    crossing_door = false;
-    crossed_door  = true;
-    red_patch_detected = false;   // por si quieres buscar otra puerta en el futuro
+    // ==========================================================
+    // HEMOS CRUZADO LA PUERTA -> REINICIAR EL CICLO COMPLETO
+    // ==========================================================
 
-    qInfo() << "CROSS_DOOR: finished crossing. travelled (mm):" << travelled_mm
-            << " -> switching to GOTO_ROOM_CENTER (SECOND room)";
+    crossing_door    = false;
+    crossed_door     = false;    // IMPORTANTE: permitir volver a cruzar
+    red_patch_detected = false;  // para volver a buscar el parche
+    relocal_centered = false;
+    localised        = false;
+    door_travel_target_mm = 0.f;
 
+    // si quieres, resetea también la pose estimada
+    // (depende de cómo estés localizando):
+    // robot_pose.setIdentity();
+
+    qInfo() << "CROSS_DOOR: finished crossing. travelled (mm):"
+            << travelled_mm
+            << " -> restarting loop from GOTO_ROOM_CENTER";
+
+    // volvemos al mismo flujo que al principio:
+    // GOTO_ROOM_CENTER -> TURN -> CROSS_DOOR ...
     return {STATE::GOTO_ROOM_CENTER, 0.f, 0.f};
 }
+
 
 
 SpecificWorker::RetVal
