@@ -931,3 +931,5 @@ int SpecificWorker::startup_check()
     QTimer::singleShot(200, QCoreApplication::instance(), SLOT(quit()));
     return 0;
 }
+
+//borrar

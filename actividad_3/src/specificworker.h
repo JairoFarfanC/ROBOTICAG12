@@ -255,3 +255,6 @@ signals:
 };
 
 #endif // SPECIFICWORKER_H
+
+
+//borrar
