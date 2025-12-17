@@ -1,8 +1,8 @@
-/home/usuario/ROBOTICAG12/actividad_3/generated/localiser_autogen/EWIEGA46WW/moc_genericworker.cpp: /home/usuario/ROBOTICAG12/actividad_3/generated/genericworker.h \
-  /home/usuario/ROBOTICAG12/actividad_3/generated/localiser_autogen/moc_predefs.h \
-  /home/usuario/ROBOTICAG12/actividad_3/generated/GenericBase.h \
-  /home/usuario/ROBOTICAG12/actividad_3/generated/Lidar3D.h \
-  /home/usuario/ROBOTICAG12/actividad_3/generated/OmniRobot.h \
+/home/usuario/ROBOTICAG12/actividad_4/generated/localiser_autogen/EWIEGA46WW/moc_genericworker.cpp: /home/usuario/ROBOTICAG12/actividad_4/generated/genericworker.h \
+  /home/usuario/ROBOTICAG12/actividad_4/generated/localiser_autogen/moc_predefs.h \
+  /home/usuario/ROBOTICAG12/actividad_4/generated/GenericBase.h \
+  /home/usuario/ROBOTICAG12/actividad_4/generated/Lidar3D.h \
+  /home/usuario/ROBOTICAG12/actividad_4/generated/OmniRobot.h \
   /home/usuario/robocomp/core/classes/ConfigLoader/ConfigLoader.h \
   /home/usuario/robocomp/core/classes/ConfigLoader/ConfigLoader.tpp \
   /home/usuario/robocomp/core/classes/grafcetStep/GRAFCETStep.h \

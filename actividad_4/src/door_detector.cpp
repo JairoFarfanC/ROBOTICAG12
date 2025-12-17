@@ -100,46 +100,42 @@ Doors DoorDetector::detect(const RoboCompLidar3D::TPoints &points, QGraphicsScen
 }
 
 // Method to use the Doors vector to filter out the LiDAR points that come from a room outside the current one
-RoboCompLidar3D::TPoints DoorDetector::filter_points(const RoboCompLidar3D::TPoints &points,
-                                                     QGraphicsScene *scene)
+RoboCompLidar3D::TPoints DoorDetector::filter_points(const RoboCompLidar3D::TPoints &points, QGraphicsScene *scene)
 {
     const auto doors = detect(points, scene);
-    if (doors.empty())
-        return points;
+    if(doors.empty()) return points;
 
+    // for each door, check if the distance from the robot to each lidar point is smaller than the distance from the robot to the door
     RoboCompLidar3D::TPoints filtered;
-    filtered.reserve(points.size());
-
-    // PRIMERO puntos, LUEGO puertas
-    for (const auto &p : points)
+    for(const auto &d : doors)
     {
-        bool keep_point = true;
-
-        for (const auto &d : doors)
+        const float dist_to_door = d.center().norm();
+        // Check if the angular range wraps around the -π/+π boundary
+        const bool angle_wraps = d.p2_angle < d.p1_angle;
+        for(const auto &p : points)
         {
-            const float dist_to_door = d.center().norm();
-            const bool angle_wraps   = (d.p2_angle < d.p1_angle);
-
+            // Determine if point is within the door's angular range
             bool point_in_angular_range;
             if (angle_wraps)
-                point_in_angular_range = (p.phi > d.p1_angle) || (p.phi < d.p2_angle);
-            else
-                point_in_angular_range = (p.phi > d.p1_angle) && (p.phi < d.p2_angle);
-
-            if (point_in_angular_range && p.distance2d >= dist_to_door)
             {
-                keep_point = false;   // está “detrás” de esa puerta
-                break;
+                // If the range wraps around, point is in range if it's > p1_angle OR < p2_angle
+                point_in_angular_range = (p.phi > d.p1_angle) or (p.phi < d.p2_angle);
             }
-        }
+            else
+            {
+                // Normal case: point is in range if it's between p1_angle and p2_angle
+                point_in_angular_range = (p.phi > d.p1_angle) and (p.phi < d.p2_angle);
+            }
 
-        if (keep_point)
+            // Filter out points that are through the door (in angular range and farther than door)
+            if(point_in_angular_range and p.distance2d >= dist_to_door)
+                continue;
+
             filtered.emplace_back(p);
+        }
     }
-
     return filtered;
 }
-
 
 std::expected<Door, std::string> DoorDetector::get_current_door() const
 {

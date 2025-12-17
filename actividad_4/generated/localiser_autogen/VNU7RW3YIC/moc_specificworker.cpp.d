@@ -1,20 +1,20 @@
-/home/usuario/ROBOTICAG12/actividad_3/generated/localiser_autogen/VNU7RW3YIC/moc_specificworker.cpp: /home/usuario/ROBOTICAG12/actividad_3/src/specificworker.h \
-  /home/usuario/ROBOTICAG12/actividad_3/generated/localiser_autogen/moc_predefs.h \
-  /home/usuario/ROBOTICAG12/actividad_3/generated/Camera360RGB.h \
-  /home/usuario/ROBOTICAG12/actividad_3/generated/GenericBase.h \
-  /home/usuario/ROBOTICAG12/actividad_3/generated/Lidar3D.h \
-  /home/usuario/ROBOTICAG12/actividad_3/generated/OmniRobot.h \
-  /home/usuario/ROBOTICAG12/actividad_3/generated/genericworker.h \
-  /home/usuario/ROBOTICAG12/actividad_3/src/common_types.h \
-  /home/usuario/ROBOTICAG12/actividad_3/src/door_detector.h \
-  /home/usuario/ROBOTICAG12/actividad_3/src/hungarian.h \
-  /home/usuario/ROBOTICAG12/actividad_3/src/image_processor.h \
-  /home/usuario/ROBOTICAG12/actividad_3/src/munkres.hpp \
-  /home/usuario/ROBOTICAG12/actividad_3/src/nominal_room.h \
-  /home/usuario/ROBOTICAG12/actividad_3/src/qcustomplot.h \
-  /home/usuario/ROBOTICAG12/actividad_3/src/ransac_line_detector.h \
-  /home/usuario/ROBOTICAG12/actividad_3/src/room_detector.h \
-  /home/usuario/ROBOTICAG12/actividad_3/src/time_series_plotter.h \
+/home/usuario/ROBOTICAG12/actividad_4/generated/localiser_autogen/VNU7RW3YIC/moc_specificworker.cpp: /home/usuario/ROBOTICAG12/actividad_4/src/specificworker.h \
+  /home/usuario/ROBOTICAG12/actividad_4/generated/localiser_autogen/moc_predefs.h \
+  /home/usuario/ROBOTICAG12/actividad_4/generated/Camera360RGB.h \
+  /home/usuario/ROBOTICAG12/actividad_4/generated/GenericBase.h \
+  /home/usuario/ROBOTICAG12/actividad_4/generated/Lidar3D.h \
+  /home/usuario/ROBOTICAG12/actividad_4/generated/OmniRobot.h \
+  /home/usuario/ROBOTICAG12/actividad_4/generated/genericworker.h \
+  /home/usuario/ROBOTICAG12/actividad_4/src/common_types.h \
+  /home/usuario/ROBOTICAG12/actividad_4/src/door_detector.h \
+  /home/usuario/ROBOTICAG12/actividad_4/src/hungarian.h \
+  /home/usuario/ROBOTICAG12/actividad_4/src/image_processor.h \
+  /home/usuario/ROBOTICAG12/actividad_4/src/munkres.hpp \
+  /home/usuario/ROBOTICAG12/actividad_4/src/nominal_room.h \
+  /home/usuario/ROBOTICAG12/actividad_4/src/qcustomplot.h \
+  /home/usuario/ROBOTICAG12/actividad_4/src/ransac_line_detector.h \
+  /home/usuario/ROBOTICAG12/actividad_4/src/room_detector.h \
+  /home/usuario/ROBOTICAG12/actividad_4/src/time_series_plotter.h \
   /home/usuario/robocomp/core/classes/ConfigLoader/ConfigLoader.h \
   /home/usuario/robocomp/core/classes/ConfigLoader/ConfigLoader.tpp \
   /home/usuario/robocomp/core/classes/abstract_graphic_viewer/abstract_graphic_viewer.h \

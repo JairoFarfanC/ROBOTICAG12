@@ -19,6 +19,11 @@
 
 #include <QGraphicsPolygonItem>
 #include <QRectF>
+#include <QGraphicsRectItem>
+
+#include <QLCDNumber>
+#include <QLabel>
+
 
 #include <doublebuffer/DoubleBuffer.h>
 #include "time_series_plotter.h"
@@ -34,7 +39,6 @@
 #include "nominal_room.h"     // NominalRoom
 #include "door_detector.h"
 #include "image_processor.h"
-
 
 /**
  * \brief Class SpecificWorker implements the core functionality of the component.
@@ -102,8 +106,6 @@ private:
         float RELOCAL_DONE_MATCH_MAX_ERROR = 1000.f;
         float CROSS_DOOR_SPEED    = 400.f;   // mm/s
         float CROSS_DOOR_DURATION = 6.f;     // segundos
-
-
     };
     Params params;
 
@@ -113,7 +115,7 @@ private:
     AbstractGraphicViewer *viewer      = nullptr; // izquierda
     AbstractGraphicViewer *viewer_room = nullptr; // derecha
 
-    QGraphicsPolygonItem *robot_draw      = nullptr; // robot en viewer
+    QGraphicsPolygonItem *robot_draw      = nullptr; // robot en viewer izquierdo
     QGraphicsPolygonItem *robot_room_draw = nullptr; // robot en viewer_room
 
     // =============
@@ -125,8 +127,8 @@ private:
     // ROOMS & MATCH
     // =============
     std::vector<NominalRoom> nominal_rooms{
-        NominalRoom{5500.f, 4000.f},
-        NominalRoom{8000.f, 4000.f}
+        NominalRoom{8000.f, 4000.f},
+        NominalRoom{5500.f, 4000.f}
     };
 
     rc::Room_Detector room_detector;
@@ -144,7 +146,7 @@ private:
         TURN,
         IDLE,
         CROSS_DOOR,
-        UPDATE_POSE // <--- AÑADE ESTO
+        UPDATE_POSE
     };
 
     inline const char* to_string(STATE s) const
@@ -177,10 +179,11 @@ private:
     RetVal turn(const Corners &corners);
 
     RetVal process_state(const RoboCompLidar3D::TPoints &data,
-                     const Corners &corners,
-                     const Lines   &lines,
-                     const Match   &match,
-                     AbstractGraphicViewer *viewer);
+                         const Corners &corners,
+                         const Lines   &lines,
+                         const Match   &match,
+                         AbstractGraphicViewer *viewer);
+
     // =============
     // DRAW
     // =============
@@ -218,10 +221,6 @@ private:
     // Doors
     DoorDetector door_detector;
 
-    // Índices para alternar puertas
-    int last_door_used_index     = -1;   // última puerta usada (en doors_cache)
-    int current_target_door_index = -1;  // puerta objetivo actual en TURN
-
     // Image processor (para la parte visual, parche rojo, etc.)
     rc::ImageProcessor image_processor;
 
@@ -230,20 +229,23 @@ private:
         last_time = std::chrono::high_resolution_clock::now();
 
     // Relocalization flags
-    // Relocalization flags
-    // Relocalization flags
-    bool relocal_centered = false;
-    bool localised        = false;
+    bool relocal_centered   = false;
+    bool localised          = false;
     bool red_patch_detected = false;
-    bool crossing_door = false;
-    bool crossed_door  = false;
+    bool crossing_door      = false;
+    bool crossed_door       = false;
     std::chrono::time_point<std::chrono::high_resolution_clock> cross_door_start;
 
-    float door_travel_target_mm = 0.f;   // <-- NUEVO: distancia total a recorrer al cruzar
+    float door_travel_target_mm = 0.f;   // distancia total a recorrer al cruzar
 
     // Pose update & control
     bool update_robot_pose(const Corners &corners, const Match &match);
     void move_robot      (float adv, float rot, float max_match_error);
+
+    // Actualiza el panel de debug (X, Y, angle, adv, rot, state...)
+    void update_debug_panel(float adv, float rot);
+
+
     Eigen::Vector3d solve_pose      (const Corners &corners, const Match &match);
     void           predict_robot_pose();
     std::tuple<float, float> robot_controller(const Eigen::Vector2f &target);
@@ -253,3 +255,6 @@ signals:
 };
 
 #endif // SPECIFICWORKER_H
+
+
+//borrar

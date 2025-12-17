@@ -1,5 +1,5 @@
 generated/CMakeFiles/localiser.dir/main.cpp.o: \
- /home/usuario/ROBOTICAG12/actividad_3/generated/main.cpp \
+ /home/usuario/ROBOTICAG12/actividad_4/generated/main.cpp \
  /usr/include/stdc-predef.h /usr/include/signal.h /usr/include/features.h \
  /usr/include/features-time64.h \
  /usr/include/x86_64-linux-gnu/bits/wordsize.h \
@@ -1251,9 +1251,9 @@ generated/CMakeFiles/localiser.dir/main.cpp.o: \
  /home/usuario/robocomp/classes/ConfigLoader/ConfigLoader.h \
  /home/usuario/robocomp/classes/sigwatch/sigwatch.h \
  /usr/include/x86_64-linux-gnu/qt6/QtCore/QObject \
- /home/usuario/ROBOTICAG12/actividad_3/generated/genericworker.h \
+ /home/usuario/ROBOTICAG12/actividad_4/generated/genericworker.h \
  /usr/include/x86_64-linux-gnu/qt6/QtGui/QtGui \
- /home/usuario/ROBOTICAG12/actividad_3/generated/localiser_autogen/include/ui_mainUI.h \
+ /home/usuario/ROBOTICAG12/actividad_4/generated/localiser_autogen/include/ui_mainUI.h \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QApplication \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QFrame \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QHBoxLayout \
@@ -1276,12 +1276,12 @@ generated/CMakeFiles/localiser.dir/main.cpp.o: \
  /usr/include/x86_64-linux-gnu/qt6/QtStateMachine/qstate.h \
  /usr/include/x86_64-linux-gnu/qt6/QtCore/QEvent \
  /usr/include/x86_64-linux-gnu/qt6/QtCore/QString \
- /home/usuario/ROBOTICAG12/actividad_3/generated/Camera360RGB.h \
- /home/usuario/ROBOTICAG12/actividad_3/generated/GenericBase.h \
- /home/usuario/ROBOTICAG12/actividad_3/generated/Lidar3D.h \
- /home/usuario/ROBOTICAG12/actividad_3/generated/OmniRobot.h \
- /home/usuario/ROBOTICAG12/actividad_3/generated/../src/specificworker.h \
- /home/usuario/ROBOTICAG12/actividad_3/generated/genericworker.h \
+ /home/usuario/ROBOTICAG12/actividad_4/generated/Camera360RGB.h \
+ /home/usuario/ROBOTICAG12/actividad_4/generated/GenericBase.h \
+ /home/usuario/ROBOTICAG12/actividad_4/generated/Lidar3D.h \
+ /home/usuario/ROBOTICAG12/actividad_4/generated/OmniRobot.h \
+ /home/usuario/ROBOTICAG12/actividad_4/generated/../src/specificworker.h \
+ /home/usuario/ROBOTICAG12/actividad_4/generated/genericworker.h \
  /home/usuario/robocomp/classes/abstract_graphic_viewer/abstract_graphic_viewer.h \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QWidget \
  /usr/include/x86_64-linux-gnu/qt6/QtWidgets/QGraphicsScene \
@@ -1485,11 +1485,11 @@ generated/CMakeFiles/localiser.dir/main.cpp.o: \
  /home/usuario/robocomp/classes/threadpool/threadpool.h \
  /usr/include/c++/13/queue /usr/include/c++/13/bits/stl_queue.h \
  /usr/include/c++/13/thread \
- /home/usuario/ROBOTICAG12/actividad_3/generated/../src/time_series_plotter.h \
+ /home/usuario/ROBOTICAG12/actividad_4/generated/../src/time_series_plotter.h \
  /usr/include/x86_64-linux-gnu/qt6/QtGui/QColor \
  /usr/include/x86_64-linux-gnu/qt6/QtCore/QVector \
  /usr/include/x86_64-linux-gnu/qt6/QtCore/QElapsedTimer \
- /home/usuario/ROBOTICAG12/actividad_3/generated/../src/qcustomplot.h \
+ /home/usuario/ROBOTICAG12/actividad_4/generated/../src/qcustomplot.h \
  /usr/include/x86_64-linux-gnu/qt6/QtCore/QPointer \
  /usr/include/x86_64-linux-gnu/qt6/QtCore/QSharedPointer \
  /usr/include/x86_64-linux-gnu/qt6/QtCore/QTimer \
@@ -1587,7 +1587,7 @@ generated/CMakeFiles/localiser.dir/main.cpp.o: \
  /usr/include/c++/13/pstl/numeric_fwd.h \
  /usr/include/c++/13/pstl/glue_numeric_impl.h \
  /usr/include/c++/13/pstl/glue_memory_impl.h \
- /home/usuario/ROBOTICAG12/actividad_3/generated/../src/common_types.h \
+ /home/usuario/ROBOTICAG12/actividad_4/generated/../src/common_types.h \
  /usr/include/x86_64-linux-gnu/qt6/QtCore/QPointF \
  /usr/include/boost/circular_buffer.hpp \
  /usr/include/boost/circular_buffer_fwd.hpp /usr/include/boost/config.hpp \
@@ -1749,7 +1749,7 @@ generated/CMakeFiles/localiser.dir/main.cpp.o: \
  /usr/include/boost/circular_buffer/space_optimized.hpp \
  /usr/include/x86_64-linux-gnu/qt6/QtCore/QLineF \
  /usr/include/Eigen/src/Geometry/ParametrizedLine.h \
- /home/usuario/ROBOTICAG12/actividad_3/generated/../src/room_detector.h \
+ /home/usuario/ROBOTICAG12/actividad_4/generated/../src/room_detector.h \
  /usr/include/opencv4/opencv2/core.hpp \
  /usr/include/opencv4/opencv2/core/cvdef.h \
  /usr/include/opencv4/opencv2/core/version.hpp \
@@ -1777,13 +1777,13 @@ generated/CMakeFiles/localiser.dir/main.cpp.o: \
  /usr/include/opencv4/opencv2/core/optim.hpp \
  /usr/include/opencv4/opencv2/core/ovx.hpp \
  /usr/include/opencv4/opencv2/core/cvdef.h /usr/include/c++/13/ranges \
- /home/usuario/ROBOTICAG12/actividad_3/generated/../src/ransac_line_detector.h \
- /home/usuario/ROBOTICAG12/actividad_3/generated/../src/hungarian.h \
- /home/usuario/ROBOTICAG12/actividad_3/generated/../src/munkres.hpp \
- /home/usuario/ROBOTICAG12/actividad_3/generated/../src/nominal_room.h \
- /home/usuario/ROBOTICAG12/actividad_3/src/common_types.h \
- /home/usuario/ROBOTICAG12/actividad_3/generated/../src/door_detector.h \
- /home/usuario/ROBOTICAG12/actividad_3/generated/../src/image_processor.h \
+ /home/usuario/ROBOTICAG12/actividad_4/generated/../src/ransac_line_detector.h \
+ /home/usuario/ROBOTICAG12/actividad_4/generated/../src/hungarian.h \
+ /home/usuario/ROBOTICAG12/actividad_4/generated/../src/munkres.hpp \
+ /home/usuario/ROBOTICAG12/actividad_4/generated/../src/nominal_room.h \
+ /home/usuario/ROBOTICAG12/actividad_4/src/common_types.h \
+ /home/usuario/ROBOTICAG12/actividad_4/generated/../src/door_detector.h \
+ /home/usuario/ROBOTICAG12/actividad_4/generated/../src/image_processor.h \
  /usr/include/opencv4/opencv2/opencv.hpp \
  /usr/include/opencv4/opencv2/calib3d.hpp \
  /usr/include/opencv4/opencv2/features2d.hpp \

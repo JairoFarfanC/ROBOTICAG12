@@ -1,4 +1,4 @@
-# Install script for directory: /home/usuario/ROBOTICAG12/actividad_3
+# Install script for directory: /home/usuario/ROBOTICAG12/actividad_4
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -44,26 +44,26 @@ endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
   list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
-   "/home/robocomp/robocomp/etc-default/localiser.conf")
+   "/home/usuario/robocomp/etc-default/localiser.conf")
   if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(WARNING "ABSOLUTE path INSTALL DESTINATION : ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
   if(CMAKE_ERROR_ON_ABSOLUTE_INSTALL_DESTINATION)
     message(FATAL_ERROR "ABSOLUTE path INSTALL DESTINATION forbidden (by caller): ${CMAKE_ABSOLUTE_DESTINATION_FILES}")
   endif()
-  file(INSTALL DESTINATION "/home/robocomp/robocomp/etc-default" TYPE FILE RENAME "localiser.conf" FILES "/home/usuario/ROBOTICAG12/actividad_3/etc/config")
+  file(INSTALL DESTINATION "/home/usuario/robocomp/etc-default" TYPE FILE RENAME "localiser.conf" FILES "/home/usuario/ROBOTICAG12/actividad_4/etc/config")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/home/usuario/ROBOTICAG12/actividad_3/generated/cmake_install.cmake")
+  include("/home/usuario/ROBOTICAG12/actividad_4/generated/cmake_install.cmake")
 
 endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
 if(CMAKE_INSTALL_LOCAL_ONLY)
-  file(WRITE "/home/usuario/ROBOTICAG12/actividad_3/install_local_manifest.txt"
+  file(WRITE "/home/usuario/ROBOTICAG12/actividad_4/install_local_manifest.txt"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
 endif()
 if(CMAKE_INSTALL_COMPONENT)
@@ -79,6 +79,6 @@ else()
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  file(WRITE "/home/usuario/ROBOTICAG12/actividad_3/${CMAKE_INSTALL_MANIFEST}"
+  file(WRITE "/home/usuario/ROBOTICAG12/actividad_4/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
 endif()

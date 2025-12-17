@@ -11,6 +11,98 @@
 #include <cmath>
 #include <limits>
 
+#include <QGraphicsRectItem>
+
+// ======================================================================
+// Helpers internos para gestionar la sala actual y el matching por sala
+// ======================================================================
+namespace
+{
+    // Rectángulo y sala actual para el viewer derecho
+    int current_room_idx = 0;
+    QGraphicsRectItem *room_rect_draw = nullptr;
+
+    // Redibuja el rectángulo de la sala actual en el viewer_room
+    void update_room_rect(AbstractGraphicViewer *viewer_room,
+                          const std::vector<NominalRoom> &nominal_rooms)
+    {
+        if (!viewer_room)
+            return;
+
+        if (current_room_idx < 0 ||
+            current_room_idx >= static_cast<int>(nominal_rooms.size()))
+            return;
+
+        auto &scene = viewer_room->scene;
+
+        // borrar el rectángulo anterior si existe
+        if (room_rect_draw)
+        {
+            scene.removeItem(room_rect_draw);
+            delete room_rect_draw;
+            room_rect_draw = nullptr;
+        }
+
+        // dibujar la sala actual
+        room_rect_draw = scene.addRect(
+            nominal_rooms[current_room_idx].rect(),
+            QPen(Qt::black, 30));
+
+        // ajustar la vista a esa sala
+        viewer_room->fitInView(room_rect_draw->boundingRect(),
+                               Qt::KeepAspectRatio);
+    }
+
+    // Resultado de intentar hacer matching con todas las salas nominales
+    struct RoomMatchResult
+    {
+        int   room_idx   = -1;
+        Match match;
+        float max_error  = std::numeric_limits<float>::infinity();
+    };
+
+    // Solo la usamos para la detección INICIAL
+    RoomMatchResult find_best_room(const Corners                 &corners,
+                                   const std::vector<NominalRoom> &nominal_rooms,
+                                   rc::Hungarian                  &hungarian,
+                                   const Eigen::Affine2d          &robot_pose)
+    {
+        RoomMatchResult res;
+        if (corners.empty())
+            return res;
+
+        for (int i = 0; i < static_cast<int>(nominal_rooms.size()); ++i)
+        {
+            const auto nominal_in_robot =
+                nominal_rooms[i].transform_corners_to(robot_pose.inverse());
+
+            Match m = hungarian.match(corners, nominal_in_robot);
+            if (m.empty())
+                continue;
+
+            float max_err = 0.f;
+            for (const auto &triple : m)
+            {
+                float e = static_cast<float>(std::get<2>(triple));
+                if (e > max_err)
+                    max_err = e;
+            }
+
+            if (res.room_idx == -1 ||
+                m.size() > res.match.size() ||
+                (m.size() == res.match.size() && max_err < res.max_error))
+            {
+                res.room_idx  = i;
+                res.match     = std::move(m);
+                res.max_error = max_err;
+            }
+        }
+
+        return res;
+    }
+}
+
+
 // =======================
 // CONSTRUCTOR / DESTRUCTOR
 // =======================
@@ -27,22 +119,6 @@ SpecificWorker::SpecificWorker(const ConfigLoader& configLoader, TuplePrx tprx, 
 #ifdef HIBERNATION_ENABLED
         hibernationChecker.start(500);
 #endif
-
-        // Example statemachine:
-        /***
-        //Your definition for the statesmachine (if you dont want use a execute function, use nullptr)
-        states["CustomState"] = std::make_unique<GRAFCETStep>("CustomState", period,
-                                                            std::bind(&SpecificWorker::customLoop, this),  // Cyclic function
-                                                            std::bind(&SpecificWorker::customEnter, this), // On-enter function
-                                                            std::bind(&SpecificWorker::customExit, this)); // On-exit function
-
-        //Add your definition of transitions (addTransition(originOfSignal, signal, dstState))
-        states["CustomState"]->addTransition(states["CustomState"].get(), SIGNAL(entered()), states["OtherState"].get());
-        states["Compute"]->addTransition(this, SIGNAL(customSignal()), states["CustomState"].get()); //Define your signal in the .h file under the "Signals" section.
-
-        //Add your custom state
-        statemachine.addState(states["CustomState"].get());
-        ***/
 
         statemachine.setChildMode(QState::ExclusiveStates);
         statemachine.start();
@@ -71,6 +147,9 @@ void SpecificWorker::initialize()
         return;
     }
 
+    // =========================
+    // 1) VIEWER IZQUIERDO
+    // =========================
     viewer = new AbstractGraphicViewer(this->frame, params.GRID_MAX_DIM);
     if (auto lay = frame->layout())
         lay->addWidget(viewer);
@@ -88,7 +167,9 @@ void SpecificWorker::initialize()
         robot_draw = r;
     }
 
+    // =========================
     // 2) VIEWER DERECHO (mapa)
+    // =========================
     viewer_room = new AbstractGraphicViewer(this->frame_room, params.GRID_MAX_DIM);
     if (auto lay = frame_room->layout())
         lay->addWidget(viewer_room);
@@ -98,24 +179,55 @@ void SpecificWorker::initialize()
     viewer_room->scene.setSceneRect(params.GRID_MAX_DIM);
     viewer_room->fitInView(params.GRID_MAX_DIM, Qt::KeepAspectRatio);
 
-    // dibujar sala nominal 0
-    viewer_room->scene.addRect(nominal_rooms[0].rect(), QPen(Qt::black, 30));
-
     // robot en viewer_room
-    auto [rr, re] = viewer_room->add_robot(params.ROBOT_WIDTH,
+    {
+        auto [rr, re] = viewer_room->add_robot(params.ROBOT_WIDTH,
                                                params.ROBOT_LENGTH,
                                                0, 100, QColor("Blue"));
-    robot_room_draw = rr;
-
+        robot_room_draw = rr;
+    }
 
     // mostrar UI
     show();
 
+    // =========================
     // 3) Pose inicial del robot
+    // =========================
     robot_pose.setIdentity();
     robot_pose.translate(Eigen::Vector2d(0.0, 0.0));
 
-    // 4) TimeSeriesPlotter
+    // =========================
+    // 4) Detectar sala inicial
+    // =========================
+    {
+        auto init_points = read_data();
+        if (!init_points.empty())
+        {
+            const auto &[init_corners, init_lines] =
+                room_detector.compute_corners(init_points, &viewer->scene);
+
+            auto res = find_best_room(init_corners,
+                                      nominal_rooms,
+                                      hungarian,
+                                      robot_pose);
+            if (res.room_idx >= 0)
+            {
+                current_room_idx = res.room_idx;
+                qInfo() << "INITIAL ROOM DETECTED:" << current_room_idx;
+            }
+            else
+                current_room_idx = 0;
+        }
+        else
+            current_room_idx = 0;
+
+        // Dibujar la sala escogida
+        update_room_rect(viewer_room, nominal_rooms);
+    }
+
+    // =========================
+    // 5) TimeSeriesPlotter
+    // =========================
     TimeSeriesPlotter::Config plotConfig;
     plotConfig.title             = "Maximum Match Error Over Time";
     plotConfig.yAxisLabel        = "Error (mm)";
@@ -127,7 +239,9 @@ void SpecificWorker::initialize()
     time_series_plotter = std::make_unique<TimeSeriesPlotter>(frame_plot_error, plotConfig);
     match_error_graph   = time_series_plotter->addGraph("", Qt::blue);
 
-    // 5) Parar el robot
+    // =========================
+    // 6) Parar el robot
+    // =========================
     move_robot(0.f, 0.f, 0.f);
 }
 
@@ -138,25 +252,24 @@ void SpecificWorker::compute()
     if (data.empty())
         return;
 
-    // 2) Esquinas
+    // 2) Esquinas + centro
     const auto &[corners, lines] = room_detector.compute_corners(data, &viewer->scene);
 
-    // Centro SOLO se usa/visualiza en la primera habitación
     std::optional<Eigen::Vector2d> center_opt;
-    if (!crossed_door)
-        center_opt = room_detector.estimate_center_from_walls(lines);
 
+    // Calculamos y dibujamos el centro SIEMPRE
+    center_opt = room_detector.estimate_center_from_walls(lines);
     draw_lidar(data, center_opt, &viewer->scene);
 
-    // 3) Matching nominal vs medido (nominal en frame ROBOT)
+    // 3) Matching SOLO con la sala actual
     const auto nominal_in_robot =
-        nominal_rooms[0].transform_corners_to(robot_pose.inverse());
+        nominal_rooms[current_room_idx].transform_corners_to(robot_pose.inverse());
 
-    const Match match = hungarian.match(corners, nominal_in_robot);
+    Match match = hungarian.match(corners, nominal_in_robot);
 
     // 4) Max match error
     float max_match_error = 99999.f;
-    if (not match.empty())
+    if (!match.empty())
     {
         auto max_it = std::max_element(
             match.begin(), match.end(),
@@ -168,21 +281,24 @@ void SpecificWorker::compute()
             time_series_plotter->addDataPoint(match_error_graph, max_match_error);
     }
 
-    // 5) Localised
+    // 5) Localised: nº de matches y error
     localised = (match.size() >= 3 && max_match_error < params.RELOCAL_DONE_MATCH_MAX_ERROR);
 
     // 6) Actualizar pose si estamos localizados (cuando implementes update_robot_pose)
     if (localised)
         update_robot_pose(corners, match);
 
-    // 7) Máquina de estados
+    // 7) FSM -> decide velocidades
     auto [st, adv, rot] = process_state(data, corners, lines, match, viewer);
     state = st;
 
-    // 8) Enviar comandos al robot
+    // 8) Enviar comandos al robot (y actualizar odometría / pose)
     move_robot(adv, rot, max_match_error);
 
-    // 9) Dibujar robot en viewer_room con la pose estimada
+    // 9) Actualizar panel de debug (X, Y, ángulo, velocidades, estado)
+    update_debug_panel(adv, rot);
+
+    // 10) Dibujar robot en viewer_room con la pose estimada
     robot_room_draw->setPos(robot_pose.translation().x(),
                             robot_pose.translation().y());
 
@@ -193,11 +309,15 @@ void SpecificWorker::compute()
     // 10) Actualizar GUI
     if (time_series_plotter)
         time_series_plotter->update();
-
-    last_time = std::chrono::high_resolution_clock::now();
 }
 
+
+
+
+// =======================
 // LECTURA LIDAR + FILTROS
+// =======================
+
 RoboCompLidar3D::TPoints SpecificWorker::read_data()
 {
     RoboCompLidar3D::TPoints points;
@@ -220,11 +340,13 @@ RoboCompLidar3D::TPoints SpecificWorker::read_data()
     // 2) De momento, no hacemos filtro de aislados agresivo
     points = filter_isolated_points(points, 200.f);
 
-   // 3) MUY IMPORTANTE: filtrar por puerta
+    // 3) MUY IMPORTANTE: filtrar por puerta igual que ellos
     points = door_detector.filter_points(points, &viewer->scene);
 
     return points;
 }
+
+
 
 RoboCompLidar3D::TPoints
 SpecificWorker::filter_same_phi(const RoboCompLidar3D::TPoints &points)
@@ -256,7 +378,10 @@ SpecificWorker::filter_isolated_points(const RoboCompLidar3D::TPoints &points, f
     return points;
 }
 
+// =======================
 // DIBUJO LIDAR
+// =======================
+
 void SpecificWorker::draw_lidar(const RoboCompLidar3D::TPoints &points,
                                 std::optional<Eigen::Vector2d> center,
                                 QGraphicsScene *scene)
@@ -294,7 +419,9 @@ void SpecificWorker::draw_lidar(const RoboCompLidar3D::TPoints &points,
     }
 }
 
+// =======================
 // STATE MACHINE (stubs)
+// =======================
 SpecificWorker::RetVal
 SpecificWorker::process_state(const RoboCompLidar3D::TPoints &data,
                               const Corners &corners,
@@ -316,7 +443,7 @@ SpecificWorker::process_state(const RoboCompLidar3D::TPoints &data,
         return turn(corners);
 
     case STATE::CROSS_DOOR:
-        return cross_door(data);
+        return cross_door(data);      // <-- NUEVO
 
     case STATE::IDLE:
         return {STATE::IDLE, 0.f, 0.f};
@@ -330,15 +457,54 @@ SpecificWorker::process_state(const RoboCompLidar3D::TPoints &data,
 SpecificWorker::RetVal
 SpecificWorker::goto_door(const RoboCompLidar3D::TPoints &points)
 {
-    Q_UNUSED(points);
-    return {STATE::GOTO_DOOR, 0.f, 0.f};
+    Q_UNUSED(points);  // La puerta ya se detecta en read_data -> filter_points -> detect
+
+    auto door_exp = door_detector.get_current_door();
+    if (!door_exp.has_value())
+    {
+        // No hay puerta en el cache → seguir girando en el sitio
+        qInfo() << "GOTO_DOOR: NO DOOR in cache -> rotating in place";
+        float adv = 0.f;
+        float rot = 0.3f;
+        return {STATE::GOTO_DOOR, adv, rot};
+    }
+
+    const Door &d = door_exp.value();
+    Eigen::Vector2f center = d.center();        // coordenadas en frame robot
+    float dist  = center.norm();
+    float angle = std::atan2(center.x(), center.y());  // x lateral, y hacia delante
+
+    // Parámetros
+    const float angle_tol = 0.05f;                 // ~3 grados
+    float adv = 0.f;
+    float rot = 0.f;
+
+    // Si ya estamos alineados: parar mirando a la puerta
+    if (std::abs(angle) < angle_tol)
+    {
+        qInfo() << "GOTO_DOOR: ALIGNED with door. dist:" << dist
+                << " angle:" << angle;
+        return {STATE::IDLE, 0.f, 0.f};
+    }
+
+    // Si no, girar proporcionalmente hacia el centro de la puerta
+    rot = 0.8f * angle;
+    rot = std::clamp(rot, -params.RELOCAL_ROT_SPEED, params.RELOCAL_ROT_SPEED);
+    adv = 0.f;
+
+    qInfo() << "GOTO_DOOR: rotating toward door."
+            << " angle:" << angle
+            << " dist:"  << dist
+            << " rot:"   << rot;
+
+    return {STATE::GOTO_DOOR, adv, rot};
 }
 
 SpecificWorker::RetVal
 SpecificWorker::orient_to_door(const RoboCompLidar3D::TPoints &points)
 {
     Q_UNUSED(points);
-    return {STATE::IDLE, 0.f, 0.f};
+    return {STATE::IDLE, 0.f, 0.f};   // este estado ni se usa ya
 }
 
 SpecificWorker::RetVal
@@ -355,30 +521,48 @@ SpecificWorker::cross_door(const RoboCompLidar3D::TPoints &points)
                 << door_travel_target_mm;
     }
 
-    // Tiempo y distancia recorrida aprox
     auto  now         = std::chrono::high_resolution_clock::now();
     float elapsed_sec = std::chrono::duration_cast<std::chrono::milliseconds>(
                             now - cross_door_start).count() / 1000.f;
+
+    // Distancia recorrida aproximada = velocidad * tiempo
     float travelled_mm = params.CROSS_DOOR_SPEED * elapsed_sec;
 
     // Mientras no hayamos llegado a la distancia objetivo, avanzamos recto
     if (travelled_mm < door_travel_target_mm)
     {
         float adv = params.CROSS_DOOR_SPEED;  // mm/s hacia delante
-        float rot = 0.f;                      // sin corrección aquí
+        float rot = 0.f;
         return {STATE::CROSS_DOOR, adv, rot};
     }
 
-    // Hemos recorrido suficiente: damos por cruzada la puerta
-    crossing_door = false;
-    crossed_door  = true;
+    // ==========================================================
+    // HEMOS CRUZADO LA PUERTA -> CAMBIO DE SALA
+    // ==========================================================
 
-    qInfo() << "CROSS_DOOR: finished crossing. travelled (mm):" << travelled_mm
-            << " -> switching to GOTO_ROOM_CENTER";
+    crossing_door       = false;
+    crossed_door        = false;
+    red_patch_detected  = false;
+    relocal_centered    = false;
+    localised           = false;
+    door_travel_target_mm = 0.f;
+
+    // Cambiamos de sala (solo hay 2, así que alternamos 0 <-> 1)
+    current_room_idx = (current_room_idx + 1) % nominal_rooms.size();
+    qInfo() << "CROSS_DOOR: room changed to" << current_room_idx;
+
+    // Resetear la pose relativa a la nueva sala
+    robot_pose.setIdentity();
+
+    // Redibujar el mapa de la sala nueva
+    update_room_rect(viewer_room, nominal_rooms);
+
+    qInfo() << "CROSS_DOOR: finished crossing. travelled (mm):"
+            << travelled_mm
+            << " -> restarting loop from GOTO_ROOM_CENTER";
 
     return {STATE::GOTO_ROOM_CENTER, 0.f, 0.f};
 }
-
 
 
 
@@ -398,7 +582,9 @@ SpecificWorker::goto_room_center(const RoboCompLidar3D::TPoints &points,
     // 1. Estimar centro de la habitación a partir de las paredes
     auto center_opt = room_detector.estimate_center_from_walls(lines);
 
+    // ===========================================================
     // 2. NO HAY CENTRO → girar sobre sí mismo, sin avanzar
+    // ===========================================================
     if (!center_opt.has_value())
     {
         float adv = 0.f;       // NO avanzar
@@ -454,119 +640,118 @@ SpecificWorker::goto_room_center(const RoboCompLidar3D::TPoints &points,
     return {STATE::GOTO_ROOM_CENTER, adv, vrot};
 }
 
+
+
 SpecificWorker::RetVal
 SpecificWorker::turn(const Corners &corners)
 {
     Q_UNUSED(corners);
 
-    auto doors = door_detector.doors();   // copia de doors_cache
+    // ============================
+    // FASE 1: BUSCAR PARCHE ROJO
+    // ============================
+    if (!red_patch_detected)
+    {
+        const auto [seen, spin] = rc::ImageProcessor::check_colour_patch_in_image(
+                                      camera360rgb_proxy,
+                                      QColor("red"),
+                                      nullptr,
+                                      1500);      // umbral píxeles rojos
 
-    const float angle_tol = 0.07f;   // ~4º de tolerancia, antes 0.10
+        Q_UNUSED(spin);  // NO usamos spin
+
+        if (!seen)
+        {
+            // Todavía no vemos el parche rojo -> girar SIEMPRE en el mismo sentido
+            float adv = 0.f;
+            float rot = 0.3f;   // siempre mismo signo
+
+            return {STATE::TURN, adv, rot};
+        }
+
+        // Aquí hemos visto el parche rojo centrado
+        red_patch_detected = true;
+        qInfo() << "TURN: RED PATCH DETECTED -> start looking for DOOR with LIDAR";
+        // seguimos en TURN pero entramos en la FASE 2 (LIDAR)
+    }
+
+    // ============================
+    // FASE 2: GIRAR HASTA TENER LA PUERTA DELANTE
+    // ============================
+    auto door_exp = door_detector.get_current_door();
+    const float angle_tol = 0.10f;   // ~6º de tolerancia
     float adv = 0.f;
-    float rot = 0.f;
+    float rot = 0.6f;                // SIEMPRE mismo sentido
 
-    if (doors.empty())
+    if (door_exp.has_value())
     {
-        rot = 0.3f;
-        qInfo() << "TURN: NO DOORS -> rotating in place";
-        return {STATE::TURN, adv, rot};
-    }
+        const Door &d = door_exp.value();
+        Eigen::Vector2f c = d.center();            // centro de la puerta en frame robot
+        float dist  = c.norm();
+        float angle = std::atan2(c.x(), c.y());    // x lateral, y hacia delante
 
-    if (current_target_door_index < 0 ||
-        current_target_door_index >= static_cast<int>(doors.size()))
-    {
-        int chosen = 0;
+        // Si ya estamos alineados con la puerta -> preparar cruce recto
+        if (std::abs(angle) < angle_tol)
+        {
+            // Queremos avanzar dist hasta la puerta + un extra para estar dentro de la segunda sala
+            const float extra_mm = 2000.f;  // 2 metros más allá de la puerta (ajusta a ojo)
+            door_travel_target_mm = dist + extra_mm;
 
-        if (doors.size() == 1)
-        {
-            chosen = 0;
-        }
-        else
-        {
-            if (last_door_used_index >= 0 &&
-                last_door_used_index < static_cast<int>(doors.size()))
-            {
-                if (doors.size() == 2)
-                    chosen = 1 - last_door_used_index;
-                else
-                    chosen = (last_door_used_index + 1) % static_cast<int>(doors.size());
-            }
-            else
-            {
-                std::mt19937 gen(rd());
-                std::uniform_int_distribution<int> dist(0, static_cast<int>(doors.size()) - 1);
-                chosen = dist(gen);
-            }
+            crossing_door   = false;   // para que cross_door se inicialice
+            crossed_door    = false;   // aún no la hemos cruzado completamente
+
+            qInfo() << "TURN: DOOR ALIGNED. dist:" << dist
+                    << " -> target travel (mm):" << door_travel_target_mm
+                    << " -> switching to CROSS_DOOR";
+
+            return {STATE::CROSS_DOOR, 0.f, 0.f};
         }
 
-        current_target_door_index = chosen;
-        qInfo() << "TURN: new target door index:" << current_target_door_index
-                << " last used:" << last_door_used_index
-                << " num doors:" << doors.size();
+        qInfo() << "TURN: rotating (door seen). angle:" << angle << " dist:" << dist;
     }
-
-    if (current_target_door_index < 0 ||
-        current_target_door_index >= static_cast<int>(doors.size()))
+    else
     {
-        rot = 0.3f;
-        qInfo() << "TURN: invalid target door index, rotating in place";
-        return {STATE::TURN, adv, rot};
+        qInfo() << "TURN: rotating (door NOT seen yet)";
     }
 
-    const Door &d = doors[current_target_door_index];
-
-    Eigen::Vector2f center = d.center();
-    float dist  = center.norm();
-    float angle = std::atan2(center.x(), center.y());
-
-    // 3) Alineado -> preparar cruce
-    if (std::abs(angle) < angle_tol)
-    {
-        const float extra_mm = 1200.f;                // un poco más conservador
-        door_travel_target_mm = dist + extra_mm;
-        door_travel_target_mm = std::min(door_travel_target_mm, 3500.f);  // límite por seguridad
-
-        crossing_door = false;
-        crossed_door  = false;
-
-        last_door_used_index      = current_target_door_index;
-        current_target_door_index = -1;
-
-        qInfo() << "TURN: DOOR ALIGNED. dist:" << dist
-                << " -> target travel (mm):" << door_travel_target_mm
-                << " -> switching to CROSS_DOOR"
-                << " (door index:" << last_door_used_index << ")";
-
-        return {STATE::CROSS_DOOR, 0.f, 0.f};
-    }
-
-    // 4) No alineado todavía -> girar hacia la puerta elegida
-    rot = 0.8f * angle;
-    rot = std::clamp(rot, -params.RELOCAL_ROT_SPEED, params.RELOCAL_ROT_SPEED);
-    adv = 0.f;
-
-    qInfo() << "TURN: rotating toward door index" << current_target_door_index
-            << " angle:" << angle
-            << " dist:"  << dist
-            << " rot:"   << rot;
-
+    // Mientras no esté alineado: seguir girando siempre igual
     return {STATE::TURN, adv, rot};
 }
 
-
-
+// =======================
 // AUXILIARES VARIOS
+// =======================
 SpecificWorker::RetVal
 SpecificWorker::update_pose(const Corners &corners, const Match &match)
 {
     Q_UNUSED(corners);
     Q_UNUSED(match);
+
     return {STATE::UPDATE_POSE, 0.f, 0.f};
 }
+
 std::expected<int, std::string>
 SpecificWorker::closest_lidar_index_to_given_angle(const auto &points, float angle)
 {
+    if (points.empty())
+        return std::unexpected("No points");
+
     int   best_idx   = -1;
+    float best_error = std::numeric_limits<float>::infinity();
+
+    for (size_t i = 0; i < points.size(); ++i)
+    {
+        float err = std::abs(points[i].phi - angle);
+        if (err < best_error)
+        {
+            best_error = err;
+            best_idx   = static_cast<int>(i);
+        }
+    }
+
+    if (best_idx == -1)
+        return std::unexpected("No valid index");
+
     return best_idx;
 }
 
@@ -576,7 +761,10 @@ void SpecificWorker::print_match(const Match &match, float error) const
     Q_UNUSED(match);
 }
 
+// =======================
 // POSE / CONTROL
+// =======================
+
 bool SpecificWorker::update_robot_pose(const Corners &corners, const Match &match)
 {
     Q_UNUSED(corners);
@@ -597,18 +785,74 @@ void SpecificWorker::predict_robot_pose()
 {
     // Stub: no hacemos predicción todavía
 }
+
 std::tuple<float, float>
 SpecificWorker::robot_controller(const Eigen::Vector2f &target)
 {
-    return {0.f, 0.f};
+    // target en frame robot: x hacia adelante, y hacia la izquierda
+    const float tx = target.x();
+    const float ty = target.y();
+
+    const float dist  = std::sqrt(tx*tx + ty*ty);
+    if (dist < 1e-3f)
+        return {0.f, 0.f};
+
+    const float angle = std::atan2(ty, tx);   // ángulo hacia el centro
+
+    // Si estamos ya dentro del radio de tolerancia del centro → parar
+    if (dist < params.RELOCAL_CENTER_EPS)
+        return {0.f, 0.f};
+
+    // Caso especial: el centro está claramente DETRÁS del robot
+    if (std::cos(angle) < 0.f)
+    {
+        float rot = (angle > 0.f ? 1.f : -1.f) * params.RELOCAL_ROT_SPEED;
+        return {0.f, rot};
+    }
+
+    const float k_w = 1.0f;
+    float rot = k_w * angle;
+    rot = std::clamp(rot, -params.RELOCAL_ROT_SPEED, params.RELOCAL_ROT_SPEED);
+
+    const float max_adv = params.RELOCAL_MAX_ADV;   // típico: 300 mm/s
+
+    const float sigma = static_cast<float>(M_PI) / 4.f;  // 45 grados
+    const float angle2 = angle * angle;
+    float brake = std::exp(- angle2 / (2.f * sigma * sigma));  // entre 0 y 1
+
+    float adv = max_adv * brake;
+
+    return {adv, rot};
 }
 
 void SpecificWorker::move_robot(float adv, float rot, float max_match_error)
 {
     Q_UNUSED(max_match_error);
 
-    // Guardar en el buffer (por si luego quieres trazar velocidades)
+    // ============================
+    // 1) ODOMETRÍA SIMPLE
+    // ============================
     auto now = std::chrono::high_resolution_clock::now();
+    float dt = std::chrono::duration_cast<std::chrono::milliseconds>(
+                   now - last_time).count() / 1000.f;
+
+    if (dt < 0.f || dt > 1.f)
+        dt = 0.f;
+
+    double d      = static_cast<double>(adv) * dt;   // mm
+    double dtheta = static_cast<double>(rot) * dt;   // rad
+
+    // Avance en eje "hacia delante" del robot (y)
+    Eigen::Affine2d delta = Eigen::Affine2d::Identity();
+    delta.translate(Eigen::Vector2d(0.0, d));
+    delta.rotate(dtheta);
+
+    // robot_pose: transformación ROBOT -> SALA NOMINAL
+    robot_pose = robot_pose * delta;
+
+    // ============================
+    // 2) GUARDAR COMANDO
+    // ============================
     long ms  = std::chrono::duration_cast<std::chrono::milliseconds>(
                    now.time_since_epoch())
                .count();
@@ -616,7 +860,9 @@ void SpecificWorker::move_robot(float adv, float rot, float max_match_error)
     commands_buffer.put(std::move(cmd));
     last_velocities = cmd;
 
-    // Enviar al robot
+    // ============================
+    // 3) ENVIAR A LA BASE
+    // ============================
     try
     {
         omnirobot_proxy->setSpeedBase(0.f, adv, rot);
@@ -625,9 +871,49 @@ void SpecificWorker::move_robot(float adv, float rot, float max_match_error)
     {
         qWarning() << "[OmniRobot] setSpeedBase error:" << e.what();
     }
+
+    // actualizar referencia temporal para la próxima odometría
+    last_time = now;
 }
 
+void SpecificWorker::update_debug_panel(float adv, float rot)
+{
+    // Pose actual en el sistema de la sala
+    const double x = robot_pose.translation().x();
+    const double y = robot_pose.translation().y();
+
+    const double angle_rad = std::atan2(
+        robot_pose.linear()(1, 0),
+        robot_pose.linear()(0, 0));
+    const double angle_deg = qRadiansToDegrees(angle_rad);
+
+    // ==== X, Y, ANGLE ====
+    if (auto lcdX = this->findChild<QLCDNumber*>("lcdNumber_x"))
+        lcdX->display(x);              // mm
+
+    if (auto lcdY = this->findChild<QLCDNumber*>("lcdNumber_y"))
+        lcdY->display(y);              // mm
+
+    if (auto lcdAngle = this->findChild<QLCDNumber*>("lcdNumber_angle"))
+        lcdAngle->display(angle_deg);  // grados
+
+    // ==== ADV, ROT ====
+    if (auto lcdAdv = this->findChild<QLCDNumber*>("lcdNumber_adv"))
+        lcdAdv->display(adv);          // mm/s (o lo que estés usando)
+
+    if (auto lcdRot = this->findChild<QLCDNumber*>("lcdNumber_rot"))
+        lcdRot->display(rot);          // rad/s
+
+    // ==== Estado de la FSM (label a la derecha de "state:") ====
+    if (auto lblState = this->findChild<QLabel*>("label_state"))
+        lblState->setText(QString::fromLatin1(to_string(state)));
+}
+
+
+
+// =======================
 // EMERGENCIA / RESTORE / STARTUP
+// =======================
 
 void SpecificWorker::emergency()
 {
@@ -646,43 +932,4 @@ int SpecificWorker::startup_check()
     return 0;
 }
 
-/**************************************/
-// From the RoboCompCamera360RGB you can call this methods:
-// RoboCompCamera360RGB::TImage this->camera360rgb_proxy->getROI(int cx, int cy, int sx, int sy, int roiwidth, int roiheight)
-
-/**************************************/
-// From the RoboCompCamera360RGB you can use this types:
-// RoboCompCamera360RGB::TRoi
-// RoboCompCamera360RGB::TImage
-
-/**************************************/
-// From the RoboCompLidar3D you can call this methods:
-// RoboCompLidar3D::TColorCloudData this->lidar3d_proxy->getColorCloudData()
-// RoboCompLidar3D::TData this->lidar3d_proxy->getLidarData(string name, float start, float len, int decimationDegreeFactor)
-// RoboCompLidar3D::TDataImage this->lidar3d_proxy->getLidarDataArrayProyectedInImage(string name)
-// RoboCompLidar3D::TDataCategory this->lidar3d_proxy->getLidarDataByCategory(TCategories categories, long timestamp)
-// RoboCompLidar3D::TData this->lidar3d_proxy->getLidarDataProyectedInImage(string name)
-// RoboCompLidar3D::TData this->lidar3d_proxy->getLidarDataWithThreshold2d(string name, float distance, int decimationDegreeFactor)
-
-/**************************************/
-// From the RoboCompLidar3D you can use this types:
-// RoboCompLidar3D::TPoint
-// RoboCompLidar3D::TDataImage
-// RoboCompLidar3D::TData
-// RoboCompLidar3D::TDataCategory
-// RoboCompLidar3D::TColorCloudData
-
-/**************************************/
-// From the RoboCompOmniRobot you can call this methods:
-// RoboCompOmniRobot::void this->omnirobot_proxy->correctOdometer(int x, int z, float alpha)
-// RoboCompOmniRobot::void this->omnirobot_proxy->getBasePose(int x, int z, float alpha)
-// RoboCompOmniRobot::void this->omnirobot_proxy->getBaseState(RoboCompGenericBase::TBaseState state)
-// RoboCompOmniRobot::void this->omnirobot_proxy->resetOdometer()
-// RoboCompOmniRobot::void this->omnirobot_proxy->setOdometer(RoboCompGenericBase::TBaseState state)
-// RoboCompOmniRobot::void this->omnirobot_proxy->setOdometerPose(int x, int z, float alpha)
-// RoboCompOmniRobot::void this->omnirobot_proxy->setSpeedBase(float advx, float advz, float rot)
-// RoboCompOmniRobot::void this->omnirobot_proxy->stopBase()
-
-/**************************************/
-// From the RoboCompOmniRobot you can use this types:
-// RoboCompOmniRobot::TMechParams
+//borrar
