@@ -1,0 +1,13 @@
+module RoboCompMNIST
+{
+    struct MNISTResult
+    {
+        int digit;        // 0-9, or -1 if no digit detected
+        float confidence; // confidence in [0,1]
+    };
+
+    interface MNIST
+    {
+        MNISTResult get_number();
+    };
+};
