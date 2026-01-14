@@ -29,6 +29,8 @@
 SpecificWorker::SpecificWorker(const ConfigLoader& configLoader, TuplePrx tprx, bool startup_check)
     : GenericWorker(configLoader, tprx)
 {
+    turn_start_time = std::chrono::high_resolution_clock::now();
+    last_mnist_check = std::chrono::high_resolution_clock::now();
     // Si `startup_check` está activo, RoboComp lanza el componente en modo “comprobación”
     // (no arranca el bucle normal; sirve para testear que carga config, proxies, etc.).
     this->startup_check_flag = startup_check;
@@ -235,18 +237,12 @@ void SpecificWorker::compute()
         max_match_error = static_cast<float>(std::get<2>(*max_it));
 
         // DEBUG: imprimir tamaño del match y error
+		/*
         qInfo() << "[MATCH]"
                 << "room:" << current_room_idx
                 << "match.size:" << static_cast<int>(match.size())
                 << "max_match_error:" << max_match_error;
-
-        if (!match.empty())
-        {
-            const float e = static_cast<float>(std::get<2>(match.front()));
-            qInfo() << "[MATCH-ONE] e:" << e << " sqrt(e):" << std::sqrt(e);
-        }
-
-
+		*/
 
         // Se añade un punto al plot (error vs tiempo) para debug/estabilidad.
         if (time_series_plotter)
@@ -299,7 +295,7 @@ RoboCompLidar3D::TPoints SpecificWorker::read_data()
 
     try
     {
-        auto data = lidar3d_proxy->getLidarDataWithThreshold2d(params.LIDAR_NAME_HIGH, 12000, 1);
+        const auto data = lidar3d_proxy->getLidarDataWithThreshold2d(params.LIDAR_NAME_HIGH, 12000, 1);
         points = data.points;
     }
     catch (const Ice::Exception& e)
@@ -493,6 +489,7 @@ SpecificWorker::RetVal SpecificWorker::process_state(const RoboCompLidar3D::TPoi
     switch (state)
     {
         case STATE::LOCALISE:
+			return localise(lines);
         case STATE::GOTO_ROOM_CENTER:
             return goto_room_center(data, lines);
 
@@ -523,101 +520,129 @@ SpecificWorker::RetVal SpecificWorker::process_state(const RoboCompLidar3D::TPoi
 // =======================
 
 // LOCALISE: en este snippet no se usa “de verdad”, se deja stub.
-SpecificWorker::RetVal SpecificWorker::localise(const Match& match)
+SpecificWorker::RetVal
+SpecificWorker::localise(const Lines& lines)
 {
-    Q_UNUSED(match);
-    return {STATE::LOCALISE, 0.f, 0.f};
+    using clock = std::chrono::high_resolution_clock;
+    auto now = clock::now();
+
+    constexpr int NO_CENTER_ROTATE_MS = 1000;
+
+    static bool first_time = true;
+
+    if (first_time)
+    {
+        qInfo() << "[LOCALISE] Entering LOCALISE: searching room center";
+        first_time = false;
+    }
+
+    auto center_opt = room_detector.estimate_center_from_walls(lines);
+
+    // ======================================================
+    // 1) NO HAY CENTRO → BUSCAR GIRANDO
+    // ======================================================
+    if (!center_opt.has_value())
+    {
+        if (!rotating_to_find_center)
+        {
+            rotating_to_find_center = true;
+            no_center_start_time = now;
+
+            qInfo() << "[LOCALISE] No center detected -> start rotating";
+        }
+
+        auto elapsed =
+            std::chrono::duration_cast<std::chrono::milliseconds>(
+                now - no_center_start_time).count();
+
+        if (elapsed < NO_CENTER_ROTATE_MS)
+        {
+            return {STATE::LOCALISE, 0.f, 0.35f};
+        }
+
+        rotating_to_find_center = false;
+        return {STATE::LOCALISE, 0.f, 0.35f};
+    }
+
+    // ======================================================
+    // 2) HAY CENTRO → PASAMOS A GOTO_ROOM_CENTER
+    // ======================================================
+    rotating_to_find_center = false;
+
+    qInfo() << "[LOCALISE] Center detected -> GOTO_ROOM_CENTER";
+
+    first_time = true;
+    return {STATE::GOTO_ROOM_CENTER, 0.f, 0.f};
 }
 
-// GOTO_ROOM_CENTER:
-//  - intenta estimar el centro con líneas (paredes)
-//  - si no hay centro: gira para “barrer” la geometría
-//  - si hay centro: se aproxima con control proporcional + freno por ángulo
-SpecificWorker::RetVal SpecificWorker::goto_room_center(const RoboCompLidar3D::TPoints& points,
-                                                        const Lines& lines)
+
+// ============================================================================
+// GOTO_ROOM_CENTER
+// ============================================================================
+
+SpecificWorker::RetVal
+SpecificWorker::goto_room_center(const RoboCompLidar3D::TPoints& points,
+                                 const Lines& lines)
 {
     Q_UNUSED(points);
 
-    // 1) Estimar centro de la habitación a partir de paredes
-    auto center_opt = room_detector.estimate_center_from_walls(lines);
+    using clock = std::chrono::high_resolution_clock;
 
-    // 2) NO HAY CENTRO -> girar sobre sí mismo, sin avanzar
+    auto center_opt = room_detector.estimate_center_from_walls(lines);
     if (!center_opt.has_value())
     {
-        float adv = 0.f;       // no avanzar
-        float rot = 0.35f;     // girar constante para “encontrar” estructura
-        qInfo() << "GOTO_ROOM_CENTER: no center, rotating to find geometry";
-        return {STATE::GOTO_ROOM_CENTER, adv, rot};
+        // Seguridad: si se pierde el centro, volvemos a LOCALISE
+        return {STATE::LOCALISE, 0.f, 0.f};
     }
 
-    // 3) Convertir centro (en frame del robot para este flujo) a variables simples
-    Eigen::Vector2d c_world = center_opt.value();
-    float cx = static_cast<float>(c_world.x());   // lateral
-    float cy = static_cast<float>(c_world.y());   // hacia delante
+    Eigen::Vector2d c = center_opt.value();
+    float cx = c.x();
+    float cy = c.y();
+    float dist = std::hypot(cx, cy);
 
-    // 4) Dibujar el centro en el viewer (debug)
-    static QGraphicsEllipseItem* item = nullptr;
-    if (item != nullptr)
-    {
-        viewer->scene.removeItem(item);
-        delete item;
-    }
-
-    item = viewer->scene.addEllipse(-100, -100, 200, 200,
-                                    QPen(Qt::red, 3),
-                                    QBrush(Qt::red, Qt::SolidPattern));
-    item->setPos(c_world.x(), c_world.y());
-
-    // 5) Distancia al centro
-    float dist = std::sqrt(cx * cx + cy * cy);
-
-
-    // 6. Si ya está en el centro → snap al centro nominal y pasar al siguiente estado
-
+    // ======================================================
+    // 3) YA ESTÁ EN EL CENTRO
+    // ======================================================
     if (dist < params.RELOCAL_CENTER_EPS)
     {
         relocal_centered = true;
 
-        // Centro geométrico de la sala nominal
         const QRectF r = nominal_rooms[current_room_idx].rect().normalized();
-        const Eigen::Vector2d nominal_center(r.center().x(), r.center().y());
+        robot_pose.translation() =
+            Eigen::Vector2d(r.center().x(), r.center().y());
 
-        // SNAP: fuerza la pose al centro nominal
-        robot_pose.translation() = nominal_center;
+        qInfo() << "GOTO_ROOM_CENTER: reached -> TURN";
 
-        // (Opcional) si quieres dejar el robot "recto" al centrar:
-        // robot_pose.linear() = Eigen::Rotation2Dd(0.0).toRotationMatrix();
+        turn_start_time = clock::now();
+        number_read_in_this_wall = false;
 
-        qInfo() << "GOTO_ROOM_CENTER: reached -> SNAP to nominal center -> GOTO_DOOR";
-
-        // 🔥 IMPORTANTE: NO ir a TURN, sino a GOTO_DOOR
-        return {STATE::GOTO_DOOR, 0.f, 0.f};
+        return {STATE::TURN, 0.f, 0.f};
     }
 
-
-
-    // 7) Ángulo hacia el centro.
-    // Convención (en tu código): atan2(x_lateral, y_forward)
+    // ======================================================
+    // 4) CONTROL NORMAL HACIA EL CENTRO
+    // ======================================================
     float angle = std::atan2(cx, cy);
+    float rot   = 0.5f * angle;
 
-    // 8) Control proporcional de giro
-    float k_rot = 0.5f;
-    float vrot = k_rot * angle;
+    float brake = std::exp(-(angle * angle) / (M_PI / 10.f));
+    float adv   = params.RELOCAL_MAX_ADV * brake;
 
-    // 9) Freno gaussiano: si el ángulo es grande, reduce avance para no “hacer drift”.
-    float brake = std::exp(-(angle * angle) / (static_cast<float>(M_PI) / 10.f));
-    float adv = params.RELOCAL_MAX_ADV * brake;
-
-    qInfo() << "CENTER:" << cx << cy << "dist:" << dist << "adv:" << adv << "vrot:" << vrot;
-    return {STATE::GOTO_ROOM_CENTER, adv, vrot};
+    return {STATE::GOTO_ROOM_CENTER, adv, rot};
 }
+
+
+
+
+
 
 // GOTO_DOOR:
 //  - detecta puertas
-//  - elige puerta según `next_use_left` (alternar izq/der)
+//  - elige puerta según next_use_left (alternar izq/der)
 //  - genera un “punto antes de la puerta” (pre-door) para colocarse bien
 //  - se aproxima con robot_controller() (control suave)
-SpecificWorker::RetVal SpecificWorker::goto_door(const RoboCompLidar3D::TPoints& points)
+SpecificWorker::RetVal
+SpecificWorker::goto_door(const RoboCompLidar3D::TPoints& points)
 {
     Q_UNUSED(points);
 
@@ -642,7 +667,7 @@ SpecificWorker::RetVal SpecificWorker::goto_door(const RoboCompLidar3D::TPoints&
         Eigen::Vector2f c = doors[i].center();
         float angle = std::atan2(c.x(), c.y());   // x lateral, y hacia delante
 
-        // Si quiero izquierda, angle > 0 (según tu convención: positivo = izquierda)
+        // Si quiero izquierda, angle > 0 (positivo = izquierda)
         if (next_use_left && angle <= 0.f) continue;
         if (!next_use_left && angle >= 0.f) continue;
 
@@ -676,7 +701,8 @@ SpecificWorker::RetVal SpecificWorker::goto_door(const RoboCompLidar3D::TPoints&
 
     // 2) Punto "antes de la puerta" en coordenadas robot
     // El 500.f suele ser “distancia hacia atrás” respecto al centro de la puerta.
-    Eigen::Vector2f target = target_door.center_before(Eigen::Vector2d::Zero(), 500.f);
+    Eigen::Vector2f target =
+        target_door.center_before(Eigen::Vector2d::Zero(), 500.f);
     float dist = target.norm();
 
     // Dibujar target en viewer (debug)
@@ -695,18 +721,21 @@ SpecificWorker::RetVal SpecificWorker::goto_door(const RoboCompLidar3D::TPoints&
     // 3) Si estamos suficientemente cerca del punto previo -> ORIENT_TO_DOOR
     if (dist < params.DOOR_REACHED_DIST)
     {
-        qInfo() << "GOTO_DOOR: pre-door point reached, dist:" << dist << " -> ORIENT_TO_DOOR";
+        qInfo() << "GOTO_DOOR: pre-door point reached, dist:"
+                << dist << " -> ORIENT_TO_DOOR";
         return {STATE::ORIENT_TO_DOOR, 0.f, 0.f};
     }
 
     // 4) Aproximación suave (arco) con controlador
     auto [adv, rot] = robot_controller(target);
 
+    /*
     qInfo() << "GOTO_DOOR: chosen door idx:" << chosen
             << " target:" << target.x() << target.y()
             << " dist:" << dist
             << " adv:" << adv
             << " rot:" << rot;
+    */
 
     return {STATE::GOTO_DOOR, adv, rot};
 }
@@ -763,7 +792,7 @@ SpecificWorker::RetVal SpecificWorker::orient_to_door(const RoboCompLidar3D::TPo
     float rot = (best_angle > 0.f ? 1.f : -1.f) * params.RELOCAL_ROT_SPEED / 2.f;
     float adv = 0.f;
 
-    qInfo() << "ORIENT_TO_DOOR: correcting angle:" << best_angle << " rot:" << rot;
+    //qInfo() << "ORIENT_TO_DOOR: correcting angle:" << best_angle << " rot:" << rot;
     return {STATE::ORIENT_TO_DOOR, adv, rot};
 }
 
@@ -804,6 +833,8 @@ SpecificWorker::RetVal SpecificWorker::cross_door(const RoboCompLidar3D::TPoints
         if (!nominal_rooms.empty())
         {
             current_room_idx = (current_room_idx + 1) % nominal_rooms.size();
+			mnist_checked_in_this_room = false;
+			number_read_in_this_wall = false;
             qInfo() << "CROSS_DOOR: room changed to" << current_room_idx;
 
             // (Opcional pero recomendable) reset de pose relativa a la nueva sala
@@ -820,7 +851,7 @@ SpecificWorker::RetVal SpecificWorker::cross_door(const RoboCompLidar3D::TPoints
         qInfo() << "CROSS_DOOR: finished after" << ms << "ms"
                 << " -> GOTO_ROOM_CENTER. next_use_left:" << next_use_left;
 
-        return {STATE::GOTO_ROOM_CENTER, 0.f, 0.f};
+        return {STATE::LOCALISE, 0.f, 0.f};
     }
 
     // Seguir cruzando recto
@@ -828,28 +859,139 @@ SpecificWorker::RetVal SpecificWorker::cross_door(const RoboCompLidar3D::TPoints
 }
 
 
-// TURN (residual):
-//  - si no hay puertas: girar buscando
-//  - si hay puertas: gira suave (pero en tu pipeline normalmente no llega aquí)
-SpecificWorker::RetVal SpecificWorker::turn(const Corners& corners)
+// TURN:
+//  - gira sobre sí mismo
+//  - intenta leer MNIST durante un tiempo limitado
+//  - si detecta número válido → espera un margen y sale
+//  - si se acaba el tiempo → sale igualmente
+SpecificWorker::RetVal
+SpecificWorker::turn(const Corners& corners)
 {
     Q_UNUSED(corners);
 
-    Doors doors = door_detector.doors();
+    using clock = std::chrono::high_resolution_clock;
+    auto now = clock::now();
 
-    if (doors.empty())
+    constexpr int MAX_TURN_TIME_MS      = 8000;  // 8 segundos totales
+    constexpr int MNIST_CHECK_PERIOD_MS = 300;   // cada 300 ms
+    constexpr int POST_DETECT_MS        = 2000;  // seguir girando 2s tras detectar
+
+    // ======================================================
+    // 1) Inicialización del estado TURN (UNA SOLA VEZ)
+    // ======================================================
+    static bool initialized = false;
+    static bool number_detected = false;
+    static clock::time_point detect_time;
+
+    if (!initialized)
     {
-        float adv = 0.f;
-        float rot = 0.3f;
-        qInfo() << "TURN: no doors -> rotating";
-        return {STATE::TURN, adv, rot};
+        turn_start_time = now;
+        last_mnist_check = now;
+
+        last_detected_number = -1;
+        last_detected_confidence = 0.f;
+
+        number_read_in_this_wall = false;
+        number_detected = false;
+
+        initialized = true;
+
+        qInfo() << "[TURN] Entering TURN state, MNIST state reset";
     }
 
+    // ======================================================
+    // 2) ¿Se acabó el tiempo total de TURN?
+    // ======================================================
+    auto elapsed_turn =
+        std::chrono::duration_cast<std::chrono::milliseconds>(
+            now - turn_start_time).count();
+
+    if (elapsed_turn > MAX_TURN_TIME_MS)
+    {
+        qInfo() << "[TURN] Finished TURN by timeout in room"
+                << current_room_idx;
+
+        mnist_checked_in_this_room = true;
+        initialized = false;
+
+        return {STATE::GOTO_DOOR, 0.f, 0.f};
+    }
+
+    // ======================================================
+    // 3) Si ya detectamos número, esperar margen antes de salir
+    // ======================================================
+    if (number_detected)
+    {
+        auto elapsed_after_detect =
+            std::chrono::duration_cast<std::chrono::milliseconds>(
+                now - detect_time).count();
+
+        if (elapsed_after_detect > POST_DETECT_MS)
+        {
+            qInfo() << "[TURN] Leaving TURN after post-detection delay";
+
+            mnist_checked_in_this_room = true;
+            initialized = false;
+
+            return {STATE::GOTO_DOOR, 0.f, 0.f};
+        }
+    }
+    else
+    {
+        // ======================================================
+        // 4) Consultar MNIST de forma desacoplada en el tiempo
+        // ======================================================
+        auto elapsed_mnist =
+            std::chrono::duration_cast<std::chrono::milliseconds>(
+                now - last_mnist_check).count();
+
+        if (elapsed_mnist > MNIST_CHECK_PERIOD_MS)
+        {
+            last_mnist_check = now;
+
+            try
+            {
+                auto result = mnist_proxy->getNumber();
+
+                qInfo() << "[MNIST][RAW]"
+                        << "digit:" << result.digit
+                        << "confidence:" << result.confidence;
+
+                if (result.digit != -1 && result.confidence > 0.2f)
+                {
+                    last_detected_number = result.digit;
+                    last_detected_confidence = result.confidence;
+
+                    number_read_in_this_wall = true;
+                    number_detected = true;
+                    detect_time = now;
+
+                    qInfo() << "[MNIST] Room" << current_room_idx
+                            << "detected number:"
+                            << result.digit
+                            << "confidence:"
+                            << result.confidence;
+                }
+            }
+            catch (const Ice::Exception &e)
+            {
+                qWarning() << "[MNIST] Ice exception:" << e.what();
+            }
+        }
+    }
+
+    // ======================================================
+    // 5) Giro simple y estable
+    // ======================================================
     float adv = 0.f;
-    float rot = 0.2f;
-    qInfo() << "TURN: doors present but TURN unused in pipeline";
+    float rot = 0.35f;
+
     return {STATE::TURN, adv, rot};
 }
+
+
+
+
 
 // =======================
 // AUXILIARES VARIOS

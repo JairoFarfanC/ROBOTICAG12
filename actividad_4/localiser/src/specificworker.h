@@ -109,6 +109,16 @@ private:
     // Flag interno para saber si se arrancó en modo startup_check
     bool startup_check_flag;
 
+	bool mnist_checked_in_this_room = false;
+
+    std::chrono::high_resolution_clock::time_point turn_start_time;
+    std::chrono::high_resolution_clock::time_point last_mnist_check;
+
+	std::chrono::high_resolution_clock::time_point no_center_start_time;
+	bool rotating_to_find_center = false;
+
+
+
     // ============================
     // PARÁMETROS DEL ROBOT / MUNDO
     // ============================
@@ -196,6 +206,13 @@ private:
     // =============
     int current_room_idx = 0;
     QGraphicsRectItem *room_rect_draw = nullptr;
+
+    //Detección de números
+    int last_detected_number = -1;
+    float last_detected_confidence = 0.f;
+
+    // ===== Detección de números MNIST =====
+    bool number_read_in_this_wall = false;
 
     // Helpers para actualizar el mapa derecho
     void update_room_rect();
@@ -290,7 +307,7 @@ private:
     RetVal orient_to_door(const RoboCompLidar3D::TPoints& points);
     RetVal cross_door(const RoboCompLidar3D::TPoints& points);
 
-    RetVal localise(const Match& match);
+    RetVal localise(const Lines& lines);
     RetVal goto_room_center(const RoboCompLidar3D::TPoints& points, const Lines& lines);
     RetVal update_pose(const Corners& corners, const Match& match);
     RetVal turn(const Corners& corners);

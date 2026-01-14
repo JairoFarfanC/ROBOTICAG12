@@ -45,10 +45,17 @@
 #include <GenericBase.h>
 #include <Lidar3D.h>
 #include <OmniRobot.h>
+#include <MNIST.h>  // <-- AÑADIDO
 
 #define BASIC_PERIOD 100
 
-using TuplePrx = std::tuple<RoboCompCamera360RGB::Camera360RGBPrxPtr,RoboCompLidar3D::Lidar3DPrxPtr,RoboCompOmniRobot::OmniRobotPrxPtr>;
+// <-- ACTUALIZADO: ahora incluye MNIST
+using TuplePrx = std::tuple<
+    RoboCompCamera360RGB::Camera360RGBPrxPtr,
+    RoboCompLidar3D::Lidar3DPrxPtr,
+    RoboCompOmniRobot::OmniRobotPrxPtr,
+    RoboCompMNIST::MNISTPrxPtr
+>;
 
 
 class GenericWorker : public QWidget, public Ui_guiDlg
@@ -70,6 +77,7 @@ public:
 	RoboCompCamera360RGB::Camera360RGBPrxPtr camera360rgb_proxy;
 	RoboCompLidar3D::Lidar3DPrxPtr lidar3d_proxy;
 	RoboCompOmniRobot::OmniRobotPrxPtr omnirobot_proxy;
+	RoboCompMNIST::MNISTPrxPtr mnist_proxy;  // <-- AÑADIDO
 
 
 protected:

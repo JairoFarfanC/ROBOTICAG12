@@ -2,8 +2,9 @@
 Proxies.Lidar3D = "lidar3d:tcp -h localhost -p 11989"
 Proxies.OmniRobot = "omnirobot:tcp -h localhost -p 10004"
 Proxies.Camera360RGB = "camera360rgb:tcp -h localhost -p 10098"
+Proxies.MNIST = "mnist:tcp -h localhost -p 10111"
 
-
+Ice.Default.Timeout = 2000
 
 Period.Compute = 100
 Period.Emergency = 500

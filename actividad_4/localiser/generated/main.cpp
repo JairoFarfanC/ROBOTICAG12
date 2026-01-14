@@ -82,6 +82,7 @@
 #include <GenericBase.h>
 #include <Lidar3D.h>
 #include <OmniRobot.h>
+#include <MNIST.h>  // <-- AÑADIDO: incluir MNIST
 
 #define USE_QTGUI
 
@@ -125,7 +126,7 @@ private:
 	void initialize();
 	std::string prefix, configFile;
 	ConfigLoader configLoader;
-	TuplePrx tprx;
+	TuplePrx tprx;  // Esta tupla debe incluir MNIST en specificworker.h
 	bool startup_check_flag = false;
 
 public:
@@ -175,7 +176,7 @@ int localiser::run(int argc, char* argv[])
 	RoboCompCamera360RGB::Camera360RGBPrxPtr camera360rgb_proxy;
 	RoboCompLidar3D::Lidar3DPrxPtr lidar3d_proxy;
 	RoboCompOmniRobot::OmniRobotPrxPtr omnirobot_proxy;
-
+	RoboCompMNIST::MNISTPrxPtr mnist_proxy;  // <-- AÑADIDO
 
 	//Require code
 	require<RoboCompCamera360RGB::Camera360RGBPrx, RoboCompCamera360RGB::Camera360RGBPrxPtr>(communicator(),
@@ -184,8 +185,10 @@ int localiser::run(int argc, char* argv[])
 	                    configLoader.get<std::string>("Proxies.Lidar3D"), "Lidar3DProxy", lidar3d_proxy);
 	require<RoboCompOmniRobot::OmniRobotPrx, RoboCompOmniRobot::OmniRobotPrxPtr>(communicator(),
 	                    configLoader.get<std::string>("Proxies.OmniRobot"), "OmniRobotProxy", omnirobot_proxy);
+	require<RoboCompMNIST::MNISTPrx, RoboCompMNIST::MNISTPrxPtr>(communicator(),
+	                    configLoader.get<std::string>("Proxies.MNIST"), "MNISTProxy", mnist_proxy);  // <-- AÑADIDO
 
-	tprx = std::make_tuple(camera360rgb_proxy,lidar3d_proxy,omnirobot_proxy);
+	tprx = std::make_tuple(camera360rgb_proxy, lidar3d_proxy, omnirobot_proxy, mnist_proxy);  // <-- AÑADIDO mnist_proxy
 	SpecificWorker *worker = new SpecificWorker(this->configLoader, tprx, startup_check_flag);
 	QObject::connect(worker, SIGNAL(kill()), &a, SLOT(quit()));
 

@@ -3,7 +3,7 @@
 #include <QRectF>
 #include <Eigen/Dense>
 #include <vector>
-#include "src/common_types.h"
+#include "common_types.h"
 
   struct NominalRoom
         {
@@ -16,10 +16,10 @@
             {
                 // compute corners from width and length
                 return {
-                    {QPointF{-width/2.f, -length/2.f}, 0.f, 0.f},
-                    {QPointF{width/2.f, -length/2.f}, 0.f, 0.f},
+                    {QPointF{-width/2.f, length/2.f}, 0.f, 0.f},
                     {QPointF{width/2.f, length/2.f}, 0.f, 0.f},
-                    {QPointF{-width/2.f, length/2.f}, 0.f, 0.f}
+                    {QPointF{width/2.f, -length/2.f}, 0.f, 0.f},
+                    {QPointF{-width/2.f, -length/2.f}, 0.f, 0.f}
                 };
             }
             [[nodiscard]] QRectF rect() const
